@@ -15,14 +15,6 @@ Getting Started
 6. Search for <code>&nbsp;_s</code> (with a space before it) to capture DocBlocks (replace with <code>&nbsp;Themename</code>).
 7. Search for `_s-` to capture prefixed handles (replace with `themename-`).
 
-OR
-
-1. Search for: '_s' and replace with: 'megatherium'
-2. Search for: _s_ and replace with: megatherium_
-3. Search for: Text Domain: _s and replace with: Text Domain: megatherium in style.css.
-4. Search for:  _s and replace with:  Megatherium
-5. Search for: _s- and replace with: megatherium-
-
 Then, update the stylesheet header in `style.css` and the links in `footer.php` with your own information.
 
 

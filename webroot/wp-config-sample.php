@@ -54,6 +54,11 @@ define('NONCE_SALT',       'put your unique phrase here');
 /**#@-*/
 
 /**
+ * change the default theme
+ */
+define( 'WP_DEFAULT_THEME', '_s' );
+
+/**
  * WordPress Database Table prefix.
  *
  * You can have multiple installations in one database if you give each a unique
