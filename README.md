@@ -8,14 +8,15 @@ Theme based on [_s](https://github.com/Automattic/_s/).
 Getting Started
 ---------------
 1. Rename the theme to your theme's name.
-2. In main.js, do a search/replace for `_s` to change the namespace to your theme's name.
-3. Search for `'_s'` (inside single quotations) to capture the text domain (replace with `'themename'`).
-4. Search for `_s_` to capture all the function names (replace with `themename_`).
-5. Search for `Text Domain: _s` in style.css (replace with `Text Domain: themename`).
-6. Search for <code>&nbsp;_s</code> (with a space before it) to capture DocBlocks (replace with <code>&nbsp;Themename</code>).
-7. Search for `_s-` to capture prefixed handles (replace with `themename-`).
-8. Update the stylesheet header in `style.css` and the links in `footer.php` with your own information.
-9. Install WordPress.
+2. Rename the `WP_DEFAULT_THEME` variable in `wp-config.php` to your theme's name.
+3. In main.js, do a search/replace for `_s` to change the namespace to your theme's name.
+4. Search for `'_s'` (inside single quotations) to capture the text domain (replace with `'themename'`).
+5. Search for `_s_` to capture all the function names (replace with `themename_`).
+6. Search for `Text Domain: _s` in style.css (replace with `Text Domain: themename`).
+7. Search for <code>&nbsp;_s</code> (with a space before it) to capture DocBlocks (replace with <code>&nbsp;Themename</code>).
+8. Search for `_s-` to capture prefixed handles (replace with `themename-`).
+9. Update the stylesheet header in `style.css` and the links in `footer.php` with your own information.
+10. Install WordPress.
 
 **IMPORTANT: Make sure you are running the search and replace inside the theme directory, and NOT all od WordPress core.**
 
