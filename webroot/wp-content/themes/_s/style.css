@@ -247,6 +247,43 @@ textarea {
  * --layout
  * --------------------------------------------------------------*/
 
+/**
+ * CONTENT - SIDEBAR
+ */
+.content-area {
+ 	float: left;
+ 	margin: 0 -25% 0 0;
+ 	width: 100%;
+}
+.site-main {
+ 	margin: 0 25% 0 0;
+}
+.site-content .widget-area {
+	float: right;
+ 	overflow: hidden;
+ 	width: 25%;
+}
+
+/**
+ * SIDEBAR - CONTENT
+ */
+/*
+.content-area {
+	float: right;
+	margin: 0 0 0 -25%;
+	width: 100%;
+}
+.site-main {
+	margin: 0 0 0 25%;
+}
+.site-content .widget-area {
+	float: left;
+	overflow: hidden;
+	width: 25%;
+}
+
+*/
+
 
 
 /* ---------------------------------------------------------------
@@ -332,7 +369,10 @@ textarea {
 }
 
 /* --footer */
-
+.site-footer {
+	clear: both;
+	width: 100%;
+}
 
 /*--------------------------------------------------------------
  * --media

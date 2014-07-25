@@ -105,7 +105,7 @@ add_action( 'wp_enqueue_scripts', '_s_scripts' );
 /**
  * Implement the Custom Header feature.
  */
-//require get_template_directory() . '/inc/custom-header.php';
+require get_template_directory() . '/inc/custom-header.php';
 
 /**
  * Custom template tags for this theme.
@@ -122,7 +122,37 @@ require get_template_directory() . '/inc/extras.php';
  */
 require get_template_directory() . '/inc/customizer.php';
 
+
+/* --------------------------
+ * _s customizations
+ * -------------------------- */
+
+//
+// --structure
+//
+
 /**
- * Load Jetpack compatibility file.
+ * _s_modify_wysiwyg
+ * @param $init : the object that drives the wysiwyg
+ * @return the modified object that represents the wysiwyg
  */
-require get_template_directory() . '/inc/jetpack.php';
+function _s_modify_wysiwyg( $init ) {
+    $init['block_formats'] = 'Paragraph=p;Heading 3=h3';
+    return $init;
+}
+add_filter('tiny_mce_before_init', 'bkb_modify_wysiwyg');
+
+//
+// --functions
+//
+
+/**
+ * include_svg
+ * @param (string) svg : the svg to include
+ * 
+ * include an svg file inline into the theme
+ */
+function include_svg( $svg ){
+    include( get_template_directory() . '/svg/' . $svg . '.svg' );
+}
+
