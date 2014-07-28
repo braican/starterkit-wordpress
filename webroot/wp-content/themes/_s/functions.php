@@ -140,7 +140,7 @@ function _s_modify_wysiwyg( $init ) {
     $init['block_formats'] = 'Paragraph=p;Heading 3=h3';
     return $init;
 }
-add_filter('tiny_mce_before_init', 'bkb_modify_wysiwyg');
+add_filter('tiny_mce_before_init', '_s_modify_wysiwyg');
 
 //
 // --functions

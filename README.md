@@ -10,7 +10,7 @@ Getting Started
 1. Run the `rename.php` script: `php rename.php YOURTHEMENAME`.
 2. Copy the `wp-sample-config.php` and add the appropriate database credentials.
 3. Update the stylesheet header in `style.css` to reflect the proper information.
-4. Install WordPress
+4. Install WordPress.
 
 Manual Installation
 -------------------
