@@ -43,6 +43,7 @@ function replaceInTemplates($filename, $themename){
 
     $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
     $file = preg_replace("/_s_/", $themename . "_", $file);
+    $file = preg_replace("/._s/", "." . $themename, $file);
     $file = preg_replace("/ _s/", " " . ucfirst($themename), $file);
     $file = preg_replace("/_s-/", " " . $themename . "-", $file);
     $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $themename, $file);

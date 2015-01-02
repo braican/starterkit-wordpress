@@ -155,13 +155,10 @@ function _s_taxonomies(){
 add_action('init', '_s_taxonomies');
 
 
-/* --------------------------------------------
- * --_s customizations
- * -------------------------------------------- */
 
-//
-// --structure
-//
+/* --------------------------------------------
+ * --filters
+ * -------------------------------------------- */
 
 /**
  * _s_modify_wysiwyg
@@ -174,17 +171,24 @@ function _s_modify_wysiwyg( $init ) {
 }
 add_filter('tiny_mce_before_init', '_s_modify_wysiwyg');
 
-//
-// --functions
-//
+
+
+/* --------------------------------------------
+ * --util
+ * -------------------------------------------- */
 
 /**
  * include_svg
  * @param (string) svg : the svg to include
- * 
- * include an svg file inline into the theme
+ * @param $return : whether to return the svg as a string or simply include the svg
  */
-function include_svg( $svg ){
-    include( get_template_directory() . '/svg/' . $svg . '.svg' );
+function include_svg( $svg, $return = false ){
+    $svg_path = get_template_directory() . '/svg/' . $svg . '.svg';
+
+    if($return){
+        return file_get_contents($svg_path);
+    }
+
+    include( $svg_path );
 }
 
