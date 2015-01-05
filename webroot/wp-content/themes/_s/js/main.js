@@ -18,8 +18,8 @@
     // -------------------------------
     // DOM ready
     //
-    $(document).ready(){
+    $(document).ready(function(){
         _s.init();
-    }
+    });
 
 })(window._s = window._s || {}, jQuery);
