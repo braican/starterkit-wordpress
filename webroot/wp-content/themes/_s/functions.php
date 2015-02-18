@@ -124,7 +124,7 @@ require get_template_directory() . '/inc/customizer.php';
 
 
 /* --------------------------------------------
- * --_s content types and taxonomies
+ * --content types and taxonomies
  * -------------------------------------------- */
 
 /**
