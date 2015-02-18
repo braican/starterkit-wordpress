@@ -11,6 +11,7 @@ Getting Started
 2. Copy the `wp-sample-config.php` and add the appropriate database credentials.
 3. Update the stylesheet header in `style.css` to reflect the proper information.
 4. Install WordPress.
+5. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
 
 Manual Installation
 -------------------
