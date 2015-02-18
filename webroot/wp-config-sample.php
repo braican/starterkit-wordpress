@@ -53,6 +53,13 @@ define('NONCE_SALT',       'put your unique phrase here');
 
 /**#@-*/
 
+
+/**
+ * change the default theme
+ */
+define( 'WP_DEFAULT_THEME', '_s' );
+
+
 /**
  * WordPress Database Table prefix.
  *
