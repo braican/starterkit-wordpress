@@ -12,21 +12,19 @@ Tags:
 
  _s is based on Underscores http://underscores.me/, (C) 2012-2014 Automattic, Inc.
 
-Resetting and rebuilding styles have been helped along thanks to the fine work of
-Eric Meyer http://meyerweb.com/eric/tools/css/reset/index.html
-along with Nicolas Gallagher and Jonathan Neal http://necolas.github.com/normalize.css/
-and Blueprint http://www.blueprintcss.org/
 */
 
 
-/* -----------------------------------
- * --colors
- * ----------------------------------- */
+/* ==============================================================
+   --colors / fonts
+   ============================================================== */
 
 
-/* --------------------------------------------------------------
- * --reset
- * --------------------------------------------------------------*/
+
+/* ==============================================================
+   --reset
+   ============================================================== */
+
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -101,10 +99,38 @@ a:active {
 a img {
 	border: 0;
 }
+hr {
+	background-color: #ccc;
+	border: 0;
+	height: 1px;
+	margin-bottom: 1.5em;
+}
+dt {
+	font-weight: bold;
+}
+dd {
+	margin: 0 1.5em 1.5em;
+}
+img {
+	height: auto; /* Make sure images are scaled correctly. */
+	max-width: 100%; /* Adhere to container width. */
+}
+figure {
+	margin: 0;
+}
+table {
+	margin: 0 0 1.5em;
+	width: 100%;
+}
+th {
+	font-weight: bold;
+}
 
-/* --------------------------------------------------------------
- * --Typography
- * --------------------------------------------------------------*/
+
+/* ==============================================================
+   --typography
+   ============================================================== */
+
 body,
 button,
 input,
@@ -116,11 +142,23 @@ textarea {
 	font-size: 1.6rem;
 	line-height: 1.5;
 }
-h1, h2, h3, h4, h5, h6 {
-	clear: both;
-}
+
 p {
 	margin-bottom: 1.5em;
+}
+ul, ol {
+	margin: 0 0 1.5em 3em;
+}
+ul {
+	list-style: disc;
+}
+ol {
+	list-style: decimal;
+}
+li > ul,
+li > ol {
+	margin-bottom: 0;
+	margin-left: 1.5em;
 }
 a {
 	color: royalblue;
@@ -188,51 +226,11 @@ big {
 	font-size: 125%;
 }
 
-/* --------------------------------------------------------------
- * --Elements
- * --------------------------------------------------------------*/
-hr {
-	background-color: #ccc;
-	border: 0;
-	height: 1px;
-	margin-bottom: 1.5em;
-}
-ul, ol {
-	margin: 0 0 1.5em 3em;
-}
-ul {
-	list-style: disc;
-}
-ol {
-	list-style: decimal;
-}
-li > ul,
-li > ol {
-	margin-bottom: 0;
-	margin-left: 1.5em;
-}
-dt {
-	font-weight: bold;
-}
-dd {
-	margin: 0 1.5em 1.5em;
-}
-img {
-	height: auto; /* Make sure images are scaled correctly. */
-	max-width: 100%; /* Adhere to container width. */
-}
-figure {
-	margin: 0;
-}
-table {
-	margin: 0 0 1.5em;
-	width: 100%;
-}
-th {
-	font-weight: bold;
-}
 
-/* --forms */
+/**
+ * --forsm
+ */
+
 button,
 input,
 select,
@@ -243,56 +241,39 @@ textarea {
 }
 
 
-/* --------------------------------------------------------------
- * --layout
- * --------------------------------------------------------------*/
+/* ==============================================================
+   --layout
+   ============================================================== */
 
-/**
- * CONTENT - SIDEBAR
- */
-.content-area {
- 	float: left;
- 	margin: 0 -25% 0 0;
- 	width: 100%;
-}
-.site-main {
- 	margin: 0 25% 0 0;
-}
-.site-content .widget-area {
-	float: right;
- 	overflow: hidden;
- 	width: 25%;
-}
-
-/**
- * SIDEBAR - CONTENT
- */
-/*
-.content-area {
-	float: right;
-	margin: 0 0 0 -25%;
+._s-container{
+	margin: 0 auto;
 	width: 100%;
+	max-width: 960px;
 }
-.site-main {
-	margin: 0 0 0 25%;
-}
-.site-content .widget-area {
+
+
+.col{
+	width: 100%;
 	float: left;
-	overflow: hidden;
-	width: 25%;
 }
 
-*/
+
+
+/* ==============================================================
+   --components
+   ============================================================== */
+
+/**
+ * --header
+ */
 
 
 
-/* ---------------------------------------------------------------
- * --components
- * ---------------------------------------------------------------*/
 
-/* --header */
 
-/* --menu */
+/**
+ * --menu
+ */
 .main-navigation {
 	clear: both;
 	display: block;
@@ -312,35 +293,6 @@ textarea {
 	display: block;
 	text-decoration: none;
 }
-.main-navigation ul ul {
-	box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
-	float: left;
-	position: absolute;
-	top: 1.5em;
-	left: -999em;
-	z-index: 99999;
-}
-.main-navigation ul ul ul {
-	left: -999em;
-	top: 0;
-}
-.main-navigation ul ul a {
-	width: 200px;
-}
-.main-navigation ul ul li {
-}
-.main-navigation li:hover > a {
-}
-.main-navigation ul ul :hover > a {
-}
-.main-navigation ul ul a:hover {
-}
-.main-navigation ul li:hover > ul {
-	left: auto;
-}
-.main-navigation ul ul li:hover > ul {
-	left: 100%;
-}
 .main-navigation .current_page_item a,
 .main-navigation .current-menu-item a {
 }
@@ -348,35 +300,24 @@ textarea {
 .menu-toggle {
 	display: none;
 }
-.site-main .comment-navigation,
-.site-main .paging-navigation,
-.site-main .post-navigation {
-	margin: 0 0 1.5em;
-	overflow: hidden;
-}
-.comment-navigation .nav-previous,
-.paging-navigation .nav-previous,
-.post-navigation .nav-previous {
-	float: left;
-	width: 50%;
-}
-.comment-navigation .nav-next,
-.paging-navigation .nav-next,
-.post-navigation .nav-next {
-	float: right;
-	text-align: right;
-	width: 50%;
-}
 
-/* --footer */
+
+
+
+/**
+ * --footer
+ */
 .site-footer {
 	clear: both;
 	width: 100%;
 }
 
-/*--------------------------------------------------------------
+
+
+
+/**
  * --media
- * --------------------------------------------------------------*/
+ */
 
 .alignleft {
 	display: inline;
@@ -441,9 +382,10 @@ object {
 
 
 
-/* --------------------------------------------------------------
- * --utility
- * --------------------------------------------------------------*/
+/* ==============================================================
+   --utility
+   ============================================================== */
+
 /* Text meant only for screen readers */
 .screen-reader-text {
 	clip: rect(1px, 1px, 1px, 1px);
@@ -477,17 +419,16 @@ object {
 /* --clear */
 ._s-cf:before,
 ._s-cf:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
+    content: " ";
+    display: table;
 }
 ._s-cf:after {
     clear: both;
 }
-._s-.cf {
-    *zoom: 1;
-}
 
 
-/* --------------------------------------------------------------
- * --media queries
- * --------------------------------------------------------------*/
+
+/* ==============================================================
+   --media queries
+   ============================================================== */
+
