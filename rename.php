@@ -11,7 +11,7 @@ $themename = $argv[1];
 // search/replace in the wp-config-sample
 $filename = "webroot/wp-config-sample.php";
 $file = file_get_contents($filename);
-file_put_contents($filename, preg_replace("/_s/", $themename, $file));
+file_put_contents($filename, preg_replace("/_s_theme/", $themename, $file));
 echo "wp-config-sample.php updated\n";
 
 // search/replace in the theme js
@@ -33,7 +33,7 @@ rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename
 
 /**
  * replaceInTemplates
- * @param string $filename : the path of the file to search/replace in
+ * @param string $filename  : the path of the file to search/replace in
  * @param string $themename : the new name of the theme
  *
  * do the search and replace on the given file
@@ -41,7 +41,7 @@ rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename
 function replaceInTemplates($filename, $themename){
     $file = file_get_contents($filename);
     
-    $file = preg_replace("/_s_script-", $themename, $file);
+    $file = preg_replace("/_s_script-/", $themename, $file);
     $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
     $file = preg_replace("/_s_/", $themename . "_", $file);
     $file = preg_replace("/\._s/", "." . $themename, $file);
