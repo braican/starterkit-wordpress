@@ -122,37 +122,62 @@ require get_template_directory() . '/inc/extras.php';
  */
 require get_template_directory() . '/inc/customizer.php';
 
+/**
+ * Customizer additions.
+ */
+require get_template_directory() . '/inc/register-content_types-taxonomies.php';
+
+
+
 
 /* --------------------------------------------
- * --content types and taxonomies
+ * --functions
  * -------------------------------------------- */
 
 /**
- * _s_content_types
- *
- * http://codex.wordpress.org/Function_Reference/register_post_type
+ * _s_the_field 
+ * 
+ * theme implementation of ACF's get_field - checks to ensure the
+ *  value is there, and then wraps it in html
+ * @param $field
+ * @param $args
+ *     - id (number)         : the post id to check this field for
+ *     - before (string)     : the html to appear before the field
+ *     - after  (string)     : the html to appear after the field
+ *     - filter (string)     : any filters to apply to the field
+ *     - sub_field (boolean) : whether or not this field is a sub-field of a repeater
+ *     - default (string)    : if the field is undefined, render the default
  */
-function _s_content_types(){
+function _s_the_field($field, $args = array() ){
 
-    // register_post_type('type_name', array(
+    global $post;
 
-    // ));
+    $defaults = array(
+        'id'        => 0,
+        'before'    => '',
+        'after'     => '',
+        'filter'    => '',
+        'sub_field' => false,
+        'default'   => ''
+    );
+    
+    $options = array_merge($defaults, $args);
+
+    $id = $options['id'] ? $options['id'] : $post->ID;
+
+    $val = $options['sub_field'] ? get_sub_field($field, $id) : get_field($field, $id) ;
+
+    if( $val ){
+        if($options['filter']){
+            $val = apply_filters( $options['filter'], $val );
+        }
+        echo $options['before'] . $val . $options['after'];
+
+    } else if($options['default']){
+        echo $options['before'] . $options['default'] . $options['after'];
+    }
 }
-add_action('init', '_s_content_types');
 
-
-/**
- * _s_taxonomies
- *
- * http://codex.wordpress.org/Function_Reference/register_taxonomy
- */
-function _s_taxonomies(){
-
-    // register_taxonomy('taxonomy_name', array('content_types'), array(
-
-    // ));
-}
-add_action('init', '_s_taxonomies');
 
 
 

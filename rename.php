@@ -41,7 +41,7 @@ rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename
 function replaceInTemplates($filename, $themename){
     $file = file_get_contents($filename);
     
-    $file = preg_replace("/_s_script-/", $themename, $file);
+    $file = preg_replace("/_s_script-/", $themename . "-", $file);
     $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
     $file = preg_replace("/_s_/", $themename . "_", $file);
     $file = preg_replace("/\._s/", "." . $themename, $file);
