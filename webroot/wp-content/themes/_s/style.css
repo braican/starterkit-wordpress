@@ -15,15 +15,18 @@ Tags:
 */
 
 
-/* ==============================================================
-   --colors / fonts
-   ============================================================== */
-
-
 
 /* ==============================================================
    --reset
    ============================================================== */
+
+*,
+*:before,
+*:after { /* apply a natural box layout model to all elements; see http://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
+    -webkit-box-sizing: border-box; /* Not needed for modern webkit but still used by Blackberry Browser 7.0; see http://caniuse.com/#search=box-sizing */
+    -moz-box-sizing:    border-box; /* Still needed for Firefox 28; see http://caniuse.com/#search=box-sizing */
+    box-sizing:         border-box;
+}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -48,13 +51,6 @@ html {
     overflow-y: scroll; /* Keeps page centered in all browsers regardless of content height */
     -webkit-text-size-adjust: 100%; /* Prevents iOS text size adjust after orientation change, without disabling user zoom */
     -ms-text-size-adjust:     100%; /* www.456bereastreet.com/archive/201012/controlling_text_size_in_safari_for_ios_without_disabling_user_zoom/ */
-}
-*,
-*:before,
-*:after { /* apply a natural box layout model to all elements; see http://www.paulirish.com/2012/box-sizing-border-box-ftw/ */
-    -webkit-box-sizing: border-box; /* Not needed for modern webkit but still used by Blackberry Browser 7.0; see http://caniuse.com/#search=box-sizing */
-    -moz-box-sizing:    border-box; /* Still needed for Firefox 28; see http://caniuse.com/#search=box-sizing */
-    box-sizing:         border-box;
 }
 body {
     background: #fff; /* Fallback for when there is no custom background color defined. */
@@ -111,10 +107,6 @@ dt {
 dd {
     margin: 0 1.5em 1.5em;
 }
-img {
-    height: auto; /* Make sure images are scaled correctly. */
-    max-width: 100%; /* Adhere to container width. */
-}
 figure {
     margin: 0;
 }
@@ -124,26 +116,6 @@ table {
 }
 th {
     font-weight: bold;
-}
-
-
-/* ==============================================================
-   --typography
-   ============================================================== */
-
-body,
-button,
-input,
-select,
-textarea {
-    color: #404040;
-    font-family: sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-p {
-    margin-bottom: 1.5em;
 }
 ul, ol {
     margin: 0 0 1.5em 3em;
@@ -159,17 +131,7 @@ li > ol {
     margin-bottom: 0;
     margin-left: 1.5em;
 }
-a {
-    color: royalblue;
-}
-a:visited {
-    color: purple;
-}
-a:hover,
-a:focus,
-a:active {
-    color: midnightblue;
-}
+
 b, strong {
     font-weight: bold;
 }
@@ -221,13 +183,33 @@ sub {
 small {
     font-size: 75%;
 }
-big {
-    font-size: 125%;
+
+
+/* ==============================================================
+   --typography
+   ============================================================== */
+
+body,
+button,
+input,
+select,
+textarea {
+    color: #404040;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+p {
+    margin-bottom: 1.5em;
+}
+a {
+    color: royalblue;
 }
 
 
 /**
- * --forsm
+ * --forms
  */
 
 button,
@@ -238,6 +220,85 @@ textarea {
     margin: 0; /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
     vertical-align: baseline; /* Improves appearance and consistency in all browsers */
 }
+
+
+
+/**
+ * --icons
+ */
+
+
+
+
+/* ==============================================================
+   --media
+   ============================================================== */
+
+img, svg {
+    height: auto; /* Make sure images are scaled correctly. */
+    max-width: 100%; /* Adhere to container width. */
+}
+
+.alignleft {
+    display: inline;
+    float: left;
+    margin-right: 1.5em;
+}
+.alignright {
+    display: inline;
+    float: right;
+    margin-left: 1.5em;
+}
+.aligncenter {
+    clear: both;
+    display: block;
+    margin: 0 auto;
+}
+
+.page-content img.wp-smiley,
+.entry-content img.wp-smiley,
+.comment-content img.wp-smiley {
+    border: none;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding: 0;
+}
+/* Make sure embeds and iframes fit their containers */
+embed,
+iframe,
+object {
+    max-width: 100%;
+}
+
+.iframe-container{
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+.iframe-container iframe{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wp-caption {
+    margin-bottom: 1.5em;
+    max-width: 100%;
+}
+.wp-caption img[class*="wp-image-"] {
+    display: block;
+    margin: 0 auto;
+}
+.wp-caption-text {
+    text-align: center;
+}
+.wp-caption .wp-caption-text {
+    margin: 0.8075em 0;
+}
+
 
 
 /* ==============================================================
@@ -312,71 +373,6 @@ textarea {
 }
 
 
-
-
-/**
- * --media
- */
-
-.alignleft {
-    display: inline;
-    float: left;
-    margin-right: 1.5em;
-}
-.alignright {
-    display: inline;
-    float: right;
-    margin-left: 1.5em;
-}
-.aligncenter {
-    clear: both;
-    display: block;
-    margin: 0 auto;
-}
-
-.page-content img.wp-smiley,
-.entry-content img.wp-smiley,
-.comment-content img.wp-smiley {
-    border: none;
-    margin-bottom: 0;
-    margin-top: 0;
-    padding: 0;
-}
-/* Make sure embeds and iframes fit their containers */
-embed,
-iframe,
-object {
-    max-width: 100%;
-}
-
-.iframe-container{
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
-    padding-top: 25px;
-    height: 0;
-}
-.iframe-container iframe{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.wp-caption {
-    margin-bottom: 1.5em;
-    max-width: 100%;
-}
-.wp-caption img[class*="wp-image-"] {
-    display: block;
-    margin: 0 auto;
-}
-.wp-caption-text {
-    text-align: center;
-}
-.wp-caption .wp-caption-text {
-    margin: 0.8075em 0;
-}
 
 
 
