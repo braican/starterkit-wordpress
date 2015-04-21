@@ -26,22 +26,26 @@ echo "theme js updated\n";
 
 // search/replace in the theme template files
 foreach( glob("webroot/wp-content/themes/_s/*.*") as $filename ){
-    replaceInTemplates($filename, $themename);
+    replaceInTemplates();
 }
 foreach( glob("webroot/wp-content/themes/_s/*/*.*") as $filename ){
-    replaceInTemplates($filename, $themename);
+    replaceInTemplates();
 }
 
 rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename);
 
 /**
  * replaceInTemplates
- * @param string $filename  : the path of the file to search/replace in
- * @param string $themename : the new name of the theme
  *
  * do the search and replace on the given file
  */
-function replaceInTemplates($filename, $themename){
+function replaceInTemplates(){
+
+    global $themename;
+    global $safe_themename;
+    global $filename;
+    
+
     $file = file_get_contents($filename);
     
     // replace the script tags

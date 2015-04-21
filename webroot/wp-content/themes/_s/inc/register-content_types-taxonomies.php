@@ -64,6 +64,6 @@ function _s_taxonomies(){
     // ));
     // register_taxonomy_for_object_type( 'tax_name', 'related_post_type' );
 
-
+}
 add_action('init', '_s_taxonomies');
 
