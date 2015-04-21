@@ -8,6 +8,9 @@ if($argc != 2){
 
 $themename = $argv[1];
 
+// for theme names with multiple words, separated by dashes or spaces
+$safe_themename = str_replace( array('-', ' '), '_', $themename);
+
 // search/replace in the wp-config-sample
 $filename = "webroot/wp-config-sample.php";
 $file = file_get_contents($filename);
@@ -41,12 +44,25 @@ rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename
 function replaceInTemplates($filename, $themename){
     $file = file_get_contents($filename);
     
+    // replace the script tags
     $file = preg_replace("/_s_script-/", $themename . "-", $file);
+
+    // replace the domain for translations
     $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
-    $file = preg_replace("/_s_/", $themename . "_", $file);
+
+    // function names
+    $file = preg_replace("/_s_/", $safe_themename . "_", $file);
+
+    // replace classes
     $file = preg_replace("/\._s/", "." . $themename, $file);
+
+    // package name
     $file = preg_replace("/ _s/", " " . ucfirst($themename), $file);
+
+    // right now, only the classes in the html
     $file = preg_replace("/_s-/", " " . $themename . "-", $file);
+
+    // text domain information
     $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $themename, $file);
 
     file_put_contents($filename, $file);
