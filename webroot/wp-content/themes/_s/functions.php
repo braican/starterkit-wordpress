@@ -12,6 +12,14 @@ if ( ! isset( $content_width ) ) {
     $content_width = 640; /* pixels */
 }
 
+
+/**
+ * hide the admin bar, if you want
+ */
+// add_filter('show_admin_bar', '__return_false');
+
+
+
 if ( ! function_exists( '_s_setup' ) ) :
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -67,6 +75,7 @@ function _s_setup() {
 }
 endif; // _s_setup
 add_action( 'after_setup_theme', '_s_setup' );
+
 
 /**
  * Register widget area.
@@ -347,6 +356,10 @@ add_filter('_s_image_markup', '_s_create_img_markup');
  */
 function include_svg( $svg, $return = false ){
     $svg_path = get_template_directory() . '/svg/' . $svg . '.svg';
+
+    if(!file_exists($svg_path)){
+        return false;
+    }
 
     if($return){
         return file_get_contents($svg_path);
