@@ -59,10 +59,10 @@ class Starterkit_Rename{
     private function replaceInTheme(){
 
         foreach( glob("webroot/wp-content/themes/_s/*.*") as $filename ){
-            replaceInTemplates( $filename );
+            $this->replaceInFile( $filename );
         }
         foreach( glob("webroot/wp-content/themes/_s/*/*.*") as $filename ){
-            replaceInTemplates( $filename );
+            $this->replaceInFile( $filename );
         }
     }
 
