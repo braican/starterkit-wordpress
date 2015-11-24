@@ -3,18 +3,12 @@
 
 class Starterkit_Rename{
 
-    function __construct( ){
-        if($argc != 2){
-            echo "Usage: search-replace.php themename\n";
-            exit;
-        }
+    function __construct( $t ){
 
-        $this->themename = $argv[1];
+        $this->themename = $t;        
 
         // for theme names with multiple words, separated by dashes or spaces
         $this->safe_themename = strtolower( str_replace( array('-', ' '), '_', $this->themename ) );
-
-
 
         $this->replaceInConfig();
 
@@ -118,7 +112,13 @@ class Starterkit_Rename{
     }
 }
 
-new Starterkit_Rename();
+
+if($argc != 2){
+    echo "Usage: search-replace.php <themename>\n";
+    exit;
+}
+
+new Starterkit_Rename( $argv[1] );
 
 
 ?>
