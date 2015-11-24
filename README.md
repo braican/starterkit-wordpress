@@ -21,11 +21,24 @@ The Javascript Structure
 
 The Javascript is organized in the following way:
 
-* individual modules are located inside the `arsenal` directory. The templated scripts are located in the `available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory, inside an `enabled` directory. Modules inside the `enabled` directory can be edited where appropriate for the project.
-* all third-party plugins that stand alone from a standardized module pattern should go in the `plugins.js` file inside the `js` directory.
-* all project-specific scripts and front-end code should go into the `main.js` file inside the `js` directory.
-* upon running
+* Individual modules are located inside the `arsenal` directory. The templated scripts are located in the `available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory, inside an `enabled` directory. Modules inside the `enabled` directory can be edited where appropriate for the project.
+* All third-party plugins that stand alone from a standardized module pattern should go in the `plugins.js` file inside the `js` directory.
+* All project-specific scripts and front-end code should go into the `main.js` file inside the `js` directory.
+* Upon running the `gulp opt-js` task, a `production.js` file will be built, and a minified version will be placed into the `build` directory within the `js` directory.
 
+
+Gulp Tasks
+----------
+
+Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more.
+
+* `gulp` - will run the default task, which will optimize the javascript and svgs.
+* `gulp opt-js` - concatenates all the javascript (see above) and minifies it, placing a `production.min.js` file into `js/build` within the theme directory.
+* `gulp opt-svg` - optimizes svgs.
+* `gulp svgstore` - creates the svg sprite for insertion into the page.
+* `gulp sass` - compile sass.
+* `gulp watch` - watch the `css` directory within the theme to changes to any `.scss` files.
+* `gulp build-scripts` - using the `setup.json` file, builds the `js` directory within the theme with the appropriate js modules.
 
 
 A database directory?
