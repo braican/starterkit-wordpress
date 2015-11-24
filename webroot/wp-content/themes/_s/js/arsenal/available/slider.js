@@ -23,8 +23,8 @@
 (function(_s, $, undefined){
 
 
-    _s.slider = function(){
+    _s.slider = (function(){
 
-    }
+    })();
 
 })(window._s = window._s || {}, jQuery);
