@@ -35,6 +35,12 @@ var setup     = require( './setup.json' ),
  * --util
  * -------------------------------------------- */
 
+/**
+ * returns an array of javascript modules that should be included in
+ *  this project, per setup.json
+ *
+ * @return array
+ */
 var getActiveJSModules = function(){
     var activeModules = [],
         modules       = setup.jsModules;
@@ -45,7 +51,6 @@ var getActiveJSModules = function(){
         }
     }
 
-
     return activeModules;
 }
 
@@ -55,16 +60,18 @@ var getActiveJSModules = function(){
  * --gulp
  * -------------------------------------------- */
 
-gulp.task('default', function() {
+//
+// default - runs the opt-js and opt-svg tasks
+//
+gulp.task('default', ['opt-js', 'opt-svg']);
 
-    // -- svgmin (minify svg)
-    gulp.src( themeDir + 'svg/*.svg' )
-        .pipe(svgmin())
-        .pipe(gulp.dest( themeDir + '/svg/build'));
-        
 
+//
+// optimize js
+//
+gulp.task('opt-js', function(){
     // -- concat js
-    gulp.src( [themeDir + 'js/plugins.js', themeDir + 'js/main.js'])
+    gulp.src( [themeDir + 'js/arsenal/enabled/*.js', themeDir + 'js/plugins.js', themeDir + 'js/main.js'])
         .pipe(concat('production.js'))
         .pipe(gulp.dest( themeDir + 'js/build' ));
 
@@ -76,8 +83,22 @@ gulp.task('default', function() {
             extname: '.min.js'
         }))
         .pipe(gulp.dest( themeDir + '/js/build' ));
-
 });
+
+
+
+//
+// optimize svg
+//
+gulp.task( 'opt-svg', function(){
+    // -- svgmin (minify svg)
+    gulp.src( themeDir + 'svg/*.svg' )
+        .pipe(svgmin())
+        .pipe(gulp.dest( themeDir + '/svg/build'));
+});
+
+
+
 
 //
 // svg store

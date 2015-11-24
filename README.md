@@ -24,6 +24,7 @@ The Javascript is organized in the following way:
 * individual modules are located inside the `arsenal` directory. The templated scripts are located in the `available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory, inside an `enabled` directory. Modules inside the `enabled` directory can be edited where appropriate for the project.
 * all third-party plugins that stand alone from a standardized module pattern should go in the `plugins.js` file inside the `js` directory.
 * all project-specific scripts and front-end code should go into the `main.js` file inside the `js` directory.
+* upon running
 
 
 
