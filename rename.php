@@ -95,25 +95,25 @@ class Starterkit_Rename{
         $file = file_get_contents($filename);
         
         // replace the script tags
-        $file = preg_replace("/_s_script-/", $themename . "-", $file);
+        $file = preg_replace("/_s_script-/", $this->safe_themename . "-", $file);
 
         // replace the domain for translations
-        $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
+        $file = preg_replace("/'_s'/", "'" . $this->themename . "'", $file);
 
         // function names
-        $file = preg_replace("/_s_/", $safe_themename . "_", $file);
+        $file = preg_replace("/_s_/", $this->safe_themename . "_", $file);
 
         // replace classes
-        $file = preg_replace("/\._s/", "." . $themename, $file);
+        $file = preg_replace("/\._s/", "." . $this->safe_themename, $file);
 
         // package name
-        $file = preg_replace("/ _s/", " " . ucfirst($themename), $file);
+        $file = preg_replace("/ _s/", " " . ucfirst($this->themename), $file);
 
         // right now, only the classes in the html
-        $file = preg_replace("/_s-/", " " . $themename . "-", $file);
+        $file = preg_replace("/_s-/", " " . $this->safe_themename . "-", $file);
 
         // text domain information
-        $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $themename, $file);
+        $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $this->themename, $file);
 
         file_put_contents($filename, $file);
         echo "theme templates updated\n";
