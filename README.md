@@ -13,6 +13,17 @@ Getting Started
 1. Run `npm install` to install gulp and get all that good stuff set up.
 1. Install WordPress.
 1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
+1. Open `setup.json` and choose the javascript modules you'll want to use in this project (you can always adjust this later). Then run `gulp build-scripts` to copy the appropriate modules into the working directory.
+
+
+The Javascript Structure
+------------------------
+
+The Javascript is organized in the following way:
+
+* individual modules are located inside the `arsenal` directory. The templated scripts are located in the `available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory, inside an `enabled` directory. Modules inside the `enabled` directory can be edited where appropriate for the project.
+* all third-party plugins that stand alone from a standardized module pattern should go in the `plugins.js` file inside the `js` directory.
+* all project-specific scripts and front-end code should go into the `main.js` file inside the `js` directory.
 
 
 

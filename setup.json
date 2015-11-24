@@ -1,6 +1,7 @@
 {
     "jsModules":{
-        "slider" : true,
-        "modal"  : true
+        "slider"    : true,
+        "modal"     : true,
+        "accordion" : true
     }
 }

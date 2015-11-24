@@ -126,7 +126,7 @@ gulp.task('watch', function(){
 //
 // build from arsenal
 //
-gulp.task('build', function(){
+gulp.task('build-scripts', function(){
 
     var activeJs = getActiveJSModules();
 
@@ -135,19 +135,12 @@ gulp.task('build', function(){
         var enabledpath   = themeDir + 'js/arsenal/enabled/' + activeJs[i] + '.js',
             availablePath = themeDir + 'js/arsenal/available/' + activeJs[i] + '.js';
 
-        fs.stat( enabledpath, function( error, stat){
-            console.log("module: " + availablePath);
-            console.log(error);
-            console.log(stat);
-            
-            if( stat === undefined ){
-                console.log("COPY IT");
-                gulp.src( availablePath )
-                    .pipe( gulp.dest( themeDir + 'js/arsenal/enabled/' ));
-            } else {
-                console.log("DONT");
-            }
-            console.log("-----");
-        });
+        try{
+            fs.statSync(enabledpath);
+        } catch( e ){
+            console.log(e);
+            gulp.src( availablePath )
+                .pipe( gulp.dest( themeDir + 'js/arsenal/enabled/' ));
+        }
     }
 });
