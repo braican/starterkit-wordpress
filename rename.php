@@ -38,15 +38,17 @@ class Starterkit_Rename{
      */
     private function replaceInJs(){
 
-        foreach( glob("webroot/wp-content/themes/_s/js/*.js") as $filename ){
-            $file = file_get_contents($filename);
-            $file = preg_replace("/_s/", strtoupper($this->themename), $file);
-            file_put_contents($filename, $file);
-        }
-        foreach( glob("webroot/wp-content/themes/_s/js/*/*.js") as $filename ){
-            $file = file_get_contents($filename);
-            $file = preg_replace("/_s/", strtoupper($this->themename), $file);
-            file_put_contents($filename, $file);
+        $dirs = array(
+            "webroot/wp-content/themes/_s/js/*.js",
+            "webroot/wp-content/themes/_s/js/arsenal/available/*.js",
+        );
+
+        foreach( $dirs as $d ){
+            foreach( glob($d) as $filename ){
+                $file = file_get_contents($filename);
+                $file = preg_replace("/_s/", strtoupper($this->themename), $file);
+                file_put_contents($filename, $file);
+            }
         }
 
         echo "theme js updated\n";
@@ -58,16 +60,22 @@ class Starterkit_Rename{
      */
     private function replaceInTheme(){
 
-        foreach( glob("webroot/wp-content/themes/_s/*.*") as $filename ){
-            $this->replaceInFile( $filename );
-        }
-        foreach( glob("webroot/wp-content/themes/_s/*/*.*") as $filename ){
-            $this->replaceInFile( $filename );
+        $dirs = array(
+            "webroot/wp-content/themes/_s/*.*",
+            "webroot/wp-content/themes/_s/inc/*.php",
+            "webroot/wp-content/themes/_s/css/*.scss",
+        );
+
+        foreach( $dirs as $d ){
+            foreach( glob($d) as $filename ){
+                $this->replaceInFile( $filename );
+            }
         }
     }
 
 
     private function renameDirectory(){
+        rename("webroot/wp-content/themes/_s/languages/_s.pot", "webroot/wp-content/themes/_s/languages/" . $this->themename . '.pot');
         rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $this->themename);
     }
 
