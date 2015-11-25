@@ -41,6 +41,16 @@ Gulp is used to maintain and complete a number of tasks for the site, including 
 * `gulp build-scripts` - using the `setup.json` file, builds the `js` directory within the theme with the appropriate js modules.
 
 
+Going Live
+----------
+
+In production, set the environment variable WP_ENV variable in apache to "production" to enqueue the production scripts and styles.
+
+```sh
+SetEnv WP_ENV "production"
+```
+
+
 A database directory?
 ---------------------
 

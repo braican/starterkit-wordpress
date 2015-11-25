@@ -38,22 +38,30 @@ function _s_setup() {
      */
     load_theme_textdomain( '_s', get_template_directory() . '/languages' );
 
-    // Add default posts and comments RSS feed links to head.
+    /**
+     * Add default posts and comments RSS feed links to head.
+     */
     add_theme_support( 'automatic-feed-links' );
 
-    /*
+    /**
      * Enable support for Post Thumbnails on posts and pages.
      */
     add_theme_support( 'post-thumbnails' );
-    // add theme sizes
+    
+    /**
+     * add image sizes 
+     */
     // add_image_size('thumbnail-size', 368, 272, true);   
 
-    // This theme uses wp_nav_menu() in one location.
+
+    /**
+     * This theme uses wp_nav_menu() in one location.
+     */
     register_nav_menus( array(
         'primary' => __( 'Primary Menu', '_s' ),
     ) );
     
-    /*
+    /**
      * Switch default core markup for search form, comment form, and comments
      * to output valid HTML5.
      */
@@ -61,15 +69,18 @@ function _s_setup() {
         'search-form', 'comment-form', 'comment-list', 'gallery', 'caption'
     ) );
 
-    /*
+    /**
      * Enable support for Post Formats.
      * See http://codex.wordpress.org/Post_Formats
      */
-    add_theme_support( 'post-formats', array(
-        'aside', 'image', 'video', 'quote', 'link'
-    ) );
+    // add_theme_support( 'post-formats', array(
+    //     'aside', 'image', 'video', 'quote', 'link'
+    // ) );
 
-    // Setup the WordPress core custom background feature.
+
+    /**
+     * Setup the WordPress core custom background feature.
+     */
     add_theme_support( 'custom-background', apply_filters( '_s_custom_background_args', array(
         'default-color' => 'ffffff',
         'default-image' => '',
@@ -97,22 +108,79 @@ function _s_widgets_init() {
 }
 add_action( 'widgets_init', '_s_widgets_init' );
 
+
+/* --------------------------------------------
+ * --scripts
+ * -------------------------------------------- */
+
 /**
  * Enqueue scripts and styles.
  */
 function _s_scripts() {
-    
+
+    $env = defined('WP_ENV') ? WP_ENV : 'staging';
+
+    //
+    // if we're in the production environment, enqueue the minified,
+    //  concatenated scripts. Otherwise, load them all individually
+    //  for easier debugging.
+    if( $env === 'production'){
+
+        // load up the one production, minified file
+        wp_enqueue_script( '_s_script-main', get_template_directory_uri() . '/js/build/production.min.js', array('jquery'), false, true );
+    } else {
+        // the arsenal
+        _s_loadArsenal();
+
+        // plugins
+        wp_enqueue_script( '_s_script-plugins', get_template_directory_uri() . '/js/plugins.js', array('jquery'), false, true );
+
+        // main
+        wp_enqueue_script( '_s_script-main', get_template_directory_uri() . '/js/main.js', array('_s_script-plugins', 'jquery'), false, true );
+    }
+
+    //
+    // since we're compiling sass anyway, the style.css file is
+    //  already minified and optimized
+    //
     wp_enqueue_style( '_s_script-style', get_template_directory_uri() . '/css/build/style.css' );
-
-    wp_enqueue_script( '_s_script-plugins', get_template_directory_uri() . '/js/plugins.js', array('jquery'), '20140725', true );
-
-    wp_enqueue_script( '_s_script-main', get_template_directory_uri() . '/js/main.js', array('_s_script-plugins', 'jquery'), '20140725', true );
-
+    
+    //
+    // comments
+    //
     if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
         wp_enqueue_script( 'comment-reply' );
     }
 }
 add_action( 'wp_enqueue_scripts', '_s_scripts' );
+
+
+/**
+ * Helper function that loads the individual arsenal javascripts, if
+ *  they are present
+ */
+function _s_loadArsenal(){
+
+    // the list of available scripts
+    $arsenal = array(
+        'modal',
+        'slider'
+    );
+
+    foreach( $arsenal as $script ){
+        
+        $path = '/js/arsenal/enabled/' . $script . '.js';
+
+        if( file_exists( get_template_directory() . $path ) ){
+            wp_enqueue_script( "_s_script--$script", get_template_directory_uri() . $path, array('jquery'), false, true);
+        }
+    }
+}
+
+
+/* --------------------------------------------
+ * --includes
+ * -------------------------------------------- */
 
 /**
  * Implement the Custom Header feature.
@@ -139,114 +207,10 @@ require get_template_directory() . '/inc/customizer.php';
  */
 require get_template_directory() . '/inc/register-content_types-taxonomies.php';
 
-
-
-
-/* --------------------------------------------
- * --functions
- * -------------------------------------------- */
-
 /**
- * _s_the_field 
- * 
- * theme implementation of ACF's get_field - checks to ensure the
- *  value is there, and then wraps it in html
- * @param $field
- * @param $args
- *     - id (number)         : the post id to check this field for
- *     - before (string)     : the html to appear before the field
- *     - after  (string)     : the html to appear after the field
- *     - filter (string)     : any filters to apply to the field
- *     - sub_field (boolean) : whether or not this field is a sub-field of a repeater
- *     - default (string)    : if the field is undefined, render the default
+ * theme api
  */
-function _s_the_field($field, $args = array() ){
-
-    if ( function_exists( 'get_field' ) ) :
-        global $post;
-
-        $defaults = array(
-            'id'        => 0,
-            'before'    => '',
-            'after'     => '',
-            'filter'    => '',
-            'sub_field' => false,
-            'default'   => ''
-        );
-        
-        $options = array_merge($defaults, $args);
-
-        $id = $options['id'] ? $options['id'] : $post->ID;
-
-        $val = $options['sub_field'] ? get_sub_field($field, $id) : get_field($field, $id) ;
-
-        if( $val ){
-            if($options['filter']){
-                $val = apply_filters( $options['filter'], $val );
-            }
-            echo $options['before'] . $val . $options['after'];
-
-        } else if($options['default']){
-            echo $options['before'] . $options['default'] . $options['after'];
-        }
-    endif;
-}
-
-
-
-/* --------------------------------------------
- * --rendering
- * -------------------------------------------- */
-
-
-/**
- * _s_the_page_blocks 
- * 
- * hooks into the ACF repeater field to render all the additional
- *  page blocks for a page. Calls tempaltes in the modules/ directoru
- */
-function _s_the_page_blocks(){
-
-    if ( function_exists( 'have_rows' ) ) :
-
-        // replace this with whatever your repeater name is within ACF
-        $blocks_repeater = '_s_page_blocks';
-
-        // replace this with whatever the block title name is within ACF
-        $module_title = '_s_page_block_title';
-
-        if(have_rows($blocks_repeater)) : ?>
-            <div class="secondary-content">
-
-                <?php // loop through the rows of data ?>
-                <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
-                    <?php $module = get_sub_field($module_title); ?>
-
-                    <div class="_s-module<?php echo $module ? " $module" : ""; ?>">
-                    <?php
-                        // //
-                        // // - example implementation of getting the header field
-                        // //    for each of the blocks
-                        // //
-                        // _s_the_field( $module_title , array(
-                        //     'before'    => '<header class="page-module-title"><h2>',
-                        //     'after'     => '</h2></header>',
-                        //     'sub_field' => true
-                        // ));
-
-                        get_template_part('modules/module', $module);
-                    ?>
-
-                    </div><!-- .cc-module -->
-                <?php endwhile; ?>
-
-            </div><!-- .secondary-content -->
-    <?php
-        endif;
-
-    endif;
-}
-
+require get_template_directory() . '/inc/api.php';
 
 
 
@@ -349,7 +313,7 @@ add_filter('_s_image_markup', '_s_create_img_markup');
 
 
 //
-// thumbnails and scaline
+// thumbnails and scaling
 //
 
 
@@ -389,7 +353,7 @@ function _s_image_crop_dimensions($default, $orig_w, $orig_h, $new_w, $new_h, $c
  * @param $return : whether to return the svg as a string or simply include the svg
  */
 function include_svg( $svg, $return = false ){
-    $svg_path = get_template_directory() . '/svg/' . $svg . '.svg';
+    $svg_path = get_template_directory() . '/svg/build/' . $svg . '.svg';
 
     if(!file_exists($svg_path)){
         return false;
