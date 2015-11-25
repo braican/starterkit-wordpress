@@ -159,7 +159,7 @@ gulp.task('build-scripts', function(){
         try{
             fs.statSync(enabledpath);
         } catch( e ){
-            console.log(e);
+            console.log("copied " + enabledpath);
             gulp.src( availablePath )
                 .pipe( gulp.dest( themeDir + 'js/arsenal/enabled/' ));
         }

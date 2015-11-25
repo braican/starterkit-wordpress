@@ -75,8 +75,8 @@ class Starterkit_Rename{
 
 
     private function renameDirectory(){
-        rename("webroot/wp-content/themes/_s/languages/_s.pot", "webroot/wp-content/themes/_s/languages/" . $this->themename . '.pot');
-        rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $this->themename);
+        rename("webroot/wp-content/themes/_s/languages/_s.pot", "webroot/wp-content/themes/_s/languages/" . $this->safe_themename . '.pot');
+        rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $this->safe_themename);
     }
 
 

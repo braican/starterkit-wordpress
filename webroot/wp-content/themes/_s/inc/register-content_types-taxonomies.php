@@ -11,6 +11,30 @@
  */
 function _s_content_types(){
 
+    //
+    // case studies (supports archive and single)
+    //
+    register_post_type('case_studies', array(
+        'labels'       => array(
+            'name'               => 'Case Studies',
+            'singular_name'      => 'Case Study',
+            'add_new_item'       => 'Add new Case Study',
+            'edit_item'          => 'Edit Case Study',
+            'new_item'           => 'New Case Study',
+            'view_item'          => 'View Case Study',
+            'search_items'       => 'Search Case Studies',
+            'not_found'          => 'No Case Studies found',
+            'not_found_in_trash' => 'No Case Studies found in Trash',
+        ),
+        'description'  => "This company's case studies.",
+        'supports'     => array('title', 'editor', 'thumbnail'),
+        'public'       => true,
+        'hierarchical' => false,
+        'rewrite'      => array(
+            'slug' => 'case-study'
+        )
+    ));
+
     // //
     // // - register post type that has page for archive and single
     // //
