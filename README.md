@@ -19,12 +19,12 @@ Getting Started
 The Javascript Structure
 ------------------------
 
-The Javascript is organized in the following way:
+The Javascript is organized in the following way (all file paths are relative to the theme path, unless otherwise noted):
 
-* Individual modules are located inside the `arsenal` directory. The templated scripts are located in the `available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory, inside an `enabled` directory. Modules inside the `enabled` directory can be edited where appropriate for the project.
-* All third-party plugins that stand alone from a standardized module pattern should go in the `plugins.js` file inside the `js` directory.
-* All project-specific scripts and front-end code should go into the `main.js` file inside the `js` directory.
-* Upon running the `gulp opt-js` task, a `production.js` file will be built, and a minified version will be placed into the `build` directory within the `js` directory.
+* Individual modules are located inside the `js/arsenal` directory. The templated scripts are located in the `js/arsenal/available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file (located in the project root) to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory. This will build a `js/arsenal/enabled` directory, which will contain all project-specific js modules. Modules inside the `js/arsenal/enabled` directory can be edited where appropriate for the project.
+* All third-party plugins that stand alone from a standardized module pattern should go in the `js/plugins.js` file.
+* All project-specific scripts and front-end code should go into the `js/main.js` file.
+* Upon running the `gulp opt-js` task, a `js/production.js` file will be built, and a minified version will be placed into the `js/build` directory.
 
 
 Gulp Tasks
@@ -32,13 +32,50 @@ Gulp Tasks
 
 Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more.
 
-* `gulp` - will run the default task, which will optimize the javascript and svgs.
-* `gulp opt-js` - concatenates all the javascript (see above) and minifies it, placing a `production.min.js` file into `js/build` within the theme directory.
-* `gulp opt-svg` - optimizes svgs.
-* `gulp svgstore` - creates the svg sprite for insertion into the page.
-* `gulp sass` - compile sass.
-* `gulp watch` - watch the `css` directory within the theme to changes to any `.scss` files.
-* `gulp build-scripts` - using the `setup.json` file, builds the `js` directory within the theme with the appropriate js modules.
+#### `gulp`
+Runs the default task, which will optimize the javascript and svgs.
+
+#### `gulp opt-js`
+Concatenates all the javascript (see above) and minifies it, placing a `production.min.js` file into `js/build` within the theme directory.
+
+#### `gulp opt-svg`
+Optimizes svgs.
+
+#### `gulp svgstore`
+Creates the svg sprite for insertion into the page.
+
+#### `gulp sass`
+Compiles sass.
+
+#### `gulp watch`
+Watch the `css` directory within the theme to changes to any `.scss` files.
+
+#### `gulp build-scripts`
+Using the `setup.json` file, builds the `js` directory within the theme with the appropriate js modules.
+
+
+WordPress Imports
+-----------------
+Inside the `_imports` directory, there are some `.xml` files that can be imported into the WordPress installation to add common components.
+
+#### `acf--page-blocks.xml`
+The Advanced Custom Fields setup for page blocks. Creates an additional field for pages that allows for the addition of modules onto that page. See the [custom page blocks](#custom-page-blocks) section below.
+
+
+Custom Page Blocks
+------------------
+This theme uses Advanced Custom Fields to create a field for the "page" content type that allows the user to add additional modules, or content blocks, onto that page. Once you import the `acf--page-blocks.xml` file in the `_imports` directory, you will find a "Page Blocks" field group in the ACF admin section. To set up the custom page blocks:
+
+1. Inside the "Page Blocks" field group, there will be a repeater field (called "Additional Page Blocks") that contains two subfields ("Block Module" and "Block Title"). Rename the "Field Name" of each of these fields/subfields to reflect your theme's namespace.
+1. In the theme directory, locate the namespaced `_s_the_page_blocks` function inside the `inc/api.php` file. Update the following variables to reflect the "Field Name" values you updated above:
+  * `$blocks_repeater` - the "Field Name" of the "Additional Page Blocks" repeater field.
+  * `$module_title` - the "Field Name" of the "Block Title" subfield.
+
+To add a new module to the page blocks, duplicate the `module.php` file inside the `modules` directory in the theme, and rename the copied file to reflect the funciton of the module. Back in the ACF admin, find the "Block Module" subfield in the "Page Blocks" field group and create a new choice using the module file name (*without* the trailing `.php`) and a label for the module. For example, if you created a module called `_s_latest-blog-posts.php`, you would add the following to the "Choices" field:
+
+`_s_latest-blog-posts : Latest Blog Posts`
+
+When you add a new block to a page, this module will be available in the "Block Module" dropdown.
 
 
 Going Live
