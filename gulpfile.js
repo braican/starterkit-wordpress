@@ -2,7 +2,7 @@
 //
 // npm packages
 //
-var gulp       = require('gulp'),
+var gulp       = require('gulp-help')(require('gulp')),
     fs         = require('fs'),
     rename     = require('gulp-rename'),
     watch      = require('gulp-watch'),
@@ -69,28 +69,32 @@ gulp.task('default', ['opt-js', 'opt-svg']);
 //
 // optimize js
 //
-gulp.task('opt-js', function(){
-    // -- concat js
-    gulp.src( [themeDir + 'js/arsenal/enabled/*.js', themeDir + 'js/plugins.js', themeDir + 'js/main.js'])
-        .pipe(concat('production.js'))
-        .pipe(gulp.dest( themeDir + 'js/build' ));
+gulp.task(
+    'opt-js',
+    'Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.',
+    function(){
+        // -- concat js
+        gulp.src( [themeDir + 'js/arsenal/enabled/*.js', themeDir + 'js/plugins.js', themeDir + 'js/main.js'])
+            .pipe(concat('production.js'))
+            .pipe(gulp.dest( themeDir + 'js/build' ));
 
 
-    // -- ugilfy
-    gulp.src( themeDir + 'js/build/production.js')
-        .pipe(uglify())
-        .pipe(rename({
-            extname: '.min.js'
-        }))
-        .pipe(gulp.dest( themeDir + '/js/build' ));
-});
+        // -- ugilfy
+        gulp.src( themeDir + 'js/build/production.js')
+            .pipe(uglify())
+            .pipe(rename({
+                extname: '.min.js'
+            }))
+            .pipe(gulp.dest( themeDir + '/js/build' ));
+    }
+);
 
 
 
 //
 // optimize svg
 //
-gulp.task( 'opt-svg', function(){
+gulp.task( 'opt-svg', 'Optimizes the svg files.', function(){
     // -- svgmin (minify svg)
     gulp.src( themeDir + 'svg/*.svg' )
         .pipe(svgmin())
@@ -103,7 +107,7 @@ gulp.task( 'opt-svg', function(){
 //
 // svg store
 //
-gulp.task('svgstore', function () {
+gulp.task('svgstore', 'Creates the svg sprite that can be loaded into the page via javascript.', function () {
     return gulp.src( themeDir + 'svg/icons/**/*.svg')
             .pipe(rename({prefix: 'icon--'}))
             .pipe( svgmin({
@@ -124,7 +128,7 @@ gulp.task('svgstore', function () {
 //
 // compile sass
 //
-gulp.task('sass', function(){
+gulp.task('sass', 'Compile that sass.', function(){
     gulp.src( themeDir + 'css/*.scss')
         .pipe(sourcemaps.init())
         .pipe(sass({
@@ -139,7 +143,7 @@ gulp.task('sass', function(){
 //
 // watch the sass directory
 //
-gulp.task('watch', function(){
+gulp.task('watch', 'Watch those sass files so we can compile it for you on the fly.', function(){
     gulp.watch( themeDir + 'css/*.scss' , ['sass']);
 });
 
@@ -147,21 +151,25 @@ gulp.task('watch', function(){
 //
 // build from arsenal
 //
-gulp.task('build-scripts', function(){
+gulp.task(
+    'build-scripts',
+    'Using the "setup.json" config file in the document root, copy the enabled javascript files from the arsenal into an "enabled" directory.',
+    function(){
 
-    var activeJs = getActiveJSModules();
+        var activeJs = getActiveJSModules();
 
-    for( var i = 0; i < activeJs.length ; i++ ){
+        for( var i = 0; i < activeJs.length ; i++ ){
 
-        var enabledpath   = themeDir + 'js/arsenal/enabled/' + activeJs[i] + '.js',
-            availablePath = themeDir + 'js/arsenal/available/' + activeJs[i] + '.js';
+            var enabledpath   = themeDir + 'js/arsenal/enabled/' + activeJs[i] + '.js',
+                availablePath = themeDir + 'js/arsenal/available/' + activeJs[i] + '.js';
 
-        try{
-            fs.statSync(enabledpath);
-        } catch( e ){
-            console.log("copied " + enabledpath);
-            gulp.src( availablePath )
-                .pipe( gulp.dest( themeDir + 'js/arsenal/enabled/' ));
+            try{
+                fs.statSync(enabledpath);
+            } catch( e ){
+                console.log("copied " + enabledpath);
+                gulp.src( availablePath )
+                    .pipe( gulp.dest( themeDir + 'js/arsenal/enabled/' ));
+            }
         }
     }
-});
+);

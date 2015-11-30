@@ -14,6 +14,24 @@ function _s_customize_register( $wp_customize ) {
 	$wp_customize->get_setting( 'blogname' )->transport         = 'postMessage';
 	$wp_customize->get_setting( 'blogdescription' )->transport  = 'postMessage';
 	$wp_customize->get_setting( 'header_textcolor' )->transport = 'postMessage';
+
+    /**
+     * add a section to the customizer
+     */
+    // $wp_customize->add_section( '_s_hero_text_section' , array(
+    //     'title'      => __( 'Homepage hero text', 'mytheme' ),
+    //     'priority'   => 60,
+    // ) );
+
+    // $wp_customize->add_setting( '_s_hero_text', array(
+    //     'default' => 'Default copyright text',
+    // ));
+
+    // $wp_customize->add_control('_s_hero_text', array(
+    //     'label' => 'Copyright text',
+    //     'section' => '_s_hero_text_section',
+    //     'type' => 'text',
+    // ));
 }
 add_action( 'customize_register', '_s_customize_register' );
 

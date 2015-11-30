@@ -30,7 +30,7 @@ The Javascript is organized in the following way (all file paths are relative to
 Gulp Tasks
 ----------
 
-Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more.
+Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more. You can use `gulp help` to get an overview of the tasks present in this project, or use the reference below.
 
 #### `gulp`
 Runs the default task, which will optimize the javascript and svgs.

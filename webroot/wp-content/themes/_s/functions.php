@@ -79,12 +79,13 @@ function _s_setup() {
 
 
     /**
-     * Setup the WordPress core custom background feature.
+     * Setup the WordPress core custom background feature. Uncomment
+     *  this if you'd like the user to be able to control this stuff.
      */
-    add_theme_support( 'custom-background', apply_filters( '_s_custom_background_args', array(
-        'default-color' => 'ffffff',
-        'default-image' => '',
-    ) ) );
+    // add_theme_support( 'custom-background', apply_filters( '_s_custom_background_args', array(
+    //     'default-color' => 'ffffff',
+    //     'default-image' => '',
+    // ) ) );
 }
 endif; // _s_setup
 add_action( 'after_setup_theme', '_s_setup' );
@@ -183,7 +184,8 @@ function _s_loadArsenal(){
  * -------------------------------------------- */
 
 /**
- * Implement the Custom Header feature.
+ * Implement the Custom Header feature. Comment this out if you don't
+ *  need a banner image on the homepage (or other pages I guess).
  */
 require get_template_directory() . '/inc/custom-header.php';
 
