@@ -17,6 +17,7 @@ function _s_customize_register( $wp_customize ) {
 
     /**
      * add a section to the customizer
+     
      */
     // $wp_customize->add_section( '_s_hero_text_section' , array(
     //     'title'      => __( 'Homepage hero text', 'mytheme' ),
@@ -32,6 +33,34 @@ function _s_customize_register( $wp_customize ) {
     //     'section' => '_s_hero_text_section',
     //     'type' => 'text',
     // ));
+
+
+    /**
+     * add a section for the logo to the customizer
+     * @usage
+     *   get_theme_mod('_s_logo')
+     */
+    $wp_customize->add_section( '_s_branding' , array(
+        'title'    => __( '_s Branding', '_s' ),
+        'priority' => 60,
+    ) );
+
+    $wp_customize->add_setting('_s_logo', array(
+        'default'   => '',
+        'transport' => 'postMessage'
+    ));
+
+    $wp_customize->add_control(
+        new WP_Customize_Image_Control(
+            $wp_customize,
+            '_s_logo',
+            array(
+                'label'      => __( 'Upload a logo', '_s' ),
+                'section'    => '_s_branding',
+                'settings'   => '_s_logo',
+            )
+        )
+    );
 }
 add_action( 'customize_register', '_s_customize_register' );
 
@@ -39,6 +68,6 @@ add_action( 'customize_register', '_s_customize_register' );
  * Binds JS handlers to make Theme Customizer preview reload changes asynchronously.
  */
 function _s_customize_preview_js() {
-	wp_enqueue_script( '_s_customizer', get_template_directory_uri() . '/js/customizer.js', array( 'customize-preview' ), '20130508', true );
+	wp_enqueue_script( '_s_customizer', get_template_directory_uri() . '/js/customizer.js', array( 'customize-preview' ), false, true );
 }
 add_action( 'customize_preview_init', '_s_customize_preview_js' );

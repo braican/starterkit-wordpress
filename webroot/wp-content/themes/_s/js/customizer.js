@@ -34,4 +34,13 @@
             }
         } );
     } );
+
+    //
+    // the logo
+    //
+    wp.customize('_s_logo', function(value){
+        value.bind(function(to){
+            $('.logo img').attr('src', to);
+        });
+    });
 } )( jQuery );
