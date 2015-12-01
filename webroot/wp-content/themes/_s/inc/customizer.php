@@ -37,14 +37,13 @@ function _s_customize_register( $wp_customize ) {
 
     /**
      * add a section for the logo to the customizer
-     * @usage
-     *   get_theme_mod('_s_logo')
      */
     $wp_customize->add_section( '_s_branding' , array(
         'title'    => __( '_s Branding', '_s' ),
         'priority' => 60,
     ) );
 
+    // @usage get_theme_mod('_s_logo')
     $wp_customize->add_setting('_s_logo', array(
         'default'   => '',
         'transport' => 'postMessage'
@@ -61,6 +60,27 @@ function _s_customize_register( $wp_customize ) {
             )
         )
     );
+
+
+    /**
+     * section for footer text
+     */
+    $wp_customize->add_section( '_s_copyright' , array(
+        'title'    => __( 'Footer Copyright', '_s' ),
+        'priority' => 60,
+    ) );
+
+    // @usage get_theme_mod('_s_copyright_text')
+    $wp_customize->add_setting('_s_copyright_text', array(
+        'default'   => '',
+        'transport' => 'postMessage'
+    ));
+
+    $wp_customize->add_control('_s_copyright_text', array(
+        'label'   => __('Footer copyright text', '_s'),
+        'type'    => 'text',
+        'section' => '_s_copyright',
+    ));
 }
 add_action( 'customize_register', '_s_customize_register' );
 

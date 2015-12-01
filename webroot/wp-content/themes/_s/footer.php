@@ -11,8 +11,8 @@
 	</div><!-- #content -->
 
 	<footer id="colophon" class="site-footer" role="contentinfo">
-		<div class="site-info">
-			&copy; <?php echo date('Y'); ?>
+		<div class="site-copyright">
+			&copy; <?php echo date('Y'); ?> <span class="copyright-text"><?php get_theme_mod('_s_copyright_text'); ?></span>
 		</div><!-- .site-info -->
 	</footer><!-- #colophon -->
 </div><!-- #page -->

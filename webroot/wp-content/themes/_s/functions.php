@@ -222,7 +222,7 @@ require get_template_directory() . '/inc/api.php';
 
 
 //
-// wysiwyg stuff
+// WYSIWYG STUFF
 //
 
 
@@ -291,8 +291,9 @@ function _s_custom_wysiwyg_classes( $init_array ) {
 add_filter( 'tiny_mce_before_init', '_s_custom_wysiwyg_classes' );  
 
 
+
 //
-// filters for rendering fields
+// RENDERING FIELDS
 //
 
 /**
@@ -312,7 +313,7 @@ add_filter('_s_image_markup', '_s_create_img_markup');
 
 
 //
-// thumbnails and scaling
+// THUMBNAILS AND SCALING
 //
 
 
@@ -337,6 +338,40 @@ function _s_image_crop_dimensions($default, $orig_w, $orig_h, $new_w, $new_h, $c
     return array( 0, 0, (int) $s_x, (int) $s_y, (int) $new_w, (int) $new_h, (int) $crop_w, (int) $crop_h );
 }
 // add_filter('image_resize_dimensions', '_s_image_crop_dimensions', 10, 6);
+
+
+
+//
+// ADMIN SECTION
+//
+
+/**
+ * adds instructions for the featured image field
+ *
+ * @param $content (string)
+ *   - the markup for the block
+ */
+function _s_add_featured_image_instruction( $content ) {
+    global $post;
+
+    if( !$post || ! isset($post->post_type) ){
+        return $content;
+    }
+
+    $post_type = $post->post_type;
+
+    $helper_text = '';
+
+    switch ($post_type) {
+        case 'post_type':
+            $helper_text = "Additional text...";
+            break;
+    }
+
+
+    return $helper_text . $content;
+}
+add_filter( 'admin_post_thumbnail_html', '_s_add_featured_image_instruction');
 
 
 

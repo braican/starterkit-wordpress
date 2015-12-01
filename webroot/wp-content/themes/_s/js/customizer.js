@@ -40,7 +40,17 @@
     //
     wp.customize('_s_logo', function(value){
         value.bind(function(to){
-            $('.logo img').attr('src', to);
+            $('.site-logo img').attr('src', to);
         });
     });
+
+    //
+    // footer copyright
+    //
+    wp.customize('_s_copyright_text', function(value){
+        value.bind(function(to){
+            $('.site-footer .copyright-text').html(to);
+        });
+    });
+
 } )( jQuery );
