@@ -25,7 +25,7 @@
 	<header id="masthead" class="site-header" role="banner">
 		<div class="site-logo">
 			<?php if( $logo = get_theme_mod('_s_logo') ) : ?>
-				<img src="<?php echo $logo; ?>">
+				<a href="<?php echo esc_url( home_url('/') ); ?>"><img src="<?php echo $logo; ?>"></a>
 			<?php endif; ?>
 		</div>
 		<div class="site-branding">
