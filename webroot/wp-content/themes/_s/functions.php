@@ -227,7 +227,8 @@ require get_template_directory() . '/inc/api.php';
 
 
 /**
- * _s_modify_wysiwyg
+ * add block formats to the wysiwyg editor
+ *
  * @param $init : the object that drives the wysiwyg
  * @return the modified object that represents the wysiwyg
  */
@@ -241,8 +242,6 @@ add_filter('tiny_mce_before_init', '_s_modify_wysiwyg');
 
 
 /**
- * _s_add_style_select
- *
  * filter to add a style select dropdown to the WYSIWYG editor
  */
 function _s_add_style_select( $buttons ) {
@@ -255,8 +254,6 @@ add_filter('mce_buttons_2', '_s_add_style_select');
 
 
 /**
- * _s_custom_wysiwyg_classes
- *
  * filter to add a the actual styles to the wysiwyg
  */
 function _s_custom_wysiwyg_classes( $init_array ) {  
@@ -299,10 +296,10 @@ add_filter( 'tiny_mce_before_init', '_s_custom_wysiwyg_classes' );
 //
 
 /**
- * _s_create_img_markup 
- * 
  * filter to render an image from a custom field
- * @param $img_obj
+ *
+ * @param $img_obj (array)
+ *   - the image object from wordpress
  */
 function _s_create_img_markup($img_obj){
 
@@ -320,10 +317,9 @@ add_filter('_s_image_markup', '_s_create_img_markup');
 
 
 /**
- * _s_image_crop_dimensions
- *
  * filter to allow the upscaling of images to fit their assigned dimensions
- * http://wordpress.stackexchange.com/questions/50649/how-to-scale-up-featured-post-thumbnail
+ *
+ * @link http://wordpress.stackexchange.com/questions/50649/how-to-scale-up-featured-post-thumbnail
  */
 function _s_image_crop_dimensions($default, $orig_w, $orig_h, $new_w, $new_h, $crop) {
     if(!$crop)
@@ -350,9 +346,12 @@ function _s_image_crop_dimensions($default, $orig_w, $orig_h, $new_w, $new_h, $c
  * -------------------------------------------- */
 
 /**
- * include_svg
- * @param (string) svg : the svg to include
- * @param $return : whether to return the svg as a string or simply include the svg
+ * include svgs inline
+ *
+ * @param $svg (string)
+ *   - the svg to include
+ * @param $return (boolean)
+ *   - whether to return the svg as a string or simply include the svg
  */
 function include_svg( $svg, $return = false ){
     $svg_path = get_template_directory() . '/svg/build/' . $svg . '.svg';
