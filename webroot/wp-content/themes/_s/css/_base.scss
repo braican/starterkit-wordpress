@@ -203,14 +203,14 @@ small {
 }
 
 /* --clear */
-._s-cf:before,
-._s-cf:after,
+.site-cf:before,
+.site-cf:after,
 .column-container:before,
 .column-container:after {
     content: " ";
     display: table;
 }
-._s-cf:after,
+.site-cf:after,
 .column-container:after {
     clear: both;
 }

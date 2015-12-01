@@ -63,7 +63,6 @@ class Starterkit_Rename{
         $dirs = array(
             "webroot/wp-content/themes/_s/*.*",
             "webroot/wp-content/themes/_s/inc/*.php",
-            "webroot/wp-content/themes/_s/css/*.scss",
         );
 
         foreach( $dirs as $d ){

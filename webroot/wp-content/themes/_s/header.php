@@ -23,7 +23,7 @@
 	<a class="skip-link screen-reader-text" href="#content"><?php _e( 'Skip to content', '_s' ); ?></a>
 
 	<header id="masthead" class="site-header" role="banner">
-		<div class="logo">
+		<div class="site-logo">
 			<?php if( $logo = get_theme_mod('_s_logo') ) : ?>
 				<img src="<?php echo $logo; ?>">
 			<?php endif; ?>
