@@ -2,3 +2,59 @@
 /* ==============================================================
    --variables
    ============================================================== */
+
+
+/* --------------------------------------------
+ * --type
+ * -------------------------------------------- */
+
+@mixin sans-serif(){
+    font-family: "Helvetica Neue", Helvetica, Arial;
+    font-weight: 100;
+}
+
+
+/* --------------------------------------------
+ * --prefixes
+ * -------------------------------------------- */
+@mixin transform($transforms) {
+    -webkit-transform: $transforms;
+       -moz-transform: $transforms;
+        -ms-transform: $transforms;
+         -o-transform: $transforms;
+            transform: $transforms;
+}
+@mixin translate($x, $y){
+    @include transform(translate($x, $y));
+}
+
+
+@mixin transition($args...) {
+  -webkit-transition: $args;
+     -moz-transition: $args;
+      -ms-transition: $args;
+       -o-transition: $args;
+          transition: $args;
+}
+
+
+
+/* --------------------------------------------
+ * --media queries
+ * -------------------------------------------- */
+
+
+// ======================
+// Breakpoints
+// ======================
+
+$breakpoint-large: 1386px;
+
+// Media Query (Min-Width)
+@mixin break-min( $breakpoint: $breakpoint-large ) {
+    @media (min-width: $breakpoint ) { @content; }
+}
+// Media Query (Min-Width)
+@mixin break-max( $breakpoint: $breakpoint-large - 1 ) {
+    @media (max-width: $breakpoint ) { @content; }
+}

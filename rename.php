@@ -10,6 +10,8 @@ class Starterkit_Rename{
         // for theme names with multiple words, separated by dashes or spaces
         $this->safe_themename = strtolower( str_replace( array('-', ' '), '_', $this->themename ) );
 
+        $this->replaceInGulpfile();
+
         $this->replaceInConfig();
 
         $this->replaceInJs();
@@ -20,12 +22,21 @@ class Starterkit_Rename{
 
     }
 
+    /**
+     * replace in the gulpfile
+     */
+    private function replaceInGulpfile(){
+        $filename = "gulpfile.js";
+        $file = file_get_contents($filename);
+        file_put_contents($filename, preg_replace("/\/_s\//", '/' . $this->safe_themename . '/', $file));
+        echo "gulpfile updated\n";
+    }
+
 
     /**
      * replace in the wp-config-sample
      */
     private function replaceInConfig(){
-        // search/replace in the wp-config-sample
         $filename = "webroot/wp-config-sample.php";
         $file = file_get_contents($filename);
         file_put_contents($filename, preg_replace("/_s_theme/", $this->themename, $file));

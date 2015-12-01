@@ -55,6 +55,39 @@ function _s_the_field($field, $args = array() ){
 
 
 
+/**
+ * wrapper to call the _s_the_field function to return
+ * @param $field
+ * @param $args - see above
+ */
+function _s_get_field($field, $args = array() ){
+    $options = array_merge($args, array('return' => true));
+    return cc_the_field($field, $options);
+}
+
+
+
+/**
+ * Wrapper to display a field within a module. Since the page blocks
+ *  utilizes an ACF repeater field, all the fields within the modules
+ *  are actually sub fields
+ *
+ * @param $field (string)
+ *   - the name of the field
+ * @param $args (array)
+ *   - the arguments for this field. See above for complete list
+ *       of arguments
+ */
+function _s_module_field( $field, $args = array() ){
+
+    $options = array_merge( $args, array('sub_field' => true) );
+
+    _s_the_field($field, $options);
+
+}
+
+
+
 /* --------------------------------------------
  * --rendering
  * -------------------------------------------- */

@@ -5,9 +5,9 @@
    ============================================================== */
 
 
-/**
+/* --------------------------------------------
  * --media
- */
+ * -------------------------------------------- */
 img, svg {
     height: auto; /* Make sure images are scaled correctly. */
     max-width: 100%; /* Adhere to container width. */
@@ -74,38 +74,39 @@ object {
 }
 
 
-/**
+
+/* --------------------------------------------
  * --header
- */
+ * -------------------------------------------- */
 
 
 
 
 
-/**
+/* --------------------------------------------
  * --menu
- */
-.main-navigation {
-    clear: both;
-    display: block;
-    float: left;
-    width: 100%;
-}
+ * -------------------------------------------- */
+/* --------------------------------------------
+ * --menu
+ * -------------------------------------------- */
 .main-navigation ul {
     list-style: none;
     margin: 0;
     padding-left: 0;
-}
-.main-navigation li {
-    float: left;
-    position: relative;
-}
-.main-navigation a {
-    display: block;
-    text-decoration: none;
-}
-.main-navigation .current_page_item a,
-.main-navigation .current-menu-item a {
+
+    li{
+        display: inline-block;
+        position: relative;
+
+        a{
+            display: block;
+            text-decoration: none;
+        }
+
+        &.current_page_item a,
+        &.current-menu-item a{}
+
+    }
 }
 /* Small menu */
 .menu-toggle {
@@ -115,9 +116,9 @@ object {
 
 
 
-/**
+/* --------------------------------------------
  * --footer
- */
+ * -------------------------------------------- */
 .site-footer {
     clear: both;
     width: 100%;
