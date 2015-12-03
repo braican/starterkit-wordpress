@@ -177,6 +177,28 @@ function _s_content_types(){
         'hierarchical' => false,
         'show_ui'      => true,
     ));
+
+    //
+    // Locations
+    //
+    register_post_type('locations', array(
+        'labels'       => array(
+            'name'               => 'Locations',
+            'singular_name'      => 'Location',
+            'add_new_item'       => 'Add new Location',
+            'edit_item'          => 'Edit Location',
+            'new_item'           => 'New Location',
+            'view_item'          => 'View Location',
+            'search_items'       => 'Search Locations',
+            'not_found'          => 'No Locations found',
+            'not_found_in_trash' => 'No Locations found in Trash',
+        ),
+        'description'  => "The locations of this company.",
+        'supports'     => array('title', 'editor', 'thumbnail'),
+        'hierarchical' => false,
+        'show_ui'      => true,
+        'rewrite'      => false
+    ));
 }
 add_action('init', '_s_content_types');
 
@@ -198,6 +220,7 @@ function _s_taxonomies(){
     //         'choose_from_most_used'      => 'Choose from the most used tax_name'
     //     ),
     //     'hierarchical'          => false,
+    //     'show_admin_column'     => true,
     //     'update_count_callback' => '_update_post_term_count'
     // ));
     // register_taxonomy_for_object_type( 'tax_name', 'related_post_type' );

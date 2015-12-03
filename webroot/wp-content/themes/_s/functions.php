@@ -375,6 +375,39 @@ add_filter( 'admin_post_thumbnail_html', '_s_add_featured_image_instruction');
 
 
 
+/**
+ * set up the columns for the posts adimn page. Change POSTTYPE in
+ *  the function name to the type of post you'd like to add the
+ *  column to.
+ *
+ * @param $columns (array)
+ *   - the list of columns
+ */
+function _s_admin_POSTTYPE_columns( $columns ) {
+    // $columns['new-column-name'] = 'Column Label';
+    return $columns;
+}
+// add_action( 'manage_POSTTYPE_posts_columns' , '_s_admin_POSTTYPE_columns' );
+
+
+/**
+ * in the admin section, display custom columns
+ * @param $name (string)
+ *   - the name of the column, as set in cc_admin_custom_post_columns
+ */
+function _s_admin_custom_columns($name) {
+    global $post;
+    switch ($name) {
+        case 'new-column-name':
+            echo "Test";
+            break;
+    }
+}
+// add_action('manage_posts_custom_column',  '_s_admin_custom_columns');
+
+
+
+
 
 /* --------------------------------------------
  * --util

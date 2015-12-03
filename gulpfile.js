@@ -9,7 +9,7 @@ var gulp       = require('gulp-help')(require('gulp')),
 
     // svg
     svgmin     = require('gulp-svgmin'),
-    svgmin     = require('gulp-svgstore'),
+    svgstore   = require('gulp-svgstore'),
 
     // concat/uglify
     concat     = require('gulp-concat'),
