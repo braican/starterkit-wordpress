@@ -14,41 +14,73 @@
  *
  * @param $field
  * @param $args
- *     - id (number)         : the post id to check this field for
- *     - before (string)     : the html to appear before the field
- *     - after  (string)     : the html to appear after the field
- *     - filter (string)     : any filters to apply to the field
- *     - sub_field (boolean) : whether or not this field is a sub-field of a repeater
- *     - default (string)    : if the field is undefined, render the default
+ *    - id (number)         : the post id to check this field for.
+ *    - before (string)     : the html to appear before the field.
+ *    - after  (string)     : the html to appear after the field.
+ *    - filter (string)     : any filters to apply to the field.
+ *    - filter_args (array) : an array of arguments to pass to the filter.
+ *    - sub_field (boolean) : whether or not this field is a sub-field of a repeater.
+ *    - default (string)    : if the field is undefined, render the default. Default is an empty string.
+ *    - return (boolean)    : whether to return the value, or simply echo it. Default is false.
+ *    - debug (boolean)     : enables debug mode. Default is false.
  */
+
+
 function _s_the_field($field, $args = array() ){
 
     if ( function_exists( 'get_field' ) ) :
         global $post;
 
         $defaults = array(
-            'id'        => 0,
-            'before'    => '',
-            'after'     => '',
-            'filter'    => '',
-            'sub_field' => false,
-            'default'   => ''
+            'id'          => 0,
+            'before'      => '',
+            'after'       => '',
+            'filter'      => '',
+            'filter_args' => array(),
+            'sub_field'   => false,
+            'default'     => '',
+            'return'      => false,
+            'debug'       => false,
         );
         
         $options = array_merge($defaults, $args);
 
-        $id = $options['id'] ? $options['id'] : $post->ID;
+        //
+        // check to see if we have an ID set. if not, grab it from
+        //  the global post variable
+        //
+        if($options['id']){
+            $id = $options['id'];
+        } else {
+            if( !isset($post->ID)){
+                return;
+            }
+            $id = $post->ID;
+        }
 
         $val = $options['sub_field'] ? get_sub_field($field, $id) : get_field($field, $id) ;
 
         if( $val ){
             if($options['filter']){
-                $val = apply_filters( $options['filter'], $val );
+                $val = apply_filters( $options['filter'], $val, $options['filter_args'] );
             }
-            echo $options['before'] . $val . $options['after'];
+
+            $markup = $options['before'] . $val . $options['after'];
+            
+            if($options['return']){
+                return $markup;
+            }
+
+            echo $markup;
 
         } else if($options['default']){
-            echo $options['before'] . $options['default'] . $options['after'];
+            $markup = $options['before'] . $options['default'] . $options['after'];
+            
+            if($options['return']){
+                return $markup;
+            }
+
+            echo $markup; 
         }
     endif;
 }

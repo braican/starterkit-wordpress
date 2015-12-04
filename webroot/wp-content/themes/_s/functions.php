@@ -207,7 +207,7 @@ require get_template_directory() . '/inc/customizer.php';
 /**
  * Custom post types and taxonomies
  */
-require get_template_directory() . '/inc/register-content_types-taxonomies.php';
+require get_template_directory() . '/inc/register-post_types-taxonomies.php';
 
 /**
  * theme api
