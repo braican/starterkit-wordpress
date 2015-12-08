@@ -311,6 +311,20 @@ add_filter('_s_image_markup', '_s_create_img_markup');
 
 
 
+/**
+ * render an email address as a linked link
+ *
+ * @param $email (string)
+ *   - the email address
+ */
+function _s_link_email($email){
+    $email = '<a href="mailto:' . $email . '">' . $email . '</a>';
+
+    return $email;
+}
+add_filter('_s_link_email', '_s_link_email');
+
+
 
 //
 // THUMBNAILS AND SCALING
