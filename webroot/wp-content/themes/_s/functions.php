@@ -356,7 +356,7 @@ function _s_image_crop_dimensions($default, $orig_w, $orig_h, $new_w, $new_h, $c
 
 
 //
-// ADMIN SECTION
+// --ADMIN SECTION
 //
 
 /**
@@ -420,6 +420,16 @@ function _s_admin_custom_columns($name) {
 // add_action('manage_posts_custom_column',  '_s_admin_custom_columns');
 
 
+
+/**
+ * hides admin menu items
+ * @link - https://codex.wordpress.org/Function_Reference/remove_menu_page
+ */
+function _s_menu_page_removing() {
+    remove_menu_page( 'edit-comments.php' );
+
+}
+add_action( 'admin_menu', '_s_menu_page_removing' );
 
 
 
