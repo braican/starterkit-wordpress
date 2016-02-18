@@ -10,10 +10,10 @@ Getting Started
 1. Run the `rename.php` script: `php rename.php YOURTHEMENAME`.
 1. Copy the `wp-sample-config.php` and add the appropriate database credentials.
 1. Update the stylesheet header in `style.css` to reflect the proper information.
-1. Install WordPress.
-1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
 1. Run `npm install` to install gulp and get all that good stuff set up.
 1. Open `setup.json` and choose the javascript modules you'll want to use in this project (you can always adjust this later). Then run `gulp build-scripts` to copy the appropriate modules into the working directory.
+1. Install WordPress.
+1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
 
 
 Setting up this project
