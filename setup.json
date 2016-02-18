@@ -1,0 +1,6 @@
+{
+    "jsModules":{
+        "slider"    : true,
+        "modal"     : true
+    }
+}

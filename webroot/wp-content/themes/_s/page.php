@@ -13,19 +13,20 @@
 get_header(); ?>
 
 	<div id="primary" class="content-area">
-		<main id="main" class="site-main" role="main">
+        
+        <?php while ( have_posts() ) : the_post(); ?>
+            
+            <?php if ( '' !== $post->post_content ) : ?>
+                <main id="main" class="site-main" role="main">
+                    <?php get_template_part( 'content', 'page' ); ?>
+                </main><!-- #main -->
+            <?php endif; ?>
 
-			<?php while ( have_posts() ) : the_post(); ?>
+            <?php _s_the_page_blocks(); ?>
 
-				<?php get_template_part( 'content', 'page' ); ?>
+        <?php endwhile; // end of the loop. ?>
 
-			<?php endwhile; // end of the loop. ?>
-
-		</main><!-- #main -->
-
-		<?php _s_the_page_blocks(); ?>
-
-	</div><!-- #primary -->
+    </div><!-- #primary -->
 
 <?php get_sidebar(); ?>
 <?php get_footer(); ?>

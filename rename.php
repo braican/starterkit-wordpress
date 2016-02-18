@@ -1,77 +1,142 @@
-
 <?php
 
+
+class Starterkit_Rename{
+
+    function __construct( $t ){
+
+        $this->themename = $t;        
+
+        // for theme names with multiple words, separated by dashes or spaces
+        $this->safe_themename = strtolower( str_replace( array('-', ' '), '_', $this->themename ) );
+
+        $this->replaceInGulpfile();
+
+        $this->replaceInConfig();
+
+        $this->replaceInJs();
+
+        $this->replaceInTheme();
+
+        $this->renameDirectory();
+
+    }
+
+    /**
+     * replace in the gulpfile
+     */
+    private function replaceInGulpfile(){
+        $filename = "gulpfile.js";
+        $file = file_get_contents($filename);
+        file_put_contents($filename, preg_replace("/\/_s\//", '/' . $this->safe_themename . '/', $file));
+        echo "gulpfile updated\n";
+    }
+
+
+    /**
+     * replace in the wp-config-sample
+     */
+    private function replaceInConfig(){
+        $filename = "webroot/wp-config-sample.php";
+        $file = file_get_contents($filename);
+        file_put_contents($filename, preg_replace("/_s_theme/", $this->themename, $file));
+        echo "wp-config-sample.php updated\n";
+    }
+
+
+    /**
+     * replace in all the js files
+     */
+    private function replaceInJs(){
+
+        $dirs = array(
+            "webroot/wp-content/themes/_s/js/*.js",
+            "webroot/wp-content/themes/_s/js/arsenal/available/*.js",
+        );
+
+        foreach( $dirs as $d ){
+            foreach( glob($d) as $filename ){
+                $file = file_get_contents($filename);
+                $file = preg_replace("/_s/", strtoupper($this->themename), $file);
+                file_put_contents($filename, $file);
+            }
+        }
+
+        echo "theme js updated\n";
+    }
+
+
+    /**
+     * replace in all the rest of the files
+     */
+    private function replaceInTheme(){
+
+        $dirs = array(
+            "webroot/wp-content/themes/_s/*.*",
+            "webroot/wp-content/themes/_s/inc/*.php",
+        );
+
+        foreach( $dirs as $d ){
+            foreach( glob($d) as $filename ){
+                $this->replaceInFile( $filename );
+            }
+        }
+    }
+
+
+    private function renameDirectory(){
+        rename("webroot/wp-content/themes/_s/languages/_s.pot", "webroot/wp-content/themes/_s/languages/" . $this->safe_themename . '.pot');
+        rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $this->safe_themename);
+    }
+
+
+    /* --------------------------------------------
+     * --util
+     * -------------------------------------------- */
+
+
+    /**
+     * replace all instances within the given file
+     *
+     * @param $filename (string)
+     *   - the name of the file to check
+     */
+    private function replaceInFile($filename){
+        $file = file_get_contents($filename);
+        
+        // replace the script tags
+        $file = preg_replace("/_s_script-/", $this->safe_themename . "-", $file);
+
+        // replace the domain for translations
+        $file = preg_replace("/'_s'/", "'" . $this->themename . "'", $file);
+
+        // function names
+        $file = preg_replace("/_s_/", $this->safe_themename . "_", $file);
+
+        // replace classes
+        $file = preg_replace("/\._s/", "." . $this->safe_themename, $file);
+
+        // package name
+        $file = preg_replace("/ _s/", " " . ucfirst($this->themename), $file);
+
+        // right now, only the classes in the html
+        $file = preg_replace("/_s-/", " " . $this->safe_themename . "-", $file);
+
+        // text domain information
+        $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $this->themename, $file);
+
+        file_put_contents($filename, $file);
+        echo "theme templates updated\n";
+    }
+}
+
+
 if($argc != 2){
-    echo "Usage: search-replace.php themename\n";
+    echo "Usage: search-replace.php <themename>\n";
     exit;
 }
 
-$themename = $argv[1];
-
-// for theme names with multiple words, separated by dashes or spaces
-$safe_themename = str_replace( array('-', ' '), '_', $themename);
-
-// search/replace in the wp-config-sample
-$filename = "webroot/wp-config-sample.php";
-$file = file_get_contents($filename);
-file_put_contents($filename, preg_replace("/_s_theme/", $themename, $file));
-echo "wp-config-sample.php updated\n";
-
-// search/replace in the theme js
-$filename = "webroot/wp-content/themes/_s/js/main.js";
-$file = file_get_contents($filename);
-$file = preg_replace("/_s/", strtoupper($themename), $file);
-file_put_contents($filename, $file);
-echo "theme js updated\n";
-
-// search/replace in the theme template files
-foreach( glob("webroot/wp-content/themes/_s/*.*") as $filename ){
-    replaceInTemplates();
-}
-foreach( glob("webroot/wp-content/themes/_s/*/*.*") as $filename ){
-    replaceInTemplates();
-}
-
-rename("webroot/wp-content/themes/_s", "webroot/wp-content/themes/" . $themename);
-
-/**
- * replaceInTemplates
- *
- * do the search and replace on the given file
- */
-function replaceInTemplates(){
-
-    global $themename;
-    global $safe_themename;
-    global $filename;
-    
-
-    $file = file_get_contents($filename);
-    
-    // replace the script tags
-    $file = preg_replace("/_s_script-/", $themename . "-", $file);
-
-    // replace the domain for translations
-    $file = preg_replace("/'_s'/", "'" . $themename . "'", $file);
-
-    // function names
-    $file = preg_replace("/_s_/", $safe_themename . "_", $file);
-
-    // replace classes
-    $file = preg_replace("/\._s/", "." . $themename, $file);
-
-    // package name
-    $file = preg_replace("/ _s/", " " . ucfirst($themename), $file);
-
-    // right now, only the classes in the html
-    $file = preg_replace("/_s-/", " " . $themename . "-", $file);
-
-    // text domain information
-    $file = preg_replace("/Text Domain: _s/", "Text Domain: " . $themename, $file);
-
-    file_put_contents($filename, $file);
-    echo "theme templates updated\n";
-}
+new Starterkit_Rename( $argv[1] );
 
 
 ?>
