@@ -24,6 +24,11 @@ Setting up this project
 1. Create `wp-config.php` by copying the `wp-sample-config.php` and add the appropriate database credentials.
 
 
+API Reference
+-------------
+The wiki of this repo contains documentation for this theme's functions.
+
+
 Namespacing
 -----------
 Functions are namespaced with the prefix `sk`.
