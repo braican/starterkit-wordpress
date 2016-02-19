@@ -22,7 +22,7 @@ var gulp       = require('gulp-help')(require('gulp')),
 //
 // local vars
 //
-var themeDir = 'webroot/wp-content/themes/_s/';
+var themeDir = 'webroot/wp-content/themes/sherman/';
 
 //
 // SETUP
