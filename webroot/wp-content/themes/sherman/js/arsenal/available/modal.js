@@ -1,16 +1,16 @@
 //
 // modal
 //
-(function(_s, $, undefined){
+(function(SK, $, undefined){
 
 
     /**
      * --modal
      */
-    _s.modal = (function(){
+    SK.modal = (function(){
 
         var ACTIVE_CLASS    = 'visible',
-            MODAL_ID        = '_s-modal',
+            MODAL_ID        = 'l-modal',
 
             // jquery objects
             $body,
@@ -99,4 +99,4 @@
         };
     })(); // modal
 
-})(window._s = window._s || {}, jQuery);
+})(window.SK = window.SK || {}, jQuery);

@@ -20,11 +20,11 @@
 //
 // slider
 //
-(function(_s, $, undefined){
+(function(SK, $, undefined){
 
 
-    _s.slider = (function(){
+    SK.slider = (function(){
 
     })();
 
-})(window._s = window._s || {}, jQuery);
+})(window.SK = window.SK || {}, jQuery);
