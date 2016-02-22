@@ -144,7 +144,7 @@ function sk_the_page_blocks(){
     $blocks_repeater = 'sk_page_blocks';
 
     if( have_rows($blocks_repeater) ) : ?>
-        <div class="secondary-content">
+        <section class="secondary-content">
 
             <?php // loop through the rows of data ?>
             <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
@@ -165,7 +165,7 @@ function sk_the_page_blocks(){
                         get_template_part('modules/module', $module);
                     ?>
 
-                </div><!-- .cc-module -->
+                </section><!-- .sk-module -->
             <?php endwhile; ?>
 
         </div><!-- .secondary-content -->
