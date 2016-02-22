@@ -98,7 +98,7 @@ function sk_the_field($field, $args = array() ){
  */
 function sk_get_field($field, $args = array() ){
     $options = array_merge($args, array('return' => true));
-    return cc_the_field($field, $options);
+    return sk_the_field($field, $options);
 }
 
 

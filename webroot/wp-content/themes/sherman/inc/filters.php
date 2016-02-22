@@ -93,7 +93,7 @@ function sk_create_img_markup($img_obj){
     return '<img src="' . $img_obj['url'] . '">';
 
 }
-add_filter('_s_image_markup', 'sk_create_img_markup');
+add_filter('sk_image_markup', 'sk_create_img_markup');
 
 
 
