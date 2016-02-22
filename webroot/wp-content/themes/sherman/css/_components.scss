@@ -1,78 +1,9 @@
-
-
 /* ==============================================================
-   --components
-   ============================================================== */
-
-
-/* --------------------------------------------
- * --media
- * -------------------------------------------- */
-img, svg {
-    height: auto; /* Make sure images are scaled correctly. */
-    max-width: 100%; /* Adhere to container width. */
-}
-
-.alignleft {
-    display: inline;
-    float: left;
-    margin-right: 1.5em;
-}
-.alignright {
-    display: inline;
-    float: right;
-    margin-left: 1.5em;
-}
-.aligncenter {
-    clear: both;
-    display: block;
-    margin: 0 auto;
-}
-
-.page-content img.wp-smiley,
-.entry-content img.wp-smiley,
-.comment-content img.wp-smiley {
-    border: none;
-    margin-bottom: 0;
-    margin-top: 0;
-    padding: 0;
-}
-/* Make sure embeds and iframes fit their containers */
-embed,
-iframe,
-object {
-    max-width: 100%;
-}
-
-.iframe-container{
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 */
-    padding-top: 25px;
-    height: 0;
-}
-.iframe-container iframe{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.wp-caption {
-    margin-bottom: 1.5em;
-    max-width: 100%;
-}
-.wp-caption img[class*="wp-image-"] {
-    display: block;
-    margin: 0 auto;
-}
-.wp-caption-text {
-    text-align: center;
-}
-.wp-caption .wp-caption-text {
-    margin: 0.8075em 0;
-}
-
+ *
+ * Components
+ *  - styles for blocks and modules and things
+ *
+ * ============================================================== */
 
 
 /* --------------------------------------------
@@ -83,9 +14,6 @@ object {
 
 
 
-/* --------------------------------------------
- * --menu
- * -------------------------------------------- */
 /* --------------------------------------------
  * --menu
  * -------------------------------------------- */
@@ -124,3 +52,51 @@ object {
     width: 100%;
 }
 
+
+/* --------------------------------------------
+ * --wordpress default media
+ * -------------------------------------------- */
+.alignleft {
+    display: inline;
+    float: left;
+    margin-right: 1.5em;
+}
+.alignright {
+    display: inline;
+    float: right;
+    margin-left: 1.5em;
+}
+.aligncenter {
+    clear: both;
+    display: block;
+    margin: 0 auto;
+}
+
+.iframe-container{
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+.iframe-container iframe{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wp-caption {
+    margin-bottom: 1.5em;
+    max-width: 100%;
+}
+.wp-caption img[class*="wp-image-"] {
+    display: block;
+    margin: 0 auto;
+}
+.wp-caption-text {
+    text-align: center;
+}
+.wp-caption .wp-caption-text {
+    margin: 0.8075em 0;
+}

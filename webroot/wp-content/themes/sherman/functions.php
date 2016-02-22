@@ -53,13 +53,13 @@ function sk_setup() {
 
     
     /**
-     * add image sizes 
+     * Add image sizes 
      */
     // add_image_size('thumbnail-size', 368, 272, true);   
 
 
     /**
-     * This theme uses wp_nav_menu() in one location.
+     * Register nav menu locations
      */
     register_nav_menus( array(
         'primary' => __( 'Primary Menu', 'sherman' ),

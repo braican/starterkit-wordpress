@@ -1,7 +1,10 @@
-
 /* ==============================================================
-   --reset
-   ============================================================== */
+ *
+ * Base
+ *  - reset
+ *  - default styles
+ *
+ * ============================================================== */
 
 *,
 *:before,
@@ -168,6 +171,22 @@ small {
 }
 
 
+/* --------------------------------------------
+ * --media
+ * -------------------------------------------- */
+img, svg {
+    height: auto; /* Make sure images are scaled correctly. */
+    max-width: 100%; /* Adhere to container width. */
+}
+
+/* Make sure embeds and iframes fit their containers */
+embed,
+iframe,
+object {
+    max-width: 100%;
+}
+
+
 /* ==============================================================
    --utility
    ============================================================== */
@@ -203,14 +222,16 @@ small {
 }
 
 /* --clear */
-.site-cf:before,
-.site-cf:after,
-.column-container:before,
-.column-container:after {
-    content: " ";
-    display: table;
-}
-.site-cf:after,
-.column-container:after {
-    clear: both;
+.l-cf,
+.l-column-container{
+
+    &:before,
+    &:after{
+        content: " ";
+        display: table;
+    }
+
+    &:after{
+        clear: both;
+    }
 }

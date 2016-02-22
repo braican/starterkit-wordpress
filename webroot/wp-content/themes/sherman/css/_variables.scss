@@ -1,22 +1,47 @@
-
 /* ==============================================================
-   --variables
-   ============================================================== */
+ *
+ * Variables
+ *  - variables and mixins to make everything easier
+ *
+ * ============================================================== */
+
+
+/* --------------------------------------------
+ * --colors
+ * -------------------------------------------- */
+
+// text color
+$text-color: #202020;
+
+// link color
+$link-color: royalblue;
 
 
 /* --------------------------------------------
  * --type
  * -------------------------------------------- */
 
+/**
+ * the sans-serif type style
+ */
 @mixin sans-serif(){
     font-family: "Helvetica Neue", Helvetica, Arial;
     font-weight: 400;
 }
 
+// global font size and line height
+$font-size: 16px;
+$line-height: 1.4;
+
 
 /* --------------------------------------------
  * --prefixes
  * -------------------------------------------- */
+
+/**
+ * css transform
+ * @param $transforms
+ */
 @mixin transform($transforms) {
     -webkit-transform: $transforms;
        -moz-transform: $transforms;
@@ -24,11 +49,20 @@
          -o-transform: $transforms;
             transform: $transforms;
 }
+
+/**
+ * css translate - shortcut for the transform
+ * @param $x
+ * @param $y
+ */
 @mixin translate($x, $y){
     @include transform(translate($x, $y));
 }
 
-
+/**
+ * css transition prefix
+ * @param $args
+ */
 @mixin transition($args...) {
   -webkit-transition: $args;
      -moz-transition: $args;
@@ -43,18 +77,18 @@
  * --media queries
  * -------------------------------------------- */
 
-
-// ======================
-// Breakpoints
-// ======================
-
 $breakpoint-large: 1386px;
 
-// Media Query (Min-Width)
+/**
+ * Media Query (Min-Width)
+ */
 @mixin break-min( $breakpoint: $breakpoint-large ) {
     @media (min-width: $breakpoint ) { @content; }
 }
-// Media Query (Min-Width)
+
+/**
+ * Media Query (Min-Width)
+ */
 @mixin break-max( $breakpoint: $breakpoint-large - 1 ) {
     @media (max-width: $breakpoint ) { @content; }
 }
