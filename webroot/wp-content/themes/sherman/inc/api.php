@@ -124,6 +124,7 @@ function sk_module_field( $field, $args = array() ){
 
 
 
+
 /* --------------------------------------------
  * --rendering
  * -------------------------------------------- */
@@ -144,13 +145,13 @@ function sk_the_page_blocks(){
     $blocks_repeater = 'sk_page_blocks';
 
     if( have_rows($blocks_repeater) ) : ?>
-        <section class="secondary-content">
+        <div class="secondary-content">
 
             <?php // loop through the rows of data ?>
             <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
                 <?php $module = get_sub_field( 'sk_page_block_module' ); ?>
 
-                <div class="sk-module<?php echo $module ? " $module" : ""; ?>">
+                <section class="sk-module<?php echo $module ? " module--$module" : ""; ?>">
                     <?php
                         // //
                         // // - example implementation of getting the header field
