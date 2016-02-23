@@ -17,24 +17,17 @@
 /* --------------------------------------------
  * --menu
  * -------------------------------------------- */
-.main-navigation ul {
-    list-style: none;
-    margin: 0;
-    padding-left: 0;
+.main-navigation ul li {
+    display: inline-block;
+    position: relative;
 
-    li{
-        display: inline-block;
-        position: relative;
-
-        a{
-            display: block;
-            text-decoration: none;
-        }
-
-        &.current_page_item a,
-        &.current-menu-item a{}
-
+    a{
+        display: block;
+        text-decoration: none;
     }
+
+    &.current_page_item a,
+    &.current-menu-item a{}
 }
 /* Small menu */
 .menu-toggle {
