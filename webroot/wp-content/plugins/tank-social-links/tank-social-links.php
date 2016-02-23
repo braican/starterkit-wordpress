@@ -192,14 +192,18 @@ if( is_admin() ){
  * render a menu containing the social links
  *
  * @param $args (array) // an array of arguments:
- *    - intro_text (string): any intro copy to appear before the list
+ *    - intro_text (string) : any intro copy to appear before the list
+ *    - new_tab (boolean)   : whether or not to open the social link in a new window
+ *    - list_class (string) : the class to assign to the ul element
  */
 function tank_social_links__menu( $args = array() ){
     if( tank_social_links__has_social_links() ) :
         $links = get_option('tank_social_links');
 
         $defaults = array(
-            'intro_text' => ''
+            'intro_text' => '',
+            'new_tab'    => true,
+            'list_class' => 'menu'
         );
 
         $options = array_merge($defaults, $args);
@@ -210,7 +214,7 @@ function tank_social_links__menu( $args = array() ){
             <?php endif; ?>
             <ul class="menu">
                 <?php foreach($links as $site => $link) : if($link) : ?>
-                    <li><a href="<?php echo $link; ?>"><?php include_svg('social--' . $site); ?></a></li>
+                    <li><a href="<?php echo $link; ?>"<?php if( $options['new_tab'] ) echo ' target="_blank"'; ?>><?php include_svg('social--' . $site); ?></a></li>
                 <?php endif; endforeach; ?>
             </ul>
         </div>
@@ -231,7 +235,6 @@ function tank_social_links__has_social_links(){
 
     return false;
 }
-
 
 
 
