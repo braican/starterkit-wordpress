@@ -25,6 +25,12 @@
 
     SK.slider = (function(){
 
+        var $selector = $('.sk-slider');
+
+        $selector.slick({
+            
+        });
+
     })();
 
 })(window.SK = window.SK || {}, jQuery);
