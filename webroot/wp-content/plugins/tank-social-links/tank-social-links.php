@@ -36,6 +36,10 @@ class TankSocialLinks {
             'instagram' => array(
                 'id'    => 'instagram',
                 'title' => 'Instagram'
+            ),
+            'linkedin'  => array(
+                'id'    => 'linkedin',
+                'title' => 'LinkedIn'
             )
         );
 
@@ -125,7 +129,7 @@ class TankSocialLinks {
      * Print the Section text
      */
     public function print_section_info() {
-        print '<p>Add links to your social media pages here.</p><p><strong>IMPORTANT:</strong> All links must start with "http://".</p>';
+        print '<p>Add links to your social media pages here.</p><p><em><strong>IMPORTANT:</strong> All links must start with a leading <code>http://</code> or <code>https://</code>.</em></p>';
     }
 
 

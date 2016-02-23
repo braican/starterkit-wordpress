@@ -186,6 +186,26 @@ function sk_loadArsenal(){
 
 
 /* --------------------------------------------
+ * --theming
+ * -------------------------------------------- */
+
+/**
+ * check to see if some acf functions are present
+ */
+if( function_exists('get_field') === false ) :
+function get_field(){
+    return false;
+}    
+endif;
+
+if( function_exists('get_sub_field') === false ) :
+function get_sub_field(){
+    return false;
+}    
+endif;
+
+
+/* --------------------------------------------
  * --includes
  * -------------------------------------------- */
 
@@ -224,6 +244,7 @@ require get_template_directory() . '/inc/api.php';
  * custom filters
  */
 require get_template_directory() . '/inc/filters.php';
+
 
 
 
