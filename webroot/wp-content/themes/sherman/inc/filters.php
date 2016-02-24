@@ -138,6 +138,21 @@ function sk_sanitize_svg( $markup ){
 add_filter('sk_sanitize_svg', 'sk_sanitize_svg');
 
 
+
+/**
+ * creates markup for a youtube video embed
+ *
+ * @param $markup (string)
+ *   - the youtube ID, from the CMS
+ */
+function sk_youtube_video_embed($id){
+
+    return '<div class="iframe-container"><iframe width="560" height="315" src="https://www.youtube.com/embed/' . $id . '" frameborder="0" allowfullscreen></iframe></div>';
+}
+add_filter('sk_youtube', 'sk_youtube_video_embed');
+
+
+
 /* --------------------------------------------
  * --thumbnails and scaling
  * -------------------------------------------- */
