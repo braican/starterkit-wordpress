@@ -112,6 +112,32 @@ add_filter('sk_link_email', 'sk_link_email');
 
 
 
+/**
+ * sanitize any values coming through the CMS that should be output
+ *  as HTML and make sure that it's svg code
+ */
+function sk_sanitize_svg( $markup ){
+    $markup = trim( $markup );
+
+    $first = substr( $markup, 0, 5);
+    $last = substr( $markup, -6);
+
+    // check to make sure the string starts with a valid svg tag, and
+    //  ends with the closing svg tag
+    if( $first !== '<svg ' || $last !== '</svg>'){
+        return '';
+    }
+
+    // check to ensure there are no script tags
+    if( strpos( $markup, 'script' ) !== false ){
+        return '';
+    }
+
+    return $markup;
+}
+add_filter('sk_sanitize_svg', 'sk_sanitize_svg');
+
+
 /* --------------------------------------------
  * --thumbnails and scaling
  * -------------------------------------------- */
