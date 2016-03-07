@@ -106,8 +106,10 @@
 
             var classes = 'modal--' + name;
 
-            $modal.removeClass().addClass(classes).empty().html( content );
+            $target.empty().html( content );
 
+            $modal.removeClass().addClass(classes);
+            $modal.addClass( ACTIVE_CLASS );
         }
 
 
@@ -121,7 +123,7 @@
             // close the regular modal
             close  : close
         };
-        
+
     })(); // modal
 
 

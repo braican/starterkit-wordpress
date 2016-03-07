@@ -51,10 +51,16 @@ Gulp Tasks
 Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more. You can use `gulp help` to get an overview of the tasks present in this project, or use the reference below.
 
 #### `gulp`
-Runs the default task, which will optimize the javascript and svgs.
+Runs the default task, which is nothing at the moment.
 
-#### `gulp opt-js`
-Concatenates all the javascript (see above) and minifies it, placing a `production.min.js` file into `js/build` within the theme directory.
+#### `gulp help`
+List all the tasks defined in the gulpfile, and see a description of what they do.
+
+#### `gulp combine`
+Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file
+
+#### `gulp uglify`
+Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.
 
 #### `gulp opt-svg`
 Optimizes svgs.
@@ -68,7 +74,7 @@ Compiles sass.
 #### `gulp watch`
 Watch the `css` directory within the theme to changes to any `.scss` files.
 
-#### `gulp build-scripts`
+#### `gulp build`
 Using the `setup.json` file, builds the `js` directory within the theme with the appropriate js scripts.
 
 
