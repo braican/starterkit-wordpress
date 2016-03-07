@@ -7,14 +7,19 @@
     /**
      * --modal
      */
-    SK.modal = (function(){
+    var modal = (function(){
 
         var ACTIVE_CLASS    = 'visible',
-            MODAL_ID        = 'l-modal',
+            MODAL_ID        = 'sk-modal',
 
-            // jquery objects
+            // the body
             $body,
-            $modal;
+
+            // the modal wrapper
+            $modal,
+
+            // the modal target, so where the content goes
+            $target;
 
 
         /**
@@ -22,18 +27,42 @@
          *  setting up event listeners
          */
         function init(){
-            $modal = $('#' + MODAL_ID);
+
+            // set up the body var
             $body = $('body');
 
+            $modal = $('#' + MODAL_ID);
+            
+            $target = $modal.find('.modal-content');
+
+
             //
-            // trigger the launch of a modal
+            // build
             //
-            $('.js-launch-modal').on('click', function(event) {
+            if( $modal.length === 0 ){
+                $modal = $('<div id="' + MODAL_ID + '" />').appendTo( $body );
+                $target = $( '<div class="modal-content" />' ).appendTo( $modal );
+            }
+
+
+            //
+            // a modal can be launched from a trigger that defines a
+            //  "data-modal" parameter, which references the id of
+            //  some html already in the dom that contains the modal
+            //  markup.
+            //
+            // @usage
+            // <a href="#" data-modal="test-modal">Launch</a>
+            // <div id="test-modal">
+            //   This is some content for the modal
+            // </div>
+            //
+            $('[data-modal]').on('click', function(event) {
                 event.preventDefault();
-                var modal        = $(this).data('modal'),
+                var modalName    = $(this).data('modal'),
                     modalContent = $('#' + modal).html();
 
-                create(modalName, modalContent);
+                launch(modalName, modalContent);
             });
 
             //
@@ -62,7 +91,7 @@
          * -------------------------------------------- */
 
         /**
-         * load and create
+         * load and launch
          *
          * @param name (string)
          *   - the filename of the modal content you're looking to
@@ -71,18 +100,13 @@
          * @param content (string)
          *   - markup comtaining the modal content
          */
-        function create(name, content){
+        function launch(name, content){
 
             close();
 
             var classes = 'modal--' + name;
 
-            if( $modal.length === 0 ){
-                $modal = $('<div id="' + MODAL_ID + '" class="' + classes + '" />').appendTo( $body );
-                $modal.append( '<div class="modal-content">' + content + '</div>' );
-            } else {
-                $modal.removeClass().addClass(classes).empty().html( content );
-            }
+            $modal.removeClass().addClass(classes).empty().html( content );
 
         }
 
@@ -91,12 +115,24 @@
             // set up the modal jquery object and init event listeners
             init   : init, 
 
-            // creates and enables the basic modal
-            create : create,
+            // launches and enables the basic modal
+            launch : launch,
 
             // close the regular modal
             close  : close
         };
+        
     })(); // modal
+
+
+    //
+    // expose the modal object in the namespace for use elsewhere
+    //
+    SK.modal = modal;
+
+
+    $(document).ready(function() {
+        modal.init();
+    });
 
 })(window.SK = window.SK || {}, jQuery);
