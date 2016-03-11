@@ -17,6 +17,7 @@ $text-color: #202020;
 $link-color: royalblue;
 
 
+
 /* --------------------------------------------
  * --type
  * -------------------------------------------- */
@@ -122,18 +123,34 @@ $line-height: 1.4;
  * --media queries
  * -------------------------------------------- */
 
-$breakpoint-large: 1386px;
+$small-desktop: 1068px;
 
-/**
- * Media Query (Min-Width)
- */
-@mixin break-min( $breakpoint: $breakpoint-large ) {
-    @media (min-width: $breakpoint ) { @content; }
+$tablet: 860px;
+
+$mobile: 580px;
+
+
+@mixin desktop {
+    @media ( min-width: 1069px ){
+        @content;
+    }
 }
 
-/**
- * Media Query (Min-Width)
- */
-@mixin break-max( $breakpoint: $breakpoint-large - 1 ) {
-    @media (max-width: $breakpoint ) { @content; }
+@mixin small-desktop{
+    @media ( max-width: #{$small-desktop} ){
+        @content;
+    }
+}
+
+@mixin tablet {
+  @media (max-width: #{$tablet}) {
+    @content;
+  }
+}
+
+
+@mixin mobile{
+    @media (max-width: #{$mobile}){
+        @content;
+    }
 }
