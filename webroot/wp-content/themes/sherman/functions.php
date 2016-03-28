@@ -185,24 +185,6 @@ function sk_loadArsenal(){
 }
 
 
-/* --------------------------------------------
- * --theming
- * -------------------------------------------- */
-
-/**
- * check to see if some acf functions are present
- */
-if( function_exists('get_field') === false ) :
-function get_field(){
-    return false;
-}    
-endif;
-
-if( function_exists('get_sub_field') === false ) :
-function get_sub_field(){
-    return false;
-}    
-endif;
 
 
 /* --------------------------------------------
