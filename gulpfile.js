@@ -7,6 +7,9 @@ var gulp       = require('gulp-help')(require('gulp')),
     rename     = require('gulp-rename'),
     watch      = require('gulp-watch'),
 
+    // inject
+    inject     = require('gulp-inject-string'),
+
     // svg
     svgmin     = require('gulp-svgmin'),
     svgstore   = require('gulp-svgstore'),
@@ -32,12 +35,12 @@ var setup     = require( './setup.json' ),
 
 
 /* --------------------------------------------
- * --util
+ * --getters
  * -------------------------------------------- */
 
 /**
- * returns an array of javascript modules that should be included in
- *  this project, per setup.json
+ * returns an array of javascript modules that should be included
+ *  in this project, per setup.json
  *
  * @return array
  */
@@ -54,6 +57,26 @@ var getActiveJSModules = function(){
     return activeModules;
 }
 
+
+
+/**
+ * returns an array of content types that should be registered for
+ *  this project, per the setup.json file
+ *
+ * @return array
+ */
+var getContentTypes = function(){
+    var ct      = [],
+        modules = setup.contentTypes;
+
+    for( module in modules ){
+        if( modules[module] === true ){
+            ct.push(module);
+        }
+    }
+
+    return ct;
+}
 
 
 /* --------------------------------------------
@@ -181,12 +204,15 @@ gulp.task(
  */
 gulp.task(
     'build',
-    'Using the "setup.json" config file in the document root, copy the enabled javascript files from the arsenal into the theme.',
+    'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.',
     function(){
 
+        //
+        // build the js
+        //
         var activeJs = getActiveJSModules();
 
-        for( var i = 0; i < activeJs.length ; i++ ){
+        for( var i = 0; i < activeJs.length; i++ ){
 
             var enabledpath   = themeDir + 'js/arsenal/' + activeJs[i] + '.js',
                 availablePath = './_arsenal/js/' + activeJs[i] + '.js';
@@ -199,5 +225,24 @@ gulp.task(
                     .pipe( gulp.dest( themeDir + 'js/arsenal/' ));
             }
         }
+
+
+        //
+        // register the content types
+        //
+        var contentTypes = getContentTypes(),
+            postTypesPhp = themeDir + 'inc/sk-post-types.php',
+            types        = '';
+
+        for( var i = 0; i < contentTypes.length; i++ ){
+            var file        = './_arsenal/content-types/' + contentTypes[i] + '.php',
+                fileContent = fs.readFileSync( file );
+
+            types += fileContent + "\n\n";
+        }
+
+        gulp.src( postTypesPhp )
+            .pipe( inject.replace('//sk_insert_types//', types ))
+            .pipe( gulp.dest( themeDir + 'inc'));
     }
 );

@@ -169,14 +169,16 @@ add_action( 'wp_enqueue_scripts', 'sk_scripts' );
 function sk_loadArsenal(){
 
     // the list of available scripts
-    $arsenal = glob('js/arsenal/*.js');
+    $arsenal = glob( get_template_directory() . '/js/arsenal/*.js');
 
     foreach( $arsenal as $script ){
-        
-        $path = '/js/arsenal/enabled/' . $script . '.js';
 
-        if( file_exists( get_template_directory() . $path ) ){
-            wp_enqueue_script( "sk_script--$script", get_template_directory_uri() . $path, array('jquery'), false, true);
+        $filename = str_replace( get_template_directory() . '/js/arsenal/', '', $script);
+        $path = get_template_directory() . '/js/arsenal/' . $filename;
+        $uri = get_template_directory_uri() . '/js/arsenal/' . $filename;
+
+        if( file_exists( $path ) ){
+            wp_enqueue_script( "sk_script--$filename", $uri, array('jquery'), false, true);
         }
     }
 }
