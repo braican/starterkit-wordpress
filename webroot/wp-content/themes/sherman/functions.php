@@ -214,7 +214,8 @@ require get_template_directory() . '/inc/customizer.php';
 /**
  * Custom post types and taxonomies
  */
-require get_template_directory() . '/inc/register-post_types-taxonomies.php';
+require get_template_directory() . '/inc/sk-post-types.php';
+require get_template_directory() . '/inc/sk-taxonomies.php';
 
 /**
  * theme api - generally front end functions
