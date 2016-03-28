@@ -8,12 +8,12 @@ Theme based on [_s](https://github.com/Automattic/_s/).
 Getting Started
 ---------------
 1. Run `npm install` to install gulp and get all that good stuff set up.
-1. Open `setup.json` and choose the javascript modules you'll want to use in this project (you can always adjust this later). Then run `gulp build-scripts` to copy the appropriate scripts into the working directory.
-1. Update the stylesheet header in `style.css` to reflect the proper information.
+1. Open `setup.json`. This file contains json that allows you to opt into common javascript components and content types. Set the components you wish to use to `true` and save the file. Run `gulp build` to build theme files containing your selected components.
+1. Update the stylesheet header in `style.css` to reflect the proper information for your theme.
 1. If you haven't created a database for this site, do that now.
-1. Copy the `wp-sample-config.php` and add the appropriate database credentials.
+1. Copy the `wp-sample-config.php` to `wp-config.php` and add the appropriate database credentials.
 1. Install WordPress.
-1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
+1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme, and enable the Advanced Custom Fields and ACF: Repeater plugins.
 
 
 Setting up this project

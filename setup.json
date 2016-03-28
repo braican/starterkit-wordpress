@@ -1,13 +1,13 @@
 {
     "jsModules": {
-        "slider"    : true,
-        "modal"     : true
+        "slider"    : false,
+        "modal"     : false
     },
     "contentTypes": {
-        "careers"       : true,
+        "careers"       : false,
         "case-studies"  : false,
-        "clients"       : true,
-        "locations"     : true,
+        "clients"       : false,
+        "locations"     : false,
         "services"      : false,
         "team-members"  : false
     }
