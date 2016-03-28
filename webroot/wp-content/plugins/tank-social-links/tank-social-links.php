@@ -36,6 +36,10 @@ class TankSocialLinks {
             'instagram' => array(
                 'id'    => 'instagram',
                 'title' => 'Instagram'
+            ),
+            'linkedin'  => array(
+                'id'    => 'linkedin',
+                'title' => 'LinkedIn'
             )
         );
 
@@ -122,10 +126,10 @@ class TankSocialLinks {
 
 
     /** 
-     * Print the Section text
+     * Print the section helper text
      */
     public function print_section_info() {
-        print '<p>Add links to your social media pages here.</p><p><strong>IMPORTANT:</strong> All links must start with "http://".</p>';
+        print '<p>Add links to your social media pages here.</p><p><em><strong>IMPORTANT:</strong> All links must start with a leading <code>http://</code> or <code>https://</code>.</em></p>';
     }
 
 
@@ -183,19 +187,34 @@ if( is_admin() ){
  * -------------------------------------------- */
 
 
+
 /**
- * tank_social_links__menu 
- * 
  * render a menu containing the social links
+ *
+ * @param $args (array) // an array of arguments:
+ *    - intro_text (string) : any intro copy to appear before the list
+ *    - new_tab (boolean)   : whether or not to open the social link in a new window
+ *    - list_class (string) : the class to assign to the ul element
  */
-function tank_social_links__menu(){
+function tank_social_links__menu( $args = array() ){
     if( tank_social_links__has_social_links() ) :
         $links = get_option('tank_social_links');
+
+        $defaults = array(
+            'intro_text' => '',
+            'new_tab'    => true,
+            'list_class' => 'menu'
+        );
+
+        $options = array_merge($defaults, $args);
     ?>
         <div class="tank-social-links--menu">
+            <?php if( $options['intro_text'] !== '' ) : ?>
+                <span class="tank-social-links--intro"><?php echo $options['intro_text']; ?></span>
+            <?php endif; ?>
             <ul class="menu">
                 <?php foreach($links as $site => $link) : if($link) : ?>
-                    <li><a href="<?php echo $link; ?>"><?php include_svg('social--' . $site); ?></a></li>
+                    <li><a href="<?php echo $link; ?>"<?php if( $options['new_tab'] ) echo ' target="_blank"'; ?>><?php include_svg('social--' . $site); ?></a></li>
                 <?php endif; endforeach; ?>
             </ul>
         </div>
@@ -204,21 +223,18 @@ function tank_social_links__menu(){
 }
 
 /**
- * tank_social_links__has_social_links
- *
- * helper function to check to see if there are any social links filled out
+ * helper function to check to see if there are any social links
+ *  filled out
  */
 function tank_social_links__has_social_links(){
     $links = get_option('tank_social_links');
 
     foreach($links as $l){
-        if($l)
-            return true;
+        if($l) return true;
     }
 
     return false;
 }
-
 
 
 

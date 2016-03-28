@@ -1,0 +1,156 @@
+/* ==============================================================
+ *
+ * Variables
+ *  - variables and mixins to make everything easier
+ *
+ * ============================================================== */
+
+
+/* --------------------------------------------
+ * --colors
+ * -------------------------------------------- */
+
+// text color
+$text-color: #202020;
+
+// link color
+$link-color: royalblue;
+
+
+
+/* --------------------------------------------
+ * --type
+ * -------------------------------------------- */
+
+/**
+ * the sans-serif type style
+ */
+@mixin sans-serif(){
+    font-family: "Helvetica Neue", Helvetica, Arial;
+    font-weight: 400;
+}
+
+// global font size and line height
+$font-size: 16px;
+$line-height: 1.4;
+
+
+/* --------------------------------------------
+ * --prefixes
+ * -------------------------------------------- */
+
+/**
+ * css transform
+ * @param $transforms
+ */
+@mixin transform($transforms) {
+    -webkit-transform: $transforms;
+       -moz-transform: $transforms;
+        -ms-transform: $transforms;
+         -o-transform: $transforms;
+            transform: $transforms;
+}
+
+/**
+ * css translate - shortcut for the transform
+ * @param $x
+ * @param $y
+ */
+@mixin translate($x, $y){
+    @include transform(translate($x, $y));
+}
+
+/**
+ * css transition prefix
+ * @param $args
+ */
+@mixin transition($args...) {
+  -webkit-transition: $args;
+     -moz-transition: $args;
+      -ms-transition: $args;
+       -o-transition: $args;
+          transition: $args;
+}
+
+
+
+/**
+ * keyframes and animation mixin
+ *
+ * @usage
+ * @include animation( [name], [duration], [repeat], [delay] )
+ *
+ * @example
+ * @include animation('fadein 1s infinite 0s');
+ */
+@mixin keyframes($animation-name) {
+    @-webkit-keyframes #{$animation-name} {
+        @content;
+    }
+    @-moz-keyframes #{$animation-name} {
+        @content;
+    }  
+    @-ms-keyframes #{$animation-name} {
+        @content;
+    }
+    @-o-keyframes #{$animation-name} {
+        @content;
+    }  
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}
+
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+     -moz-animation: #{$str};
+      -ms-animation: #{$str};
+       -o-animation: #{$str};
+          animation: #{$str};      
+}
+
+/**
+ * the keyframe animation
+ */
+@include keyframes( fadein ) {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+
+
+/* --------------------------------------------
+ * --media queries
+ * -------------------------------------------- */
+
+$small-desktop: 1068px;
+
+$tablet: 860px;
+
+$mobile: 580px;
+
+
+@mixin desktop {
+    @media ( min-width: 1069px ){
+        @content;
+    }
+}
+
+@mixin small-desktop{
+    @media ( max-width: #{$small-desktop} ){
+        @content;
+    }
+}
+
+@mixin tablet {
+  @media (max-width: #{$tablet}) {
+    @content;
+  }
+}
+
+
+@mixin mobile{
+    @media (max-width: #{$mobile}){
+        @content;
+    }
+}

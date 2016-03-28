@@ -7,21 +7,31 @@ Theme based on [_s](https://github.com/Automattic/_s/).
 
 Getting Started
 ---------------
-1. Run the `rename.php` script: `php rename.php YOURTHEMENAME`.
-1. Copy the `wp-sample-config.php` and add the appropriate database credentials.
+1. Run `npm install` to install gulp and get all that good stuff set up.
+1. Open `setup.json` and choose the javascript modules you'll want to use in this project (you can always adjust this later). Then run `gulp build-scripts` to copy the appropriate scripts into the working directory.
 1. Update the stylesheet header in `style.css` to reflect the proper information.
+1. If you haven't created a database for this site, do that now.
+1. Copy the `wp-sample-config.php` and add the appropriate database credentials.
 1. Install WordPress.
 1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme.
-1. Run `npm install` to install gulp and get all that good stuff set up.
-1. Open `setup.json` and choose the javascript modules you'll want to use in this project (you can always adjust this later). Then run `gulp build-scripts` to copy the appropriate modules into the working directory.
 
 
 Setting up this project
 -----------------------
 1. Clone this repo.
+1. Run `npm install` to install gulp and get all that good stuff set up.
 1. Install the database, from wherever you can get it. Worse case, there is a `db` directory in here, use the most recent dump in there.
 1. Create `wp-config.php` by copying the `wp-sample-config.php` and add the appropriate database credentials.
-1. Run `npm install` to install gulp and get all that good stuff set up.
+
+
+API Reference
+-------------
+The wiki of this repo contains documentation for this theme's functions.
+
+
+Namespacing
+-----------
+Functions are namespaced with the prefix `sk`.
 
 
 The Javascript Structure
@@ -41,10 +51,16 @@ Gulp Tasks
 Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more. You can use `gulp help` to get an overview of the tasks present in this project, or use the reference below.
 
 #### `gulp`
-Runs the default task, which will optimize the javascript and svgs.
+Runs the default task, which is nothing at the moment.
 
-#### `gulp opt-js`
-Concatenates all the javascript (see above) and minifies it, placing a `production.min.js` file into `js/build` within the theme directory.
+#### `gulp help`
+List all the tasks defined in the gulpfile, and see a description of what they do.
+
+#### `gulp combine`
+Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file
+
+#### `gulp uglify`
+Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.
 
 #### `gulp opt-svg`
 Optimizes svgs.
@@ -58,8 +74,8 @@ Compiles sass.
 #### `gulp watch`
 Watch the `css` directory within the theme to changes to any `.scss` files.
 
-#### `gulp build-scripts`
-Using the `setup.json` file, builds the `js` directory within the theme with the appropriate js modules.
+#### `gulp build`
+Using the `setup.json` file, builds the `js` directory within the theme with the appropriate js scripts.
 
 
 WordPress Imports
@@ -69,22 +85,30 @@ Inside the `_imports` directory, there are some `.xml` files that can be importe
 #### `acf--page-blocks.xml`
 The Advanced Custom Fields setup for page blocks. Creates an additional field for pages that allows for the addition of modules onto that page. See the [custom page blocks](#custom-page-blocks) section below.
 
+Upon importing these fields
+
 #### `acf--location-fields.xml`
 Fields for the Location content type.
 
 
 Custom Page Blocks
 ------------------
-This theme uses Advanced Custom Fields to create a field for the "page" content type that allows the user to add additional modules, or content blocks, onto that page. Once you import the `acf--page-blocks.xml` file in the `_imports` directory, you will find a "Page Blocks" field group in the ACF admin section. To set up the custom page blocks:
+This theme uses Advanced Custom Fields to create a field for the "page" content type that allows the user to add additional modules, or content blocks, onto that page. To set this functionality up: 
 
-1. Inside the "Page Blocks" field group, there will be a repeater field (called "Additional Page Blocks") that contains two subfields ("Block Module" and "Block Title"). Rename the "Field Name" of each of these fields/subfields to reflect your theme's namespace.
-1. In the theme directory, locate the namespaced `_s_the_page_blocks` function inside the `inc/api.php` file. Update the following variables to reflect the "Field Name" values you updated above:
-  * `$blocks_repeater` - the "Field Name" of the "Additional Page Blocks" repeater field.
-  * `$module_title` - the "Field Name" of the "Block Title" subfield.
+1. Install the `Advanced Custom Fields` and `Advanced Custom Fields: Repeater Field` plugins.
+1. Import the `acf--page-blocks.xml` file in the `_imports` directory.
 
-To add a new module to the page blocks, duplicate the `module.php` file inside the `modules` directory in the theme, and rename the copied file to reflect the funciton of the module. Back in the ACF admin, find the "Block Module" subfield in the "Page Blocks" field group and create a new choice using the module file name (*without* the trailing `.php`) and a label for the module. For example, if you created a module called `_s_latest-blog-posts.php`, you would add the following to the "Choices" field:
+Once you import the xml file you will find a "Page Blocks" field group in the ACF admin section. This will include a repeater field called `Additional Page Blocks` containing two sub-fields:
 
-`_s_latest-blog-posts : Latest Blog Posts`
+#### `Block Module`
+An html select element containing all of the available block modules that can be included on a page
+
+#### `Block Title`
+A title for this block. Depending on the theme implementation, this value can be used in the theme as a heading for this block.
+
+To add a new module to the page blocks, duplicate the `module.php` file inside the `modules` directory in the theme, and rename the copied file to reflect the function of the module (include a leading `module-` in the filename). Back in the ACF admin, find the "Block Module" subfield in the "Page Blocks" field group and create a new choice using the module file name (*without* the trailing `.php`) and a label for the module. For example, if you created a module called `module-latest-blog-posts.php`, you would add the following to the "Choices" field:
+
+`module-latest-blog-posts : Latest Blog Posts`
 
 When you add a new block to a page, this module will be available in the "Block Module" dropdown.
 

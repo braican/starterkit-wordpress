@@ -22,7 +22,7 @@ var gulp       = require('gulp-help')(require('gulp')),
 //
 // local vars
 //
-var themeDir = 'webroot/wp-content/themes/_s/';
+var themeDir = 'webroot/wp-content/themes/sherman/';
 
 //
 // SETUP
@@ -60,40 +60,44 @@ var getActiveJSModules = function(){
  * --gulp
  * -------------------------------------------- */
 
-//
-// default - runs the opt-js and opt-svg tasks
-//
-gulp.task('default', ['opt-js', 'opt-svg']);
+/**
+ * default - doesn't do anything
+ * @TODO set up what the default task should do
+ */
+gulp.task('default', []);
 
 
-//
-// optimize js
-//
-gulp.task(
-    'opt-js',
-    'Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.',
-    function(){
-        // -- concat js
-        gulp.src( [themeDir + 'js/arsenal/enabled/*.js', themeDir + 'js/plugins.js', themeDir + 'js/main.js'])
-            .pipe(concat('production.js'))
-            .pipe(gulp.dest( themeDir + 'js/build' ));
+/**
+ * concatenate javascripts
+ */
+gulp.task( 'combine', 'Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file', function(){
+    return gulp.src( [
+                themeDir + 'js/arsenal/enabled/*.js',
+                themeDir + 'js/plugins.js',
+                themeDir + 'js/main.js'
+            ] )
+            .pipe( concat('production.js') )
+            .pipe( gulp.dest( themeDir + 'js/build' ) );
+});
 
 
-        // -- ugilfy
-        gulp.src( themeDir + 'js/build/production.js')
-            .pipe(uglify())
-            .pipe(rename({
-                extname: '.min.js'
-            }))
-            .pipe(gulp.dest( themeDir + '/js/build' ));
-    }
-);
+/**
+ * minify the concatenated javascript file
+ */
+gulp.task( 'uglify', 'Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.', ['combine'], function(){
+    return gulp.src( themeDir + 'js/build/production.js')
+        .pipe(uglify())
+        .pipe(rename({
+            extname: '.min.js'
+        }))
+        .pipe(gulp.dest( themeDir + '/js/build' ));
+});
 
 
 
-//
-// optimize svg
-//
+/**
+ * optimize svg
+ */
 gulp.task( 'opt-svg', 'Optimizes the svg files.', function(){
     // -- svgmin (minify svg)
     gulp.src( themeDir + 'svg/*.svg' )
@@ -104,9 +108,9 @@ gulp.task( 'opt-svg', 'Optimizes the svg files.', function(){
 
 
 
-//
-// svg store
-//
+/**
+ * svg store
+ */
 gulp.task('svgstore', 'Creates the svg sprite that can be loaded into the page via javascript.', function () {
     return gulp.src( themeDir + 'svg/icons/**/*.svg')
             .pipe(rename({prefix: 'icon--'}))
@@ -125,9 +129,9 @@ gulp.task('svgstore', 'Creates the svg sprite that can be loaded into the page v
             .pipe(gulp.dest( themeDir + 'svg/icons/build'));
 });
 
-//
-// compile sass
-//
+/**
+ * compile sass
+ */
 gulp.task('sass', 'Compile that sass.', function(){
     gulp.src( themeDir + 'css/*.scss')
         .pipe(sourcemaps.init())
@@ -140,19 +144,19 @@ gulp.task('sass', 'Compile that sass.', function(){
         .pipe(gulp.dest( themeDir + 'css/build/' ));
 });
 
-//
-// watch the sass directory
-//
+/**
+ * watch the sass directory
+ */
 gulp.task('watch', 'Watch those sass files so we can compile it for you on the fly.', function(){
     gulp.watch( themeDir + 'css/*.scss' , ['sass']);
 });
 
 
-//
-// build from arsenal
-//
+/**
+ * build from arsenal
+ */
 gulp.task(
-    'build-scripts',
+    'build',
     'Using the "setup.json" config file in the document root, copy the enabled javascript files from the arsenal into an "enabled" directory.',
     function(){
 
