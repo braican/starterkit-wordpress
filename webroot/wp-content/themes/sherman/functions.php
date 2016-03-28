@@ -169,10 +169,7 @@ add_action( 'wp_enqueue_scripts', 'sk_scripts' );
 function sk_loadArsenal(){
 
     // the list of available scripts
-    $arsenal = array(
-        'modal',
-        'slider'
-    );
+    $arsenal = glob('js/arsenal/*.js');
 
     foreach( $arsenal as $script ){
         
