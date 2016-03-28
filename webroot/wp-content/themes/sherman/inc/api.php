@@ -104,8 +104,8 @@ function sk_get_field($field, $args = array() ){
 
 
 /**
- * Wrapper to display a field within a module. Since the page blocks
- *  utilizes an ACF repeater field, all the fields within the modules
+ * Wrapper to display a field within a block. Since the page blocks
+ *  utilizes an ACF repeater field, all the fields within the blocks
  *  are actually sub fields
  *
  * @param $field (string)
@@ -114,7 +114,7 @@ function sk_get_field($field, $args = array() ){
  *   - the arguments for this field. See above for complete list
  *       of arguments
  */
-function sk_module_field( $field, $args = array() ){
+function sk_block_field( $field, $args = array() ){
 
     $options = array_merge( $args, array('sub_field' => true) );
 
@@ -132,7 +132,7 @@ function sk_module_field( $field, $args = array() ){
 
 /**
  * hooks into the ACF repeater field to render all the additional
- *  page blocks for a page. Calls tempaltes in the modules/ directory
+ *  page blocks for a page. Calls tempaltes in the blocks/ directory
  */
 function sk_the_page_blocks(){
 
@@ -149,9 +149,9 @@ function sk_the_page_blocks(){
 
             <?php // loop through the rows of data ?>
             <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
-                <?php $module = get_sub_field( 'sk_page_block_module' ); ?>
+                <?php $block = get_sub_field( 'sk_page_block_module' ); ?>
 
-                <section class="sk-module<?php echo $module ? " module--$module" : ""; ?>">
+                <section class="sk-block<?php echo $module ? " block--$module" : ""; ?>">
                     <?php
                         // //
                         // // - example implementation of getting the header field
@@ -163,7 +163,7 @@ function sk_the_page_blocks(){
                         //     'sub_field' => true
                         // ));
 
-                        get_template_part('modules/module', $module);
+                        get_template_part('blocks/block', $module);
                     ?>
 
                 </section><!-- .sk-module -->
