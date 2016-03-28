@@ -149,9 +149,9 @@ function sk_the_page_blocks(){
 
             <?php // loop through the rows of data ?>
             <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
-                <?php $block = get_sub_field( 'sk_page_block_module' ); ?>
+                <?php $block = get_sub_field( 'sk_page_block' ); ?>
 
-                <section class="sk-block<?php echo $module ? " block--$module" : ""; ?>">
+                <section class="sk-block<?php echo $block ? " block--$block" : ""; ?>">
                     <?php
                         // //
                         // // - example implementation of getting the header field
@@ -163,7 +163,7 @@ function sk_the_page_blocks(){
                         //     'sub_field' => true
                         // ));
 
-                        get_template_part('blocks/block', $module);
+                        get_template_part('blocks/block', $block);
                     ?>
 
                 </section><!-- .sk-module -->
