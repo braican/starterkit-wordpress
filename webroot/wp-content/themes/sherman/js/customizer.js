@@ -38,7 +38,7 @@
     //
     // the logo
     //
-    wp.customize('_s_logo', function(value){
+    wp.customize('sk_logo', function(value){
         value.bind(function(to){
             $('.site-logo img').attr('src', to);
         });
@@ -47,7 +47,7 @@
     //
     // footer copyright
     //
-    wp.customize('_s_copyright_text', function(value){
+    wp.customize('sk_copyright_text', function(value){
         value.bind(function(to){
             $('.site-footer .copyright-text').html(to);
         });
