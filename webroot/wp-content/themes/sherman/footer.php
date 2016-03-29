@@ -12,7 +12,7 @@
 
 	<footer id="colophon" class="site-footer" role="contentinfo">
 		<div class="site-copyright">
-			&copy; <?php echo date('Y'); ?> <span class="copyright-text"><?php get_theme_mod('sk_copyright_text'); ?></span>
+			&copy; <?php echo date('Y'); ?> <span class="copyright-text"><?php echo get_theme_mod('sk_copyright_text'); ?></span>
 		</div><!-- .site-info -->
 	</footer><!-- #colophon -->
 </div><!-- #page -->
