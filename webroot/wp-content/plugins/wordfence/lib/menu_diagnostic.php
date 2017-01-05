@@ -12,11 +12,18 @@ $w = new wfConfig();
 ?>
 
 <div class="wrap wordfence">
-	<?php require('menuHeader.php'); ?>
 	<h2 id="wfHeading">
 		Diagnostics
 	</h2>
 	<br clear="both"/>
+	
+	<?php
+	if (!isset($sendingDiagnosticEmail)) { $sendingDiagnosticEmail = false; }
+	if (!$sendingDiagnosticEmail) {
+		$rightRail = new wfView('marketing/rightrail', array('additionalClasses' => 'wordfenceRightRailDiagnostics'));
+		echo $rightRail;
+	}
+	?>
 
 	<form id="wfConfigForm">
 		<table class="wf-table"<?php echo !empty($inEmail) ? ' border=1' : '' ?>>
@@ -341,6 +348,43 @@ $w = new wfConfig();
 				</table>
 			</div>
 		<?php endif ?>
+		<div style="max-width: 100%; overflow: auto; padding: 1px;">
+			<table class="wf-table"<?php echo !empty($inEmail) ? ' border=1' : '' ?>>
+				<tbody class="empty-row">
+				<tr>
+					<td colspan="2"></td>
+				</tr>
+				</tbody>
+				<tbody class="thead">
+				<tr>
+					<th colspan="2">Log Files (Error messages from WordPress core, plugins, and themes)</th>
+				</tr>
+				</tbody>
+				<tbody class="thead thead-subhead" style="font-size: 85%">
+				<tr>
+					<th>File</th>
+					<th>Download</th>
+				</tr>
+				</tbody>
+				<tbody style="font-size: 85%">
+				<?php
+				$errorLogs = wfErrorLogHandler::getErrorLogs();
+				if (count($errorLogs) < 1): ?>
+					<tr>
+						<td colspan="2"><em>No log files found.</em></td>
+					</tr>
+				<?php else:
+					foreach ($errorLogs as $log => $readable): ?>
+						<tr>
+							<td style="width: 100%"><?php echo esc_html($log) . ' (' . wfUtils::formatBytes(filesize($log)) . ')'; ?></td>
+							<td style="white-space: nowrap; text-align: right;"><?php echo ($readable ? '<a href="#" data-logfile="' . esc_html($log) . '" class="downloadLogFile" target="_blank">Download</a>' : '<em>Requires downloading from the server directly</em>'); ?></td> 
+						</tr>
+					<?php endforeach;
+				endif; ?>
+				</tbody>
+			
+			</table>
+		</div>
 	</form>
 </div>
 
@@ -407,9 +451,22 @@ $w = new wfConfig();
 			</button>
 <!--			<em id="waf-rules-last-updated"></em>-->
 		</p>
+		<p><em id="waf-rules-next-update"></em></p>
 		<?php
 		try {
 			$lastUpdated = wfWAF::getInstance()->getStorageEngine()->getConfig('rulesLastUpdated');
+
+			$nextUpdate = PHP_INT_MAX;
+			$cron = wfWAF::getInstance()->getStorageEngine()->getConfig('cron');
+			if (is_array($cron)) {
+				/** @var wfWAFCronEvent $event */
+				foreach ($cron as $index => $event) {
+					$event->setWaf(wfWAF::getInstance());
+					if (!$event->isInPast()) {
+						$nextUpdate = min($nextUpdate, $event->getFireTime());
+					}
+				}
+			}
 		} catch (wfWAFStorageFileException $e) {
 			error_log($e->getMessage());
 		}
@@ -420,21 +477,19 @@ $w = new wfConfig();
 			</script>
 		<?php endif ?>
 
+		<?php if ($nextUpdate < PHP_INT_MAX): ?>
+		<script>
+			var nextUpdate = <?php echo (int) $nextUpdate ?>;
+			WFAD.renderWAFRulesNextUpdate(new Date(nextUpdate * 1000));
+		</script>
+		<?php endif ?>
+
 	</div>
 	<?php endif ?>
 
 	<h3>Debugging Options</h3>
 	<form action="#" id="wfDebuggingConfigForm">
 		<table class="wfConfigForm">
-			<tr>
-				<th>Add a debugging comment to HTML source of cached pages.<a
-						href="http://docs.wordfence.com/en/Wordfence_options#Add_a_debugging_comment_to_HTML_source_of_cached_pages"
-						target="_blank" class="wfhelp"></a></th>
-				<td><input type="checkbox" id="addCacheComment" class="wfConfigElem" name="addCacheComment"
-				           value="1" <?php $w->cb('addCacheComment'); ?> />
-				</td>
-			</tr>
-
 			<tr>
 				<th>Enable debugging mode (increases database load)<a
 						href="http://docs.wordfence.com/en/Wordfence_options#Enable_debugging_mode_.28increases_database_load.29"
@@ -450,15 +505,6 @@ $w = new wfConfig();
 				<td><input type="checkbox" id="startScansRemotely" class="wfConfigElem" name="startScansRemotely"
 				           value="1" <?php $w->cb('startScansRemotely'); ?> />
 					(Try this if your scans aren't starting and your site is publicly accessible)
-				</td>
-			</tr>
-			<tr>
-				<th>Disable config caching<a
-						href="http://docs.wordfence.com/en/Wordfence_options#Disable_config_caching" target="_blank"
-						class="wfhelp"></a></th>
-				<td><input type="checkbox" id="disableConfigCaching" class="wfConfigElem"
-				           name="disableConfigCaching" value="1" <?php $w->cb('disableConfigCaching'); ?> />
-					(Try this if your options aren't saving)
 				</td>
 			</tr>
 

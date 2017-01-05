@@ -1,5 +1,10 @@
+<?php if (wfConfig::liveTrafficEnabled()): ?>
+	<div id="wfLiveTrafficOverlayAnchor"></div>
+	<div id="wfLiveTrafficDisabledMessage">
+		<h2>Live Updates Paused<br /><small>Click inside window to resume</small></h2>
+	</div>
+<?php endif ?>
 <div class="wrap wordfence">
-	<?php require('menuHeader.php'); ?>
 
 	<h2 id="wfHeading">
 		<div style="float: left;">
@@ -23,16 +28,25 @@
 
 	<div class="wordfenceModeElem" id="wordfenceMode_activity"></div>
 	<div class="wordfenceLive">
-		<table border="0" cellpadding="0" cellspacing="0">
+		<table border="0" cellpadding="0" cellspacing="0" class="wordfenceLiveActivity">
 			<tr>
 				<td><h2>Wordfence Live Activity:</h2></td>
 				<td id="wfLiveStatus"></td>
 			</tr>
 		</table>
+		<table border="0" cellpadding="0" cellspacing="0" class="wordfenceLiveStateMessage">
+			<tr>
+				<td>Live Updates Paused &mdash; Click inside window to resume</td>
+			</tr>
+		</table>
 	</div>
-	<div class="wordfenceWrap">
+	<div class="wordfenceWrap<?php if (!wfConfig::get('isPaid')) { echo " wordfence-community"; }?>">
+		<?php
+		$rightRail = new wfView('marketing/rightrail', array('additionalClasses' => 'wordfenceRightRailLiveTraffic'));
+		echo $rightRail;
+		?>
 		<?php if (!wfConfig::liveTrafficEnabled()): ?>
-			<div id="wordfenceLiveActivityDisabled"><p><strong>Live activity is disabled.</strong> <?php if (wfConfig::get('cacheType') == 'falcon') { ?>This is done to improve performance because you have Wordfence Falcon Engine enabled.<?php } ?> Login and firewall activity will still appear below.</p></div>
+			<div id="wordfenceLiveActivityDisabled"><p><strong>Live activity is disabled.</strong> Login and firewall activity will still appear below.</p></div>
 		<?php endif ?>
 		
 		<div id="wf-live-traffic" class="wfTabsContainer">
@@ -48,7 +62,7 @@
 
 				<form data-bind="submit: reloadListings">
 
-					<?php if (defined('WP_DEBUG') && WP_DEBUG): ?>
+					<?php if (defined('WP_DEBUG') && WP_DEBUG && false): ?>
 						<pre data-bind="text: 'DEBUG: ' + sql(), visible: sql"></pre>
 					<?php endif ?>
 
@@ -185,7 +199,7 @@
 					<tr>
 						<td>
 							<div data-bind="if: loc()">
-								<img data-bind="attr: { src: '//www.wordfence.com/images/flags/' + loc().countryCode.toLowerCase() + '.png',
+								<img data-bind="attr: { src: '<?php echo wfUtils::getBaseURL() . 'images/flags/'; ?>' + loc().countryCode.toLowerCase() + '.png',
 											alt: loc().countryName, title: loc().countryName }" width="16" height="11"
 								     class="wfFlag"/>
 								<a data-bind="text: (loc().city ? loc().city + ', ' : '') + loc().countryName,
@@ -240,7 +254,7 @@
 										</span>
 										<span data-bind="if: loc()">
 											<span data-bind="if: action() != 'loginOK' && user()"> in</span>
-											<img data-bind="attr: { src: '//www.wordfence.com/images/flags/' + loc().countryCode.toLowerCase() + '.png',
+											<img data-bind="attr: { src: '<?php echo wfUtils::getBaseURL() . 'images/flags/'; ?>' + loc().countryCode.toLowerCase() + '.png',
 												alt: loc().countryName, title: loc().countryName }" width="16"
 											     height="11"
 											     class="wfFlag"/>
@@ -273,7 +287,7 @@
 										<span data-bind="if: statusCode() == 200 && !action()">
 											visited
 										</span>
-										<span data-bind="if: statusCode() == 403">
+										<span data-bind="if: statusCode() == 403 || statusCode() == 503">
 											was <span data-bind="text: firewallAction" style="color: #F00;"></span> at
 										</span>
 
