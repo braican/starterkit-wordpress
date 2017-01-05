@@ -4,8 +4,8 @@
         "modal"  : false
     },
     "contentTypes": {
-        "careers"      : true,
-        "case-studies" : true,
+        "careers"      : false,
+        "case-studies" : false,
         "clients"      : false,
         "locations"    : false,
         "services"     : false,
