@@ -5,7 +5,6 @@
 
 
 
-
 /**
  * Render a menu containing the social links
  *
@@ -16,10 +15,10 @@
  *
  * @usage
  *
- *    sk_social_links_menu();
+ *    sk_social_media_menu();
  *
  */
-function sk_social_links_menu( $args = array() ){
+function sk_social_media_menu( $args = array() ){
     if( sk_has_social_links() ) :
         $links = get_option('sk_social');
 
@@ -31,9 +30,9 @@ function sk_social_links_menu( $args = array() ){
 
         $options = array_merge($defaults, $args);
     ?>
-        <div class="tank-social-links--menu">
+        <div class="sk-social-media-menu">
             <?php if( $options['intro_text'] !== '' ) : ?>
-                <span class="tank-social-links--intro"><?php echo $options['intro_text']; ?></span>
+                <span class="sk-social-media-intro"><?php echo $options['intro_text']; ?></span>
             <?php endif; ?>
             <ul class="menu">
                 <?php foreach($links as $site => $link) : if($link) : ?>
