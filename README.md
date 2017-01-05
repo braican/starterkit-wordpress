@@ -39,7 +39,7 @@ The Javascript Structure
 
 The Javascript is organized in the following way (all file paths are relative to the theme path, unless otherwise noted):
 
-* Individual modules are located inside the `js/arsenal` directory. The templated scripts are located in the `js/arsenal/available` subdirectory; *these should not be edited inside an individual project*. Use the `setup.json` file (located in the project root) to choose which of these modules you'll need for this project, and the `gulp build-scripts` command to copy the appropriate modules into the working directory. This will build a `js/arsenal/enabled` directory, which will contain all project-specific js modules. Modules inside the `js/arsenal/enabled` directory can be edited where appropriate for the project.
+* Available javascript modules are located in the `_arsenal/js` directory. Use the `setup.json` file in the webroot to choose which of these modules (if any) you'll need for this project, and run the `gulp build-arsenal` command. This will place the activated modules inside the theme at `js/arsenal`.
 * All third-party plugins that stand alone from a standardized module pattern should go in the `js/plugins.js` file.
 * All project-specific scripts and front-end code should go into the `js/main.js` file.
 * Upon running the `gulp opt-js` task, a `js/production.js` file will be built, and a minified version will be placed into the `js/build` directory.
@@ -59,11 +59,8 @@ List all the tasks defined in the gulpfile, and see a description of what they d
 #### `gulp combine`
 Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file
 
-#### `gulp uglify`
+#### `gulp opt-js`
 Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.
-
-#### `gulp opt-svg`
-Optimizes svgs.
 
 #### `gulp svgstore`
 Creates the svg sprite for insertion into the page.
@@ -79,45 +76,27 @@ Using the `setup.json` file, populates the theme with the chosen build component
 
 
 
-
 WordPress Imports
 -----------------
-Inside the `_imports` directory, there are some `.xml` files that can be imported into the WordPress installation to add common components.
+Inside the `_imports` directory, there are some `.json` files that can be imported into ACF to add common components.
 
-#### `acf--page-blocks.xml`
-The Advanced Custom Fields setup for page blocks. Creates an additional field for pages that allows for the addition of modules onto that page. See the [custom page blocks](#custom-page-blocks) section below.
-
-Upon importing these fields
-
-#### `acf--location-fields.xml`
-Fields for the Location content type.
-
-
-
-
+#### `acf-page-blocks.json`
+The Advanced Custom Fields setup for page blocks. Creates an additional Flexible Content field for pages that allows for the addition of secondary blocks onto that page. See the [custom page blocks](#custom-page-blocks) section below.
 
 
 
 Custom Page Blocks
 ------------------
-This theme uses Advanced Custom Fields to create a field for the "page" content type that allows the user to add additional modules, or content blocks, onto that page. To set this functionality up: 
+This theme uses Advanced Custom Fields to create a Flexible Content field for the "page" content type that allows the user to add additional content blocks onto that page. To set this functionality up: 
 
-1. Install the `Advanced Custom Fields` and `Advanced Custom Fields: Repeater Field` plugins.
-1. Import the `acf--page-blocks.xml` file in the `_imports` directory.
+1. Enable the `Advanced Custom Fields Pro` plugin.
+1. Import the `acf-page-blocks.json` file in the `_imports` directory.
 
-Once you import the xml file you will find a "Page Blocks" field group in the ACF admin section. This will include a repeater field called `Additional Page Blocks` containing two sub-fields:
+Once you import the json file you will find a "Page Blocks" field group in the ACF admin section. This will include a Flexible Content field called `Page Blocks` that will start off with one layout, the "Simple Copy Block."
 
-#### `Block Module`
-An html select element containing all of the available block modules that can be included on a page
+To add a new block, duplicate the `block.php` file inside the `blocks` directory in the theme, and rename the copied file to reflect the function of the block (include a leading `block-` in the filename). Back in the ACF admin and the "Page Blocks" field group, add a new layout and add the relevant fields for that layout. The "name" field for this layout should match the php file name (*without* the trailing `.php`). For example, if you created a block called `block-latest_blog_posts.php`, you would name the layout `latest_blog_posts`.
 
-#### `Block Title`
-A title for this block. Depending on the theme implementation, this value can be used in the theme as a heading for this block.
-
-To add a new module to the page blocks, duplicate the `module.php` file inside the `modules` directory in the theme, and rename the copied file to reflect the function of the module (include a leading `module-` in the filename). Back in the ACF admin, find the "Block Module" subfield in the "Page Blocks" field group and create a new choice using the module file name (*without* the trailing `.php`) and a label for the module. For example, if you created a module called `module-latest-blog-posts.php`, you would add the following to the "Choices" field:
-
-`module-latest-blog-posts : Latest Blog Posts`
-
-When you add a new block to a page, this module will be available in the "Block Module" dropdown.
+When you add a new layout, this block will be available in the "Page Blocks" field group on all pages.
 
 
 Going Live

@@ -167,14 +167,16 @@ function sk_the_page_blocks(){
     }
 
     // the page blocks repeater field
-    $blocks_repeater = 'sk_page_blocks';
+    $newBlocks = 'sk_page_blocks';
 
-    if( have_rows($blocks_repeater) ) : ?>
+
+    if( have_rows( $newBlocks ) ) : ?>
+    
         <div class="secondary-content">
 
             <?php // loop through the rows of data ?>
-            <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
-                <?php $block = get_sub_field( 'sk_page_block' ); ?>
+            <?php while ( have_rows($newBlocks) ) : the_row(); ?>
+                <?php $block = get_row_layout(); ?>
 
                 <section class="sk-block<?php echo $block ? " block--$block" : ""; ?>">
                     <?php

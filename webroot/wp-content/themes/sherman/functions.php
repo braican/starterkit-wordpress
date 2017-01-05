@@ -174,10 +174,9 @@ function sk_loadArsenal(){
     foreach( $arsenal as $script ){
 
         $filename = str_replace( get_template_directory() . '/js/arsenal/', '', $script);
-        $path = get_template_directory() . '/js/arsenal/' . $filename;
         $uri = get_template_directory_uri() . '/js/arsenal/' . $filename;
 
-        if( file_exists( $path ) ){
+        if( file_exists( $script ) ){
             wp_enqueue_script( "sk_script--$filename", $uri, array('jquery'), false, true);
         }
     }

@@ -112,7 +112,7 @@ gulp.task(
  * minify the concatenated javascript file
  */
 gulp.task(
-    'uglify',
+    'opt-js',
     'Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.',
     ['combine'],
     function(){
