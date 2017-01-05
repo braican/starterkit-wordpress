@@ -211,11 +211,9 @@ require get_template_directory() . '/inc/extras.php';
  */
 require get_template_directory() . '/inc/customizer.php';
 
-/**
- * Custom post types and taxonomies
- */
-require get_template_directory() . '/inc/sk-post-types.php';
-require get_template_directory() . '/inc/sk-taxonomies.php';
+
+
+require get_template_directory() . '/inc/custom-taxonomies.php';
 
 /**
  * theme api - generally front end functions
@@ -228,6 +226,13 @@ require get_template_directory() . '/inc/api.php';
 require get_template_directory() . '/inc/filters.php';
 
 
+/**
+ * Arsenal
+ */
+$arsenal_postTypes = get_template_directory() . '/arsenal/post-types.php';
+if( file_exists( $arsenal_postTypes ) ){
+    require $arsenal_postTypes;
+}
 
 
 

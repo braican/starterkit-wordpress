@@ -87,7 +87,7 @@ var getContentTypes = function(){
  * default - doesn't do anything
  * @TODO set up what the default task should do
  */
-gulp.task('default', []);
+gulp.task( 'default', [] );
 
 
 /**
@@ -127,19 +127,6 @@ gulp.task(
 
 
 
-/**
- * optimize svg
- */
-gulp.task(
-    'opt-svg',
-    'Optimizes the svg files.',
-    function(){
-        gulp.src( themeDir + 'svg/*.svg' )
-            .pipe(svgmin())
-            .pipe(gulp.dest( themeDir + '/svg/build'));
-    }
-);
-
 
 
 
@@ -167,6 +154,8 @@ gulp.task(
                 .pipe(gulp.dest( themeDir + 'svg/icons/build'));
     }
 );
+
+
 
 /**
  * compile sass
@@ -199,11 +188,13 @@ gulp.task(
 );
 
 
+
+
 /**
  * build from arsenal
  */
 gulp.task(
-    'build',
+    'build-arsenal',
     'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.',
     function(){
 
@@ -230,19 +221,41 @@ gulp.task(
         //
         // register the content types
         //
-        var contentTypes = getContentTypes(),
-            postTypesPhp = themeDir + 'inc/sk-post-types.php',
-            types        = '';
+        var typeCode = getPostTypeCode();
 
-        for( var i = 0; i < contentTypes.length; i++ ){
-            var file        = './_arsenal/content-types/' + contentTypes[i] + '.php',
-                fileContent = fs.readFileSync( file );
-
-            types += fileContent + "\n\n";
-        }
-
-        gulp.src( postTypesPhp )
-            .pipe( inject.replace('//sk_insert_types//', types ))
-            .pipe( gulp.dest( themeDir + 'inc'));
+        gulp.src( './_arsenal/_templates/post-types.php' )
+            .pipe( inject.replace('//sk_insert_types//', typeCode ))
+            .pipe( gulp.dest( themeDir + 'arsenal' ));
     }
 );
+
+
+
+
+/* ------------------------------------------
+ * --util
+ * ------------------------------------------ */
+
+/**
+ * Concatenates the code from each of the active post types templates.
+ *
+ * @return string
+ */
+function getPostTypeCode(){
+    
+    var contentTypes = getContentTypes(),
+        typeCode     = "";
+
+    for( var i = 0; i < contentTypes.length; i++ ){
+        var file = './_arsenal/post-types/' + contentTypes[i] + '.php';
+
+        try{
+            var fileContent = fs.readFileSync( file );
+            typeCode += fileContent + "\n\n";
+        } catch (e){
+            console.error( "Warning: couldn't write " + e.path + "; please make sure that file exists." );
+        }
+    }
+
+    return typeCode;
+}

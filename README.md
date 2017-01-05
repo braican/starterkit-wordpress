@@ -74,8 +74,10 @@ Compiles sass.
 #### `gulp watch`
 Watch the `css` directory within the theme to changes to any `.scss` files.
 
-#### `gulp build`
-Using the `setup.json` file, builds the `js` directory within the theme with the appropriate js scripts.
+#### `gulp build-arsenal`
+Using the `setup.json` file, populates the theme with the chosen build components, including javascript modules and WordPress content types.
+
+
 
 
 WordPress Imports
@@ -89,6 +91,11 @@ Upon importing these fields
 
 #### `acf--location-fields.xml`
 Fields for the Location content type.
+
+
+
+
+
 
 
 Custom Page Blocks
