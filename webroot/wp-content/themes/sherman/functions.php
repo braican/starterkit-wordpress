@@ -174,10 +174,9 @@ function sk_loadArsenal(){
     foreach( $arsenal as $script ){
 
         $filename = str_replace( get_template_directory() . '/js/arsenal/', '', $script);
-        $path = get_template_directory() . '/js/arsenal/' . $filename;
         $uri = get_template_directory_uri() . '/js/arsenal/' . $filename;
 
-        if( file_exists( $path ) ){
+        if( file_exists( $script ) ){
             wp_enqueue_script( "sk_script--$filename", $uri, array('jquery'), false, true);
         }
     }
@@ -211,11 +210,9 @@ require get_template_directory() . '/inc/extras.php';
  */
 require get_template_directory() . '/inc/customizer.php';
 
-/**
- * Custom post types and taxonomies
- */
-require get_template_directory() . '/inc/sk-post-types.php';
-require get_template_directory() . '/inc/sk-taxonomies.php';
+
+
+require get_template_directory() . '/inc/custom-taxonomies.php';
 
 /**
  * theme api - generally front end functions
@@ -228,6 +225,13 @@ require get_template_directory() . '/inc/api.php';
 require get_template_directory() . '/inc/filters.php';
 
 
+/**
+ * Arsenal
+ */
+$arsenal_postTypes = get_template_directory() . '/arsenal/post-types.php';
+if( file_exists( $arsenal_postTypes ) ){
+    require $arsenal_postTypes;
+}
 
 
 

@@ -52,6 +52,7 @@
             //  markup.
             //
             // @usage
+            //
             // <a href="#" data-modal="test-modal">Launch</a>
             // <div id="test-modal">
             //   This is some content for the modal
@@ -93,12 +94,8 @@
         /**
          * load and launch
          *
-         * @param name (string)
-         *   - the filename of the modal content you're looking to
-         *      load up
-         *
-         * @param content (string)
-         *   - markup comtaining the modal content
+         * @param string name    : The name of the modal
+         * @param string content : Markup comtaining the modal content
          */
         function launch(name, content){
 

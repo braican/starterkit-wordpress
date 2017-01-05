@@ -42,6 +42,7 @@
 			serverTimestampOffset: 0,
 			serverMicrotime: 0,
 			wfLiveTraffic: null,
+			loadingBlockedIPs: false,
 
 			init: function() {
 				this.nonce = WordfenceAdminVars.firstNonce;
@@ -62,6 +63,10 @@
 					$this.hide();
 					$($this.data('selector')).show();
 					return false;
+				});
+				
+				$('.downloadLogFile').each(function() {
+					$(this).attr('href', WordfenceAdminVars.ajaxURL + '?action=wordfence_downloadLogFile&nonce=' + WFAD.nonce + '&logfile=' + encodeURIComponent($(this).data('logfile')));
 				});
 
 				$('#doSendEmail').click(function() {
@@ -111,11 +116,39 @@
 					jQuery('#consoleActivity').scrollTop(jQuery('#consoleActivity').prop('scrollHeight'));
 					jQuery('#consoleScan').scrollTop(jQuery('#consoleScan').prop('scrollHeight'));
 					this.noScanHTML = jQuery('#wfNoScanYetTmpl').tmpl().html();
-					this.loadIssues();
+
+
+					var loadingIssues = true;
+					
+					this.loadIssues(function() {
+						loadingIssues = false;
+					});
 					this.startActivityLogUpdates();
 					if (this.needTour()) {
 						this.scanTourStart();
 					}
+
+					var issuesWrapper = $('#wfScanIssuesWrapper');
+					var hasScrolled = false;
+					$(window).on('scroll', function() {
+						var win = $(this);
+						// console.log(win.scrollTop() + window.innerHeight, liveTrafficWrapper.outerHeight() + liveTrafficWrapper.offset().top);
+						var currentScrollBottom = win.scrollTop() + window.innerHeight;
+						var scrollThreshold = issuesWrapper.outerHeight() + issuesWrapper.offset().top;
+						if (hasScrolled && !loadingIssues && currentScrollBottom >= scrollThreshold) {
+							// console.log('infinite scroll');
+
+							loadingIssues = true;
+							hasScrolled = false;
+							var offset = $('div.wfIssue').length;
+							WFAD.loadMoreIssues(function() {
+								loadingIssues = false;
+							}, offset);
+						} else if (currentScrollBottom < scrollThreshold) {
+							hasScrolled = true;
+							// console.log('no infinite scroll');
+						}
+					});
 				} else if (jQuery('#wordfenceMode_waf').length > 0) {
 					if (this.needTour()) {
 						this.tour('wfWAFTour', 'wfHeading', 'top', 'left', "Learn about Live Traffic", function() {
@@ -127,14 +160,9 @@
 					this.setupSwitches('wfLiveTrafficOnOff', 'liveTrafficEnabled', function() {
 					});
 					jQuery('#wfLiveTrafficOnOff').change(function() {
-						if (/^(?:falcon|php)$/.test(WordfenceAdminVars.cacheType)) {
-							jQuery('#wfLiveTrafficOnOff').attr('checked', false);
-							self.colorbox('400px', "Live Traffic not available in high performance mode", "Please note that you can't enable live traffic when Falcon Engine or basic caching is enabled. This is done for performance reasons. If you want live traffic, go to the 'Performance Setup' menu and disable caching.");
-						} else {
-							self.updateSwitch('wfLiveTrafficOnOff', 'liveTrafficEnabled', function() {
-								window.location.reload(true);
-							});
-						}
+						self.updateSwitch('wfLiveTrafficOnOff', 'liveTrafficEnabled', function() {
+							window.location.reload(true);
+						});
 					});
 
 					if (WordfenceAdminVars.liveTrafficEnabled) {
@@ -147,15 +175,12 @@
 					}
 					startTicker = true;
 					if (this.needTour()) {
-						this.tour('wfWelcomeContent3', 'wfHeading', 'top', 'left', "Learn about Site Performance", function() {
-							self.tourRedir('WordfenceSitePerf');
+						this.tour('wfWelcomeContent3', 'wfHeading', 'top', 'left', "Learn about IP Blocking", function() {
+							self.tourRedir('WordfenceBlockedIPs');
 						});
 					}
 				} else if (jQuery('#wordfenceMode_options').length > 0) {
 					this.mode = 'options';
-					jQuery('.wfConfigElem').change(function() {
-						jQuery('#securityLevel').val('CUSTOM');
-					});
 					this.updateTicker(true);
 					startTicker = true;
 					if (this.needTour()) {
@@ -181,6 +206,25 @@
 							self.tourRedir('WordfencePasswdAudit');
 						});
 					}
+
+					var self = this;
+					var hasScrolled = false;
+					$(window).on('scroll', function() {
+						var win = $(this);
+						var wrapper = $('#wfActivity_' + self.activityMode);
+						// console.log(win.scrollTop() + window.innerHeight, liveTrafficWrapper.outerHeight() + liveTrafficWrapper.offset().top);
+						var currentScrollBottom = win.scrollTop() + window.innerHeight;
+						var scrollThreshold = wrapper.outerHeight() + wrapper.offset().top;
+						if (hasScrolled && !self.loadingBlockedIPs && currentScrollBottom >= scrollThreshold) {
+							// console.log('infinite scroll');
+							hasScrolled = false;
+							
+							self.loadStaticPanelContent(true);
+						} else if (currentScrollBottom < scrollThreshold) {
+							hasScrolled = true;
+							// console.log('no infinite scroll');
+						}
+					});
 				} else if (jQuery('#wordfenceMode_passwd').length > 0) {
 					this.mode = 'passwd';
 					startTicker = false;
@@ -238,15 +282,6 @@
 							self.tourRedir('WordfenceWhois');
 						});
 					}
-				} else if (jQuery('#wordfenceMode_caching').length > 0) {
-					this.mode = 'caching';
-					startTicker = false;
-					if (this.needTour()) {
-						this.tour('wfWelcomeContentCaching', 'wfHeading', 'top', 'left', "Learn about IP Blocking", function() {
-							self.tourRedir('WordfenceBlockedIPs');
-						});
-					}
-					this.loadCacheExclusions();
 				} else {
 					this.mode = false;
 				}
@@ -324,7 +359,9 @@
 			},
 			updateConfig: function(key, val, cb) {
 				this.ajax('wordfence_updateConfig', {key: key, val: val}, function() {
-					cb();
+					if (cb) {
+						cb();
+					}
 				});
 			},
 			tourFinish: function() {
@@ -374,6 +411,10 @@
 					jQuery('#pointer-close').after('<a id="pointer-primary" class="button-primary">' + buttonLabel + '</a>');
 					jQuery('#pointer-primary').click(buttonCallback);
 				}
+
+				$('html, body').animate({
+					scrollTop: $('.wp-pointer').offset().top - 100
+				}, 1000);
 			},
 			startTourAgain: function() {
 				var self = this;
@@ -402,7 +443,13 @@
 			},
 			updateActivityLog: function() {
 				if (this.activityLogUpdatePending || !this.windowHasFocus()) {
+					if (!jQuery('body').hasClass('wordfenceLiveActivityPaused') && !this.activityLogUpdatePending) {
+						jQuery('body').addClass('wordfenceLiveActivityPaused');
+					}
 					return;
+				}
+				if (jQuery('body').hasClass('wordfenceLiveActivityPaused')) {
+					jQuery('body').removeClass('wordfenceLiveActivityPaused');
 				}
 				this.activityLogUpdatePending = true;
 				var self = this;
@@ -515,7 +562,7 @@
 					}
 					html += '">[' + item.date + ']&nbsp;' + item.msg + '</div>';
 					jQuery('#consoleActivity').append(html);
-					if (/Scan complete\./i.test(item.msg)) {
+					if (/Scan complete\./i.test(item.msg) || /Scan interrupted\./i.test(item.msg)) {
 						this.loadIssues();
 					}
 				}
@@ -545,6 +592,10 @@
 				} else if (item.msg.indexOf('SUM_ENDERR') != -1) {
 					msg = item.msg.replace('SUM_ENDERR:', '');
 					jQuery('div.wfSummaryMsg:contains("' + msg + '")').next().addClass('wfSummaryErr').html('An error occurred.');
+					summaryUpdated = true;
+				} else if (item.msg.indexOf('SUM_ENDSKIPPED') != -1) {
+					msg = item.msg.replace('SUM_ENDSKIPPED:', '');
+					jQuery('div.wfSummaryMsg:contains("' + msg + '")').next().addClass('wfSummaryResult').html('Skipped.');
 					summaryUpdated = true;
 				} else if (item.msg.indexOf('SUM_DISABLED:') != -1) {
 					msg = item.msg.replace('SUM_DISABLED:', '');
@@ -581,7 +632,13 @@
 			},
 			updateTicker: function(forceUpdate) {
 				if ((!forceUpdate) && (this.tickerUpdatePending || !this.windowHasFocus())) {
+					if (!jQuery('body').hasClass('wordfenceLiveActivityPaused') && !this.tickerUpdatePending) {
+						jQuery('body').addClass('wordfenceLiveActivityPaused');
+					}
 					return;
+				}
+				if (jQuery('body').hasClass('wordfenceLiveActivityPaused')) {
+					jQuery('body').removeClass('wordfenceLiveActivityPaused');
 				}
 				this.tickerUpdatePending = true;
 				var self = this;
@@ -781,13 +838,23 @@
 					jQuery('#wfAuditJobs').empty().html("<p>You don't have any password auditing jobs in progress or completed yet.</p>");
 				}
 			},
-			loadIssues: function(callback) {
+			loadIssues: function(callback, offset, limit) {
 				if (this.mode != 'scan') {
 					return;
 				}
+				offset = offset || 0;
+				limit = limit || WordfenceAdminVars.scanIssuesPerPage;
 				var self = this;
-				this.ajax('wordfence_loadIssues', {}, function(res) {
+				this.ajax('wordfence_loadIssues', {offset: offset, limit: limit}, function(res) {
 					self.displayIssues(res, callback);
+				});
+			},
+			loadMoreIssues: function(callback, offset, limit) {
+				offset = offset || 0;
+				limit = limit || WordfenceAdminVars.scanIssuesPerPage;
+				var self = this;
+				this.ajax('wordfence_loadIssues', {offset: offset, limit: limit}, function(res) {
+					self.appendIssues(res.issuesLists, callback);
 				});
 			},
 			sev2num: function(str) {
@@ -860,7 +927,7 @@
 						"bPaginate": false,
 						"bLengthChange": false,
 						"bAutoWidth": false,
-						"aaData": res.issuesLists[issueStatus],
+						//"aaData": res.issuesLists[issueStatus],
 						"aoColumns": [
 							{
 								"sTitle": '<div class="th_wrapp">Severity</div>',
@@ -878,13 +945,30 @@
 								"sWidth": '400px',
 								"sType": 'html',
 								fnRender: function(obj) {
-									var tmplName = 'issueTmpl_' + obj.aData.type;
+									var issueType = (obj.aData.type == 'knownfile' ? 'file' : obj.aData.type);
+									var tmplName = 'issueTmpl_' + issueType;
 									return jQuery('#' + tmplName).tmpl(obj.aData).html();
 								}
 							}
 						]
 					});
 				}
+				
+				this.appendIssues(res.issuesLists, callback);
+				
+				return true;
+			},
+			appendIssues: function(issuesLists, callback) {
+				for (var issueStatus in issuesLists) {
+					var tableID = 'wfIssuesTable_' + issueStatus;
+					if (jQuery('#' + tableID).length < 1) {
+						//Invalid issue status
+						continue;
+					}
+
+					jQuery('#' + tableID).dataTable().fnAddData(issuesLists[issueStatus]);
+				}
+
 				if (callback) {
 					jQuery('#wfIssues_' + this.visibleIssuesPanel).fadeIn(500, function() {
 						callback();
@@ -892,7 +976,6 @@
 				} else {
 					jQuery('#wfIssues_' + this.visibleIssuesPanel).fadeIn(500);
 				}
-				return true;
 			},
 			ajax: function(action, data, cb, cbErr, noLoading) {
 				if (typeof(data) == 'string') {
@@ -947,8 +1030,11 @@
 					}
 				});
 			},
-			colorbox: function(width, heading, body) {
-				this.colorboxQueue.push([width, heading, body]);
+			colorbox: function(width, heading, body, settings) {
+				if (typeof settings === 'undefined') {
+					settings = {};
+				}
+				this.colorboxQueue.push([width, heading, body, settings]);
 				this.colorboxServiceQueue();
 			},
 			colorboxServiceQueue: function() {
@@ -959,18 +1045,19 @@
 					return;
 				}
 				var elem = this.colorboxQueue.shift();
-				this.colorboxOpen(elem[0], elem[1], elem[2]);
+				this.colorboxOpen(elem[0], elem[1], elem[2], elem[3]);
 			},
-			colorboxOpen: function(width, heading, body) {
+			colorboxOpen: function(width, heading, body, settings) {
 				var self = this;
 				this.colorboxIsOpen = true;
-				jQuery.colorbox({
+				jQuery.extend(settings, {
 					width: width,
 					html: "<h3>" + heading + "</h3><p>" + body + "</p>",
 					onClosed: function() {
 						self.colorboxClose();
 					}
 				});
+				jQuery.colorbox(settings);
 			},
 			colorboxClose: function() {
 				this.colorboxIsOpen = false;
@@ -1030,7 +1117,11 @@
 					issueID: issueID,
 					forceDelete: force
 				}, function(res) {
-					self.doneDeleteFile(res);
+					if (res.needsCredentials) {
+						document.location.href = res.redirect;
+					} else {
+						self.doneDeleteFile(res);
+					}
 				});
 			},
 			doneDeleteFile: function(res) {
@@ -1067,12 +1158,31 @@
 					});
 				}
 			},
+			useRecommendedHowGetIPs: function(issueID) {
+				var self = this;
+				this.ajax('wordfence_misconfiguredHowGetIPsChoice', {
+					issueID: issueID,
+					choice: 'yes'
+				}, function(res) {
+					if (res.ok) {
+						jQuery('#wordfenceMisconfiguredHowGetIPsNotice').fadeOut();
+						
+						self.loadIssues(function() {
+							self.colorbox('400px', "Success updating option", "The 'How does Wordfence get IPs' option was successfully updated to the recommended value.");
+						});
+					} else if (res.cerrorMsg) {
+						self.loadIssues(function() {
+							self.colorbox('400px', 'An error occurred', res.cerrorMsg);
+						}); 
+					}
+				});	
+			},
 			fixFPD: function(issueID) {
 				var self = this;
 				var title = "Full Path Disclosure";
 				issueID = parseInt(issueID);
 
-				this.ajax('wordfence_checkFalconHtaccess', {}, function(res) {
+				this.ajax('wordfence_checkHtaccess', {}, function(res) {
 					if (res.ok) {
 						self.colorbox("400px", title, 'We are about to change your <em>.htaccess</em> file. Please make a backup of this file proceeding'
 							+ '<br/>'
@@ -1146,7 +1256,7 @@
 				var nginx = "You will need to manually delete those files";
 				issueID = parseInt(issueID, 10);
 
-				this.ajax('wordfence_checkFalconHtaccess', {}, this._handleHtAccess(issueID, '_hideFile', title, nginx));
+				this.ajax('wordfence_checkHtaccess', {}, this._handleHtAccess(issueID, '_hideFile', title, nginx));
 			},
 
 			restoreFile: function(issueID) {
@@ -1154,7 +1264,11 @@
 				this.ajax('wordfence_restoreFile', {
 					issueID: issueID
 				}, function(res) {
-					self.doneRestoreFile(res);
+					if (res.needsCredentials) {
+						document.location.href = res.redirect;
+					} else {
+						self.doneRestoreFile(res);
+					}
 				});
 			},
 			doneRestoreFile: function(res) {
@@ -1175,7 +1289,7 @@
 				var title = "Disable Directory Listing";
 				issueID = parseInt(issueID);
 
-				this.ajax('wordfence_checkFalconHtaccess', {}, function(res) {
+				this.ajax('wordfence_checkHtaccess', {}, function(res) {
 					if (res.ok) {
 						self.colorbox("400px", title, 'We are about to change your <em>.htaccess</em> file. Please make a backup of this file proceeding'
 							+ '<br/>'
@@ -1288,7 +1402,7 @@
 				});
 			},
 			emailActivityLog: function() {
-				this.colorbox('400px', 'Email Wordfence Activity Log', "Enter the email address you would like to send the Wordfence activity log to. Note that the activity log may contain thousands of lines of data. This log is usually only sent to a member of the Wordfence support team. It also contains your PHP configuration from the phpinfo() function for diagnostic data.<br /><br /><input type='text' value='support@wordfence.com' size='20' id='wfALogRecip' /><input type='button' value='Send' onclick=\"WFAD.completeEmailActivityLog();\" /><input type='button' value='Cancel' onclick='jQuery.colorbox.close();' /><br /><br />");
+				this.colorbox('400px', 'Email Wordfence Activity Log', "Enter the email address you would like to send the Wordfence activity log to. Note that the activity log may contain thousands of lines of data. This log is usually only sent to a member of the Wordfence support team. It also contains your PHP configuration from the phpinfo() function for diagnostic data.<br /><br /><input type='text' value='wftest@wordfence.com' size='20' id='wfALogRecip' /><input type='button' value='Send' onclick=\"WFAD.completeEmailActivityLog();\" /><input type='button' value='Cancel' onclick='jQuery.colorbox.close();' /><br /><br />");
 			},
 			completeEmailActivityLog: function() {
 				jQuery.colorbox.close();
@@ -1354,38 +1468,76 @@
 				}
 				this.activityMode = mode;
 
+				this.loadStaticPanelContent(false);
+			},
+			loadStaticPanelContent: function(append) {
+				append = !!append;
 				var self = this;
-				this.ajax('wordfence_loadStaticPanel', {
-					mode: this.activityMode
+				var offset = append ? $('tr.' + self.activityMode + 'Record').length : 0;
+				self.loadingBlockedIPs = true;
+				$('.wfLoadMoreButton').attr("disabled", "disabled");
+				self.ajax('wordfence_loadStaticPanel', {
+					mode: self.activityMode,
+					offset: offset
 				}, function(res) {
 					self.completeLoadStaticPanel(res);
+					self.loadingBlockedIPs = false;
 				});
 			},
 			completeLoadStaticPanel: function(res) {
 				var contentElem = '#wfActivity_' + this.activityMode;
-				jQuery(contentElem).empty();
-				if (res.results && res.results.length > 0) {
+				if (!res.continuation) {
+					jQuery(contentElem).empty();
+				}
+				
+				if (res.hasMore) {
+					$('.wfLoadMoreButton').removeAttr("disabled");
+				}
+				
+				if ((res.results && res.results.length > 0) || res.continuation) {
+					if (!(res.results && res.results.length > 0)) {
+						return;
+					}
+					
 					var tmpl;
+					var wrapperTmpl;
+					var wrapperID;
 					if (this.activityMode == 'topScanners' || this.activityMode == 'topLeechers') {
 						tmpl = '#wfLeechersTmpl';
+						wrapperTmpl = '#wfLeechersWrapperTmpl';
+						wrapperID = '#wfLeechersWrapper';
 					} else if (this.activityMode == 'blockedIPs') {
 						tmpl = '#wfBlockedIPsTmpl';
+						wrapperTmpl = '#wfBlockedIPsWrapperTmpl';
+						wrapperID = '#wfBlockedIPsWrapper';
 					} else if (this.activityMode == 'lockedOutIPs') {
 						tmpl = '#wfLockedOutIPsTmpl';
+						wrapperTmpl = '#wfLockedOutIPsWrapperTmpl';
+						wrapperID = '#wfLockedOutIPsWrapper';
 					} else if (this.activityMode == 'throttledIPs') {
 						tmpl = '#wfThrottledIPsTmpl';
+						wrapperTmpl = '#wfThrottledIPsWrapperTmpl';
+						wrapperID = '#wfThrottledIPsWrapper';
 					} else {
 						return;
 					}
-					var i, j, chunk = 1000;
-					var bigArray = res.results.slice(0);
-					res.results = false;
-					for (i = 0, j = bigArray.length; i < j; i += chunk) {
-						res.results = bigArray.slice(i, i + chunk);
-						jQuery(tmpl).tmpl(res).appendTo(contentElem);
+
+					if (!res.continuation) {
+						jQuery(wrapperTmpl).tmpl(res).appendTo(contentElem);
+						
+						var self = this;
+						$('.wfLoadMoreButton').on('click', function(event) {
+							event.stopPropagation();
+							event.preventDefault();
+							self.loadStaticPanelContent(true);
+						});
 					}
+
+					jQuery(tmpl).tmpl(res).appendTo(jQuery(wrapperID));
 					this.reverseLookupIPs();
-				} else {
+				}
+				else {
+					$('.wfLoadMoreButton').hide();
 					if (this.activityMode == 'topScanners' || this.activityMode == 'topLeechers') {
 						jQuery(contentElem).html("No site hits have been logged yet. Check back soon.");
 					} else if (this.activityMode == 'blockedIPs') {
@@ -1534,15 +1686,62 @@
 					return;
 				}
 				range = range.replace(/ /g, '');
-				if (range && /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s*\-\s*\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(range)) {
+				range = range.replace(/[\u2013-\u2015]/g, '-'); //Non-hyphen dashes to hyphen
+				if (range && /^[^\-]+\-[^\-]+$/.test(range)) {
+					var count = 1;
+					var countOverflow = false;
+					var badRange = false;
+					var badIP = false;
+					
 					var ips = range.split('-');
-					var total = this.inet_aton(ips[1]) - this.inet_aton(ips[0]) + 1;
-					if (total < 1) {
+					var ip1 = this.inet_pton(ips[0]);
+					var ip2 = this.inet_pton(ips[1]);
+					
+					if (ip1 === false || ip2 === false) {
+						badIP = true;
+					}
+					else {
+						//Both to 16-byte binary strings
+						var binStart = ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff" + ip1).slice(-16);
+						var binEnd = ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff" + ip2).slice(-16);
+						
+						for (var i = 0; i < binStart.length; i++) {
+							var n0 = binStart.charCodeAt(i);
+							var n1 = binEnd.charCodeAt(i);
+							
+							if (i < 11 && n1 - n0 > 0) { //Based on Number.MAX_SAFE_INTEGER, which equals 2 ^ 53 - 1. Any of the first 9 bytes and part of the 10th that add to the range will put us over that
+								countOverflow = true;
+								break;
+							}
+							else if (i < 11 && n1 - n0 < 0) {
+								badRange = true;
+								break;
+							}
+							
+							count += (n1 - n0) << (8 * (15 - i));
+							if (count < 1) {
+								badRange = true;
+								break;
+							}
+						}
+					}
+					
+					if (badIP) {
+						jQuery('#wfShowRangeTotal').html("<span style=\"color: #F00;\">Invalid IP entered.</span>"); 
+						return;
+					}
+					else if (badRange) {
 						jQuery('#wfShowRangeTotal').html("<span style=\"color: #F00;\">Invalid. Starting IP is greater than ending IP.</span>");
 						return;
 					}
-					jQuery('#wfShowRangeTotal').html("<span style=\"color: #0A0;\">Valid: " + total + " addresses in range.</span>");
-				} else {
+					else if (countOverflow) {
+						jQuery('#wfShowRangeTotal').html("<span style=\"color: #0A0;\">Valid: &gt;281474976710656 addresses in range.</span>");
+						return;
+					}
+
+					jQuery('#wfShowRangeTotal').html("<span style=\"color: #0A0;\">Valid: " + count + " addresses in range.</span>"); 
+				}
+				else {
 					jQuery('#wfShowRangeTotal').empty();
 				}
 			},
@@ -1640,6 +1839,7 @@
 					return;
 				}
 				ipRange = ipRange.replace(/ /g, '').toLowerCase();
+				ipRange = ipRange.replace(/[\u2013-\u2015]/g, '-'); //Non-hyphen dashes to hyphen
 				if (ipRange) {
 					var range = ipRange.split('-'),
 						validRange;
@@ -1763,76 +1963,6 @@
 						jQuery(sel).fadeOut();
 					}, 2000);
 				});
-			},
-			getCacheStats: function() {
-				var self = this;
-				this.ajax('wordfence_getCacheStats', {}, function(res) {
-					if (res.ok) {
-						self.colorbox('400px', res.heading, res.body);
-					}
-				});
-			},
-			clearPageCache: function() {
-				var self = this;
-				this.ajax('wordfence_clearPageCache', {}, function(res) {
-					if (res.ok) {
-						self.colorbox('400px', res.heading, res.body);
-					}
-				});
-			},
-			switchToFalcon: function() {
-				var self = this;
-				this.ajax('wordfence_checkFalconHtaccess', {}, function(res) {
-					if (res.ok) {
-						self.colorbox('400px', "Enabling Falcon Engine", 'First read this <a href="http://www.wordfence.com/introduction-to-wordfence-falcon-engine/" target="_blank">Introduction to Falcon Engine</a>. Falcon modifies your website configuration file which is called your .htaccess file. To enable Falcon we ask that you make a backup of this file. This is a safety precaution in case for some reason Falcon is not compatible with your site.<br /><br /><a href="' + WordfenceAdminVars.ajaxURL + '?action=wordfence_downloadHtaccess&nonce=' + self.nonce + '" onclick="jQuery(\'#wfNextBut\').prop(\'disabled\', false); return true;">Click here to download a backup copy of your .htaccess file now</a><br /><br /><input type="button" name="but1" id="wfNextBut" value="Click to Enable Falcon Engine" disabled="disabled" onclick="WFAD.confirmSwitchToFalcon(0);" />');
-					} else if (res.nginx) {
-						self.colorbox('400px', "Enabling Falcon Engine", 'You are using an Nginx web server and using a FastCGI processor like PHP5-FPM. To use Falcon you will need to manually modify your nginx.conf configuration file and reload your Nginx server for the changes to take effect. You can find the <a href="http://www.wordfence.com/blog/2014/05/nginx-wordfence-falcon-engine-php-fpm-fastcgi-fast-cgi/" target="_blank">rules you need to make these changes to nginx.conf on this page on wordfence.com</a>. Once you have made these changes, compressed cached files will be served to your visitors directly from Nginx making your site extremely fast. When you have made the changes and reloaded your Nginx server, you can click the button below to enable Falcon.<br /><br /><input type="button" name="but1" id="wfNextBut" value="Click to Enable Falcon Engine" onclick="WFAD.confirmSwitchToFalcon(1);" />');
-					} else if (res.err) {
-						self.colorbox('400px', "We encountered a problem", "We can't modify your .htaccess file for you because: " + res.err + "<br /><br />Advanced users: If you would like to manually enable Falcon yourself by editing your .htaccess, you can add the rules below to the beginning of your .htaccess file. Then click the button below to enable Falcon. Don't do this unless you understand website configuration.<br /><textarea style='width: 300px; height:100px;' readonly>" + jQuery('<div/>').text(res.code).html() + "</textarea><br /><input type='button' value='Enable Falcon after manually editing .htaccess' onclick='WFAD.confirmSwitchToFalcon(1);' />");
-					}
-				});
-			},
-			confirmSwitchToFalcon: function(noEditHtaccess) {
-				jQuery.colorbox.close();
-				var cacheType = 'falcon';
-				var self = this;
-				this.ajax('wordfence_saveCacheConfig', {
-						cacheType: cacheType,
-						noEditHtaccess: noEditHtaccess
-					}, function(res) {
-						if (res.ok) {
-							self.colorbox('400px', res.heading, res.body);
-						}
-					}
-				);
-			},
-			saveCacheConfig: function() {
-				var cacheType = jQuery('input:radio[name=cacheType]:checked').val();
-				if (cacheType == 'falcon') {
-					return this.switchToFalcon();
-				}
-				var self = this;
-				this.ajax('wordfence_saveCacheConfig', {
-						cacheType: cacheType
-					}, function(res) {
-						if (res.ok) {
-							self.colorbox('400px', res.heading, res.body);
-						}
-					}
-				);
-			},
-			saveCacheOptions: function() {
-				var self = this;
-				this.ajax('wordfence_saveCacheOptions', {
-						allowHTTPSCaching: (jQuery('#wfallowHTTPSCaching').is(':checked') ? 1 : 0),
-						addCacheComment: (jQuery('#wfaddCacheComment').is(':checked') ? 1 : 0),
-						clearCacheSched: (jQuery('#wfclearCacheSched').is(':checked') ? 1 : 0)
-					}, function(res) {
-						if (res.updateErr) {
-							self.colorbox('400px', "You need to manually update your .htaccess", res.updateErr + "<br />Your option was updated but you need to change the Wordfence code in your .htaccess to the following:<br /><textarea style='width: 300px; height: 120px;'>" + jQuery('<div/>').text(res.code).html() + '</textarea>');
-						}
-					}
-				);
 			},
 			saveConfig: function() {
 				var qstr = jQuery('#wfConfigForm').serialize();
@@ -2094,15 +2224,82 @@
 					}, 2000);
 				});
 			},
-			addTwoFactor: function(username, phone) {
+			addTwoFactor: function(username, phone, mode) {
 				var self = this;
 				this.ajax('wordfence_addTwoFactor', {
 					username: username,
-					phone: phone
+					phone: phone,
+					mode: mode
 				}, function(res) {
 					if (res.ok) {
-						self.twoFacStatus('User added! Check the user\'s phone to get the activation code.');
-						jQuery('<div id="twoFacCont_' + res.userID + '">' + jQuery('#wfTwoFacUserTmpl').tmpl(res).html() + '</div>').prependTo(jQuery('#wfTwoFacUsers'));
+						if (mode == 'authenticator') {
+							var totpURL = "otpauth://totp/" + encodeURI(res.homeurl) + encodeURI(" (" + res.username + ")") + "?" + res.uriQueryString + "&issuer=Wordfence"; 
+							self.twoFacStatus('User added! Scan the QR code with your authenticator app to add it.');
+							
+							var message = "Scan the code below with your authenticator app to add this account. Some authenticator apps also allow you to type in the text version instead.<br><div id=\"wfTwoFactorQRCodeTable\"></div><br><strong>Key:</strong> <input type=\"text\" size=\"45\" value=\"" + res.base32Secret + "\" onclick=\"this.select();\" readonly>";
+							if (res.recoveryCodes.length > 0) {
+								message = message + "<br><br><strong>Recovery Codes</strong><br><p>Use one of these " + res.recoveryCodes.length + " codes to log in if you lose access to your authenticator device. Codes are 16 characters long, plus optional spaces. Each one may be used only once.</p><ul id=\"wfTwoFactorRecoveryCodes\">";
+
+								var recoveryCodeFileContents = "Cellphone Sign-In Recovery Codes - " + res.homeurl + " (" + res.username + ")\r\n";
+								recoveryCodeFileContents = recoveryCodeFileContents + "\r\nEach line of 16 letters and numbers is a single recovery code, with optional spaces for readability. When typing your password, enter \"wf\" followed by the entire code like \"mypassword wf1234 5678 90AB CDEF\". If your site shows a separate prompt for entering a code after entering only your username and password, enter only the code like \"1234 5678 90AB CDEF\". Your recovery codes are:\r\n\r\n";
+								var splitter = /.{4}/g;
+								for (var i = 0; i < res.recoveryCodes.length; i++) { 
+									var code = res.recoveryCodes[i];
+									var chunks = code.match(splitter);
+									message = message + "<li>" + chunks[0] + " " + chunks[1] + " " + chunks[2] + " " + chunks[3] + "</li>";
+									recoveryCodeFileContents = recoveryCodeFileContents + chunks[0] + " " + chunks[1] + " " + chunks[2] + " " + chunks[3] + "\r\n"; 
+								}
+								
+								message = message + "</ul>";
+								
+								message = message + "<p class=\"wf-center\"><a href=\"#\" class=\"button\" id=\"wfTwoFactorDownload\" target=\"_blank\"><i class=\"dashicons dashicons-download\"></i> Download</a></p>";
+							}
+
+							message = message + "<p><em>This will be shown only once. Keep these codes somewhere safe.</em></p>";
+							
+							self.colorbox('440px', "Authentication Code", message, {onComplete: function() { 
+								jQuery('#wfTwoFactorQRCodeTable').qrcode({text: totpURL});
+								jQuery('#wfTwoFactorDownload').on('click', function(e) {
+									e.preventDefault();
+									e.stopPropagation();
+									saveAs(new Blob([recoveryCodeFileContents], {type: "text/plain;charset=" + document.characterSet}), self.htmlEscape(res.homeurl) + "_" + self.htmlEscape(res.username) + "_recoverycodes.txt");
+								});
+							}});
+						}
+						else {
+							self.twoFacStatus('User added! Check the user\'s phone to get the activation code.');
+
+							if (res.recoveryCodes.length > 0) {
+								var message = "<p>Use one of these " + res.recoveryCodes.length + " codes to log in if you are unable to access your phone. Codes are 16 characters long, plus optional spaces. Each one may be used only once.</p><ul id=\"wfTwoFactorRecoveryCodes\">";
+
+								var recoveryCodeFileContents = "Cellphone Sign-In Recovery Codes - " + res.homeurl + " (" + res.username + ")\r\n";
+								recoveryCodeFileContents = recoveryCodeFileContents + "\r\nEach line of 16 letters and numbers is a single recovery code, with optional spaces for readability. When typing your password, enter \"wf\" followed by the entire code like \"mypassword wf1234 5678 90AB CDEF\". If your site shows a separate prompt for entering a code after entering only your username and password, enter only the code like \"1234 5678 90AB CDEF\". Your recovery codes are:\r\n\r\n";
+								var splitter = /.{4}/g;
+								for (var i = 0; i < res.recoveryCodes.length; i++) {
+									var code = res.recoveryCodes[i];
+									var chunks = code.match(splitter);
+									message = message + "<li>" + chunks[0] + " " + chunks[1] + " " + chunks[2] + " " + chunks[3] + "</li>";
+									recoveryCodeFileContents = recoveryCodeFileContents + chunks[0] + " " + chunks[1] + " " + chunks[2] + " " + chunks[3] + "\r\n";
+								}
+
+								message = message + "<p class=\"wf-center\"><a href=\"#\" class=\"button\" id=\"wfTwoFactorDownload\" target=\"_blank\"><i class=\"dashicons dashicons-download\"></i> Download</a></p>";
+
+								message = message + "</ul><p><em>This will be shown only once. Keep these codes somewhere safe.</em></p>";
+
+								self.colorbox('400px', "Recovery Codes", message, {onComplete: function() {
+									jQuery('#wfTwoFactorQRCodeTable').qrcode({text: totpURL});
+									jQuery('#wfTwoFactorDownload').on('click', function(e) {
+										e.preventDefault();
+										e.stopPropagation();
+										saveAs(new Blob([recoveryCodeFileContents], {type: "text/plain;charset=" + document.characterSet}), self.htmlEscape(res.homeurl) + "_" + self.htmlEscape(res.username) + "_recoverycodes.txt");
+									});
+								}});
+							}
+						}
+						
+						var updatedTwoFac = jQuery('#wfTwoFacUserTmpl').tmpl({users: [res]});
+						jQuery('#twoFactorUser-none').remove();
+						jQuery('#wfTwoFacUsers > table > tbody:last-child').append(updatedTwoFac.find('tbody > tr'));
 					}
 				});
 			},
@@ -2113,9 +2310,10 @@
 					code: code
 				}, function(res) {
 					if (res.ok) {
-						jQuery('#twoFacCont_' + res.userID).html(
-							jQuery('#wfTwoFacUserTmpl').tmpl(res)
-						);
+						var updatedTwoFac = jQuery('#wfTwoFacUserTmpl').tmpl({users: [res]});
+						updatedTwoFac.find('tbody > tr').each(function(index, element) {
+							jQuery('#' + jQuery(element).attr('id')).replaceWith(element);
+						});
 						self.twoFacStatus('Cellphone Sign-in activated for user.');
 					}
 				});
@@ -2125,20 +2323,19 @@
 					userID: userID
 				}, function(res) {
 					if (res.ok) {
-						jQuery('#twoFacCont_' + res.userID).fadeOut(function() {
+						jQuery('#twoFactorUser-' + res.userID).fadeOut(function() {
 							jQuery(this).remove();
+							
+							if (jQuery('#wfTwoFacUsers > table > tbody:last-child').children().length == 0) {
+								jQuery('#wfTwoFacUsers').html(jQuery('#wfTwoFacUserTmpl').tmpl({users: []}));
+							}
 						});
 					}
 				});
 			},
 			loadTwoFactor: function() {
 				this.ajax('wordfence_loadTwoFactor', {}, function(res) {
-					if (res.users && res.users.length > 0) {
-						for (var i = 0; i < res.users.length; i++) {
-							jQuery('<div id="twoFacCont_' + res.users[i].userID + '">' +
-								jQuery('#wfTwoFacUserTmpl').tmpl(res.users[i]).html() + '</div>').appendTo(jQuery('#wfTwoFacUsers'));
-						}
-					}
+					jQuery('#wfTwoFacUsers').html(jQuery('#wfTwoFacUserTmpl').tmpl(res));
 				});
 			},
 			getQueryParam: function(name) {
@@ -2181,33 +2378,42 @@
 					// Return if 4 bytes, otherwise false.
 					return m.length === 4 ? m : false;
 				}
-				r = /^((?:[\da-f]{1,4}(?::|)){0,8})(::)?((?:[\da-f]{1,4}(?::|)){0,8})$/;
+				r = /^((?:[\da-f]{1,4}(?::|)){0,8})(::)?((?:[\da-f]{1,4}(?::|)){0,8})$/i;
 				m = a.match(r); // IPv6
 				if (m) {
-					// Translate each hexadecimal value.
-					for (j = 1; j < 4; j++) {
-						// Indice 2 is :: and if no length, continue.
-						if (j === 2 || m[j].length === 0) {
-							continue;
-						}
-						m[j] = m[j].split(':');
-						for (i = 0; i < m[j].length; i++) {
-							m[j][i] = parseInt(m[j][i], 16);
-							// Would be NaN if it was blank, return false.
-							if (isNaN(m[j][i])) {
-								return false; // Invalid IP.
-							}
-							m[j][i] = f(m[j][i] >> 8) + f(m[j][i] & 0xFF);
-						}
-						m[j] = m[j].join('');
+					if (a == '::') {
+						return "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
 					}
-					x = m[1].length + m[3].length;
-					if (x === 16) {
-						return m[1] + m[3];
-					} else if (x < 16 && m[2].length > 0) {
-						return m[1] + (new Array(16 - x + 1))
-								.join('\x00') + m[3];
+
+					var colonCount = a.split(':').length - 1;
+					var doubleColonPos = a.indexOf('::');
+					if (doubleColonPos > -1) {
+						var expansionLength = ((doubleColonPos == 0 || doubleColonPos == a.length - 2) ? 9 : 8) - colonCount;
+						var expansion = '';
+						for (i = 0; i < expansionLength; i++) {
+							expansion += ':0000';
+						}
+						a = a.replace('::', expansion + ':');
+						a = a.replace(/(?:^\:|\:$)/, '', a);
 					}
+					
+					var ipGroups = a.split(':');
+					var ipBin = '';
+					for (i = 0; i < ipGroups.length; i++) {
+						var group = ipGroups[i];
+						if (group.length > 4) {
+							return false;
+						}
+						group = ("0000" + group).slice(-4);
+						var b1 = parseInt(group.slice(0, 2), 16);
+						var b2 = parseInt(group.slice(-2), 16);
+						if (isNaN(b1) || isNaN(b2)) {
+							return false;
+						}
+						ipBin += f(b1) + f(b2);
+					}
+					
+					return ipBin.length == 16 ? ipBin : false;
 				}
 				return false; // Invalid IP.
 			},
@@ -2242,40 +2448,6 @@
 				}
 			},
 
-			removeCacheExclusion: function(id) {
-				this.ajax('wordfence_removeCacheExclusion', {id: id}, function(res) {
-					window.location.reload(true);
-				});
-			},
-			addCacheExclusion: function(patternType, pattern) {
-				if (/^https?:\/\//.test(pattern)) {
-					this.colorbox('400px', "Incorrect pattern for exclusion", "You can not enter full URL's for exclusion from caching. You entered a full URL that started with http:// or https://. You must enter relative URL's e.g. /exclude/this/page/. You can also enter text that might be contained in the path part of a URL or at the end of the path part of a URL.");
-					return;
-				}
-
-				this.ajax('wordfence_addCacheExclusion', {
-					patternType: patternType,
-					pattern: pattern
-				}, function(res) {
-					if (res.ok) { //Otherwise errorMsg will get caught
-						window.location.reload(true);
-					}
-				});
-			},
-			loadCacheExclusions: function() {
-				this.ajax('wordfence_loadCacheExclusions', {}, function(res) {
-					if (res.ex instanceof Array && res.ex.length > 0) {
-						for (var i = 0; i < res.ex.length; i++) {
-							var newElem = jQuery('#wfCacheExclusionTmpl').tmpl(res.ex[i]);
-							newElem.prependTo('#wfCacheExclusions').fadeIn();
-						}
-						jQuery('<h2>Cache Exclusions</h2>').prependTo('#wfCacheExclusions');
-					} else {
-						jQuery('<h2>Cache Exclusions</h2><p style="width: 500px;">There are not currently any exclusions. If you have a site that does not change often, it is perfectly normal to not have any pages you want to exclude from the cache.</p>').prependTo('#wfCacheExclusions');
-					}
-
-				});
-			},
 			exportSettings: function() {
 				var self = this;
 				this.ajax('wordfence_exportSettings', {}, function(res) {
@@ -2389,6 +2561,16 @@
 				var self = this;
 				jQuery('.wfTimeAgo-timestamp').each(function(idx, elem) {
 					var el = jQuery(elem);
+					var testEl = el;
+					if (typeof jQuery === "function" && testEl instanceof jQuery) {
+						testEl = testEl[0];
+					}
+
+					var rect = testEl.getBoundingClientRect();
+					if (!(rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth))) {
+						return;
+					}
+					
 					var timestamp = el.data('wfctime');
 					if (!timestamp) {
 						timestamp = el.attr('data-timestamp');
@@ -2491,19 +2673,38 @@
 					}, 500);
 			},
 
+			renderWAFRulesNextUpdate: function(date) {
+				var dateString = date.toString();
+				if (date.toLocaleString) {
+					dateString = date.toLocaleString();
+				}
+				$('#waf-rules-next-update').text('Next Update Check: ' + dateString)
+					.css({
+						'opacity': 0
+					})
+					.animate({
+						'opacity': 1
+					}, 500);
+			},
+
 			wafUpdateRules: function(onSuccess) {
 				var self = this;
 				this.ajax('wordfence_updateWAFRules', {}, function(res) {
 					self.wafData = res;
 					self.wafConfigPageRender();
-					if (!self.wafData['isPaid']) {
-						self.colorbox('400px', 'Rules Updated', 'Your rules have been updated successfully. You are ' +
-							'currently using the the free version of Wordfence. ' +
-							'Upgrade to Wordfence premium to have your rules updated automatically as new threats emerge. ' +
-							'<a href="https://www.wordfence.com/wafUpdateRules1/wordfence-signup/">Click here to purchase a premium API key</a>. ' +
-							'<em>Note: Your rules will still update every 30 days as a free user.</em>');
-					} else {
-						self.colorbox('400px', 'Rules Updated', 'Your rules have been updated successfully.');
+					if (self.wafData['updated']) {
+						if (!self.wafData['isPaid']) {
+							self.colorbox('400px', 'Rules Updated', 'Your rules have been updated successfully. You are ' +
+								'currently using the the free version of Wordfence. ' +
+								'Upgrade to Wordfence premium to have your rules updated automatically as new threats emerge. ' +
+								'<a href="https://www.wordfence.com/wafUpdateRules1/wordfence-signup/">Click here to purchase a premium API key</a>. ' +
+								'<em>Note: Your rules will still update every 30 days as a free user.</em>');
+						} else {
+							self.colorbox('400px', 'Rules Updated', 'Your rules have been updated successfully.');
+						}
+					}
+					else {
+						self.colorbox('400px', 'Rule Update Failed', 'No rules were updated. Please verify you have permissions to write to the /wp-content/wflogs directory.');
 					}
 					if (typeof onSuccess === 'function') {
 						return onSuccess.apply(this, arguments);
@@ -2530,7 +2731,7 @@
 
 			wafConfigureAutoPrepend: function() {
 				var self = this;
-				self.colorbox("400px", 'Backup .htaccess before continuing', 'We are about to change your <em>.htaccess</em> file. Please make a backup of this file proceeding'
+				self.colorbox("400px", 'Backup .htaccess before continuing', 'We are about to change your <em>.htaccess</em> file. Please make a backup of this file before proceeding.'
 					+ '<br/>'
 					+ '<a href="' + WordfenceAdminVars.ajaxURL + '?action=wordfence_downloadHtaccess&nonce=' + self.nonce + '" onclick="jQuery(\'#wf-htaccess-confirm\').prop(\'disabled\', false); return true;">Click here to download a backup copy of your .htaccess file now</a>' +
 					'<br /><br />' +
@@ -2570,5 +2771,15 @@
 	}
 	jQuery(function() {
 		wordfenceAdmin.init();
+		jQuery(window).on('focus', function() {
+			if (jQuery('body').hasClass('wordfenceLiveActivityPaused')) {
+				jQuery('body').removeClass('wordfenceLiveActivityPaused');
+			}
+		});
 	});
 })(jQuery);
+
+/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
+var saveAs=saveAs||function(e){"use strict";if(typeof e==="undefined"||typeof navigator!=="undefined"&&/MSIE [1-9]\./.test(navigator.userAgent)){return}var t=e.document,n=function(){return e.URL||e.webkitURL||e},r=t.createElementNS("http://www.w3.org/1999/xhtml","a"),o="download"in r,i=function(e){var t=new MouseEvent("click");e.dispatchEvent(t)},a=/constructor/i.test(e.HTMLElement),f=/CriOS\/[\d]+/.test(navigator.userAgent),u=function(t){(e.setImmediate||e.setTimeout)(function(){throw t},0)},d="application/octet-stream",s=1e3*40,c=function(e){var t=function(){if(typeof e==="string"){n().revokeObjectURL(e)}else{e.remove()}};setTimeout(t,s)},l=function(e,t,n){t=[].concat(t);var r=t.length;while(r--){var o=e["on"+t[r]];if(typeof o==="function"){try{o.call(e,n||e)}catch(i){u(i)}}}},p=function(e){if(/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type)){return new Blob([String.fromCharCode(65279),e],{type:e.type})}return e},v=function(t,u,s){if(!s){t=p(t)}var v=this,w=t.type,m=w===d,y,h=function(){l(v,"writestart progress write writeend".split(" "))},S=function(){if((f||m&&a)&&e.FileReader){var r=new FileReader;r.onloadend=function(){var t=f?r.result:r.result.replace(/^data:[^;]*;/,"data:attachment/file;");var n=e.open(t,"_blank");if(!n)e.location.href=t;t=undefined;v.readyState=v.DONE;h()};r.readAsDataURL(t);v.readyState=v.INIT;return}if(!y){y=n().createObjectURL(t)}if(m){e.location.href=y}else{var o=e.open(y,"_blank");if(!o){e.location.href=y}}v.readyState=v.DONE;h();c(y)};v.readyState=v.INIT;if(o){y=n().createObjectURL(t);setTimeout(function(){r.href=y;r.download=u;i(r);h();c(y);v.readyState=v.DONE});return}S()},w=v.prototype,m=function(e,t,n){return new v(e,t||e.name||"download",n)};if(typeof navigator!=="undefined"&&navigator.msSaveOrOpenBlob){return function(e,t,n){t=t||e.name||"download";if(!n){e=p(e)}return navigator.msSaveOrOpenBlob(e,t)}}w.abort=function(){};w.readyState=w.INIT=0;w.WRITING=1;w.DONE=2;w.error=w.onwritestart=w.onprogress=w.onwrite=w.onabort=w.onerror=w.onwriteend=null;return m}(typeof self!=="undefined"&&self||typeof window!=="undefined"&&window||this.content);if(typeof module!=="undefined"&&module.exports){module.exports.saveAs=saveAs}else if(typeof define!=="undefined"&&define!==null&&define.amd!==null){define([],function(){return saveAs})}
+
+!function(t){"use strict";if(t.URL=t.URL||t.webkitURL,t.Blob&&t.URL)try{return void new Blob}catch(e){}var n=t.BlobBuilder||t.WebKitBlobBuilder||t.MozBlobBuilder||function(t){var e=function(t){return Object.prototype.toString.call(t).match(/^\[object\s(.*)\]$/)[1]},n=function(){this.data=[]},o=function(t,e,n){this.data=t,this.size=t.length,this.type=e,this.encoding=n},i=n.prototype,a=o.prototype,r=t.FileReaderSync,c=function(t){this.code=this[this.name=t]},l="NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR".split(" "),s=l.length,u=t.URL||t.webkitURL||t,d=u.createObjectURL,f=u.revokeObjectURL,R=u,p=t.btoa,h=t.atob,b=t.ArrayBuffer,g=t.Uint8Array,w=/^[\w-]+:\/*\[?[\w\.:-]+\]?(?::[0-9]+)?/;for(o.fake=a.fake=!0;s--;)c.prototype[l[s]]=s+1;return u.createObjectURL||(R=t.URL=function(t){var e,n=document.createElementNS("http://www.w3.org/1999/xhtml","a");return n.href=t,"origin"in n||("data:"===n.protocol.toLowerCase()?n.origin=null:(e=t.match(w),n.origin=e&&e[1])),n}),R.createObjectURL=function(t){var e,n=t.type;return null===n&&(n="application/octet-stream"),t instanceof o?(e="data:"+n,"base64"===t.encoding?e+";base64,"+t.data:"URI"===t.encoding?e+","+decodeURIComponent(t.data):p?e+";base64,"+p(t.data):e+","+encodeURIComponent(t.data)):d?d.call(u,t):void 0},R.revokeObjectURL=function(t){"data:"!==t.substring(0,5)&&f&&f.call(u,t)},i.append=function(t){var n=this.data;if(g&&(t instanceof b||t instanceof g)){for(var i="",a=new g(t),l=0,s=a.length;s>l;l++)i+=String.fromCharCode(a[l]);n.push(i)}else if("Blob"===e(t)||"File"===e(t)){if(!r)throw new c("NOT_READABLE_ERR");var u=new r;n.push(u.readAsBinaryString(t))}else t instanceof o?"base64"===t.encoding&&h?n.push(h(t.data)):"URI"===t.encoding?n.push(decodeURIComponent(t.data)):"raw"===t.encoding&&n.push(t.data):("string"!=typeof t&&(t+=""),n.push(unescape(encodeURIComponent(t))))},i.getBlob=function(t){return arguments.length||(t=null),new o(this.data.join(""),t,"raw")},i.toString=function(){return"[object BlobBuilder]"},a.slice=function(t,e,n){var i=arguments.length;return 3>i&&(n=null),new o(this.data.slice(t,i>1?e:this.data.length),n,this.encoding)},a.toString=function(){return"[object Blob]"},a.close=function(){this.size=0,delete this.data},n}(t);t.Blob=function(t,e){var o=e?e.type||"":"",i=new n;if(t)for(var a=0,r=t.length;r>a;a++)Uint8Array&&t[a]instanceof Uint8Array?i.append(t[a].buffer):i.append(t[a]);var c=i.getBlob(o);return!c.slice&&c.webkitSlice&&(c.slice=c.webkitSlice),c};var o=Object.getPrototypeOf||function(t){return t.__proto__};t.Blob.prototype=o(new t.Blob)}("undefined"!=typeof self&&self||"undefined"!=typeof window&&window||this.content||this);

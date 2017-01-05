@@ -1,0 +1,73 @@
+[
+    {
+        "key": "group_586eb4d54c1bd",
+        "title": "Page Blocks",
+        "fields": [
+            {
+                "layouts": [
+                    {
+                        "key": "586eb50a4bdd5",
+                        "name": "simple_copy",
+                        "label": "Simple Copy Block",
+                        "display": "block",
+                        "sub_fields": [
+                            {
+                                "tabs": "all",
+                                "toolbar": "full",
+                                "media_upload": 1,
+                                "default_value": "",
+                                "delay": 0,
+                                "key": "field_586eb556538b5",
+                                "label": "Copy",
+                                "name": "copy",
+                                "type": "wysiwyg",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                }
+                            }
+                        ],
+                        "min": "",
+                        "max": ""
+                    }
+                ],
+                "min": "",
+                "max": "",
+                "button_label": "Add Block",
+                "key": "field_586eb4e22c58c",
+                "label": "Page Blocks",
+                "name": "sk_page_blocks",
+                "type": "flexible_content",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                }
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "seamless",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": 1,
+        "description": ""
+    }
+]

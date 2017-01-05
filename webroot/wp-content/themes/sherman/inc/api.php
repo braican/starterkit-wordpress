@@ -8,12 +8,18 @@
 
 
 
+
+/* -------------------------------------------------
+ * --base getting fields
+ * ------------------------------------------------- */
+
+
 /**
  * theme implementation of ACF's get_field - checks to ensure the
  *  value is there, and then wraps it in html
  *
- * @param $field
- * @param $args
+ * @param string $field : The name of the field
+ * @param array  $args  : Arguments to display this field
  *    - id (number)         : the post id to check this field for.
  *    - before (string)     : the html to appear before the field.
  *    - after  (string)     : the html to appear after the field.
@@ -92,34 +98,53 @@ function sk_the_field($field, $args = array() ){
 
 
 /**
- * wrapper to call the sk_the_field function to return
- * @param $field
- * @param $args - see above
+ * Wrapper to call the sk_the_field function to return
+ *
+ * @param string $field : Field we want
+ * @param array  $args  : see above
  */
-function sk_get_field($field, $args = array() ){
+function sk_get_field( $field, $args = array() ){
     $options = array_merge($args, array('return' => true));
     return sk_the_field($field, $options);
 }
 
 
 
+
+/**
+ * Wrapper to call the sk_the_field with a subfield
+ *
+ * @param string $field : Field we want
+ * @param array  $args  : see above
+ */
+function sk_the_subfield( $field, $args = array() ){
+    $options = array_merge( $args, array('sub_field' => true) );
+    sk_the_field($field, $options);
+}
+
+
+
+/**
+ * Wrapper to call the sk_the_field to return and show a subfield
+ *
+ * @param string $field : Field we want
+ * @param array  $args  : see above
+ */
+function sk_get_subfield( $field, $args = array() ){
+    $options = array_merge($args, array('return' => true, 'sub_field' => true));
+    return sk_the_field($field, $options);
+}
+
+
+
+
+
 /**
  * Wrapper to display a field within a block. Since the page blocks
- *  utilizes an ACF repeater field, all the fields within the blocks
- *  are actually sub fields
- *
- * @param $field (string)
- *   - the name of the field
- * @param $args (array)
- *   - the arguments for this field. See above for complete list
- *       of arguments
+ *  utilizes an ACF repeater field, this is an alias of sk_the_subfield()
  */
 function sk_block_field( $field, $args = array() ){
-
-    $options = array_merge( $args, array('sub_field' => true) );
-
-    sk_the_field($field, $options);
-
+    sk_the_subfield( $field, $args );
 }
 
 
@@ -142,25 +167,26 @@ function sk_the_page_blocks(){
     }
 
     // the page blocks repeater field
-    $blocks_repeater = 'sk_page_blocks';
+    $newBlocks = 'sk_page_blocks';
 
-    if( have_rows($blocks_repeater) ) : ?>
+
+    if( have_rows( $newBlocks ) ) : ?>
+    
         <div class="secondary-content">
 
             <?php // loop through the rows of data ?>
-            <?php while ( have_rows($blocks_repeater) ) : the_row(); ?>
-                <?php $block = get_sub_field( 'sk_page_block' ); ?>
+            <?php while ( have_rows($newBlocks) ) : the_row(); ?>
+                <?php $block = get_row_layout(); ?>
 
                 <section class="sk-block<?php echo $block ? " block--$block" : ""; ?>">
                     <?php
-                        // //
-                        // // - example implementation of getting the header field
-                        // //    for each of the blocks
-                        // //
-                        // sk_the_field( 'sk_page_block_title' , array(
+                        //
+                        // - example implementation of getting the header field
+                        //    for each of the blocks
+                        //
+                        // sk_block_field( 'sk_page_block_title' , array(
                         //     'before'    => '<header class="page-module-title"><h2>',
-                        //     'after'     => '</h2></header>',
-                        //     'sub_field' => true
+                        //     'after'     => '</h2></header>'
                         // ));
 
                         get_template_part('blocks/block', $block);
