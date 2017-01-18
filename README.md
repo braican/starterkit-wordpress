@@ -18,6 +18,7 @@ Once you've set all this up, log into the site and do a couple things:
 
 1. Change the theme under Appearance > Themes to the "Sherman" theme
 1. Head over to the plugins page and activate "Advanced Custom Fields PRO" and "WP Migrate DB"
+1. Once ACF Pro is enabled, head to "Custom Fields > Tools". Use the "Import Field Groups" file selector to import the `_imports/acf-page-blocks.json` file to add the page blocks functionality.
 
 
 Setting up this project
