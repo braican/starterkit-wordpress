@@ -15,6 +15,7 @@ Getting Started
 1. Navigate to the site (remember, you probably want to have added a subdomain in your virtual hosts in apache), and install WordPress.
 
 Once you've set all this up, log into the site and do a couple things:
+
 1. Change the theme under Appearance > Themes to the "Sherman" theme
 1. Head over to the plugins page and activate "Advanced Custom Fields PRO" and "WP Migrate DB"
 
