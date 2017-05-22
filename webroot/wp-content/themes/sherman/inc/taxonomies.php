@@ -25,6 +25,7 @@
 
 
 
+if( function_exists('sk_taxonomies') ) :
 /**
  * Register taxonomies. Insert taxonomy registrations in here
  */
@@ -32,4 +33,4 @@ function sk_taxonomies(){
 
 }
 add_action('init', 'sk_taxonomies');
-
+endif; // sk_taxonomies

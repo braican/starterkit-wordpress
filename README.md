@@ -24,14 +24,10 @@ Setting up this project
 1. Create `wp-config.php` by copying the `wp-sample-config.php` and add the appropriate database credentials.
 
 
-API Reference
--------------
-The wiki of this repo contains documentation for this theme's functions.
-
-
 Namespacing
 -----------
 Functions are namespaced with the prefix `sk`.
+
 
 
 The Javascript Structure
@@ -39,10 +35,10 @@ The Javascript Structure
 
 The Javascript is organized in the following way (all file paths are relative to the theme path, unless otherwise noted):
 
-* Available javascript modules are located in the `_arsenal/js` directory. Use the `setup.json` file in the webroot to choose which of these modules (if any) you'll need for this project, and run the `gulp build-arsenal` command. This will place the activated modules inside the theme at `js/arsenal`.
-* All third-party plugins that stand alone from a standardized module pattern should go in the `js/plugins.js` file.
-* All project-specific scripts and front-end code should go into the `js/main.js` file.
-* Upon running the `gulp opt-js` task, a `js/production.js` file will be built, and a minified version will be placed into the `js/build` directory.
+* Available javascript modules are located in the project root in the `_arsenal/js` directory. Use the `setup.json` file in the webroot to choose which of these modules (if any) you'll need for this project, and run the `gulp build-arsenal` command. This will place the activated modules inside the theme at `js/arsenal`.
+* All third-party plugins that stand alone from a standardized module pattern should go in the `js/src/plugins.js` file.
+* All project-specific scripts and front-end code should go into the `js/src/main.js` file.
+* Upon running the `gulp opt-js` task, `production.js` will be built, and a minified version will be placed into the `js/build` directory.
 
 
 Gulp Tasks
@@ -65,7 +61,7 @@ Optimizes javascript by concatenating all the enabled arsenal scripts, the plugi
 #### `gulp svgstore`
 Creates the svg sprite for insertion into the page.
 
-#### `gulp sass`
+#### `gulp styles`
 Compiles sass.
 
 #### `gulp watch`
@@ -99,6 +95,8 @@ To add a new block, duplicate the `block.php` file inside the `blocks` directory
 When you add a new layout, this block will be available in the "Page Blocks" field group on all pages.
 
 
+
+
 Going Live
 ----------
 
@@ -114,3 +112,88 @@ A database directory?
 
 I know there's some back and forth between whether putting a database dump into a git repo is a good idea or not, but since most WordPress database dumps are relatively small, I'm leaving this as a good solution for data in version control.
 
+
+
+
+
+API Reference
+-------------
+
+### Getting fields
+
+####**sk\_the\_field( $field, $args = array() )**
+Helper function that enhances the ACF `the_field` function with some optional settings.
+
+`$field` is the string indicating the ACF field to get.
+
+`$args` is an associative array with the following options:
+
+* `id` (int) : Post we're getting the field for.
+* `before` (string) : HTML markup to appear before the field.
+* `after` (string) : HTML markup to appear after the field.
+* `filter` (string) : Any filter you'd like to apply to the field.
+* `filter_args` (array) : An associative array that will pass the values to the given filter.
+* `sub_field` (boolean) : Whether or not this field is a sub-field. Default is FALSE.
+* `default` (mixed) : If the field is undefined, the default value of this function call.
+* `return` (boolean) : If true, return the value of this field rather than echo it out. Default is FALSE
+* `debug` (boolean) : Debug flag; offers the option to print out helpful debugging data.
+
+If the `return` argument is true, this function returns a string containing the markup with the requested field.
+
+
+####**sk\_get\_field( $field, $args = array() )**
+Wrapper to call the `sk_the_field()` function with the `return` parameter set to TRUE.
+
+
+####**sk\_the\_subfield( $field, $args = array() )**
+Wrapper to call the `sk_the_field()` function with the `sub_field` parameter set to TRUE.
+
+
+####**sk\_get\_subfield( $field, $args = array() )**
+Wrapper to call the `sk_the_field()` function with the `sub_field` and `return` parameters set to TRUE.
+
+
+####**sk\_block\_field( $field, $args = array() )**
+Wrapper to display a field within a block. Since the page blocks utilizes an ACF repeater field, this is an alias of `sk_the_subfield()`.
+
+
+
+### Rendering
+
+####**sk\_the\_page\_blocks()**
+Hooks into the ACF repeater field to render all the additional page blocks for a page. Calls tempaltes in the blocks/ directory
+
+
+
+
+
+Theme Filters
+-------------
+
+There are a number of filters that can be used to handle values within the theme. The source for these filters can be found in `inc/filters.php`.
+
+
+####**sk\_image\_markup**
+Filter for handling an image object from the database and returning a valid img tag with the appropriate src from that image object. This filter can be passed an associative array with the following values:
+
+* `img_size` (string) : The registered image size in WordPress
+
+
+####**sk\_link\_email**
+Renders an email address as a linked link.
+
+
+####**sk\_sanitize\_svg**
+Sanitize any values coming through the CMS that should be output as HTML and make sure that it's svg code.
+
+
+####**sk\_youtube\_video\_embed**
+Renders markup for a youtube video embed from a YouTube video ID.
+
+
+
+
+Admin Filters
+-------------
+
+Within the theme directory, there are some admin filters in place in the `inc/admin.php` file that extend the administrative functionality. Check out that file to add WYSIWYG styles, add columns for custim fields to post types, adjust the administrative interface, and more.

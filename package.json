@@ -4,6 +4,7 @@
   "devDependencies": {
     "fs": "0.0.2",
     "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^4.0.0",
     "gulp-concat": "^2.6.0",
     "gulp-help": "^1.6.1",
     "gulp-inject-string": "^1.1.0",

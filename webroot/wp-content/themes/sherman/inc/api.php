@@ -1,19 +1,20 @@
 <?php
 
-/* --------------------------------------------
+/* ========================================================
  *
  * API function calls for theming
  *
- * -------------------------------------------- */
+ * ======================================================== */
 
 
 
 
 /* -------------------------------------------------
- * --base getting fields
+ * --getting fields
  * ------------------------------------------------- */
 
 
+if( !function_exists('sk_the_field') ) :
 /**
  * theme implementation of ACF's get_field - checks to ensure the
  *  value is there, and then wraps it in html
@@ -30,8 +31,6 @@
  *    - return (boolean)    : whether to return the value, or simply echo it. Default is false.
  *    - debug (boolean)     : enables debug mode. Default is false.
  */
-
-
 function sk_the_field($field, $args = array() ){
 
     // lets check the existance of ACF
@@ -94,9 +93,13 @@ function sk_the_field($field, $args = array() ){
         echo $markup; 
     }
 }
+endif; // sk_the_field
 
 
 
+
+
+if( !function_exists('sk_get_field') ) :
 /**
  * Wrapper to call the sk_the_field function to return
  *
@@ -107,10 +110,13 @@ function sk_get_field( $field, $args = array() ){
     $options = array_merge($args, array('return' => true));
     return sk_the_field($field, $options);
 }
+endif; // sk_get_field
 
 
 
 
+
+if( !function_exists('sk_the_subfield') ) :
 /**
  * Wrapper to call the sk_the_field with a subfield
  *
@@ -121,9 +127,12 @@ function sk_the_subfield( $field, $args = array() ){
     $options = array_merge( $args, array('sub_field' => true) );
     sk_the_field($field, $options);
 }
+endif; // sk_the_subfield
 
 
 
+
+if( !function_exists('sk_get_subfield') ) :
 /**
  * Wrapper to call the sk_the_field to return and show a subfield
  *
@@ -134,11 +143,12 @@ function sk_get_subfield( $field, $args = array() ){
     $options = array_merge($args, array('return' => true, 'sub_field' => true));
     return sk_the_field($field, $options);
 }
+endif; // sk_get_subfield
 
 
 
 
-
+if( !function_exists('sk_block_field') ) :
 /**
  * Wrapper to display a field within a block. Since the page blocks
  *  utilizes an ACF repeater field, this is an alias of sk_the_subfield()
@@ -146,6 +156,10 @@ function sk_get_subfield( $field, $args = array() ){
 function sk_block_field( $field, $args = array() ){
     sk_the_subfield( $field, $args );
 }
+endif; // sk_block_field
+
+
+
 
 
 
@@ -155,6 +169,7 @@ function sk_block_field( $field, $args = array() ){
  * -------------------------------------------- */
 
 
+if( !function_exists('sk_the_page_blocks') ) :
 /**
  * hooks into the ACF repeater field to render all the additional
  *  page blocks for a page. Calls tempaltes in the blocks/ directory
@@ -199,4 +214,4 @@ function sk_the_page_blocks(){
 <?php
     endif;
 }
-
+endif; // sk_the_page_blocks
