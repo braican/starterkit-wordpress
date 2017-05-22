@@ -7,13 +7,18 @@ Theme based on [_s](https://github.com/Automattic/_s/).
 
 Getting Started
 ---------------
+1. Download this repo from the Downloads link on the left. Extract the contents and add all the files to your project. Don't forget to set up your local apache to point to the `webroot` directory.
+1. Run `git init` to init the git repo, `git add -A` to add all the files, and `git commit -m "initial commit"` to add all the files. Once you've set up your remote repo, `git push` to that remote.
 1. Run `npm install` to install gulp and get all that good stuff set up.
-1. Open `setup.json`. This file contains json that allows you to opt into common javascript components and content types. Set the components you wish to use to `true` and save the file. Run `gulp build` to build theme files containing your selected components.
-1. Update the stylesheet header in `style.css` to reflect the proper information for your theme.
-1. If you haven't created a database for this site, do that now.
-1. Copy the `wp-sample-config.php` to `wp-config.php` and add the appropriate database credentials.
-1. Install WordPress.
-1. Upon logging in for the first time, change the theme under Appearance > Themes to the newly created theme, and enable the Advanced Custom Fields and ACF: Repeater plugins.
+1. Create your database for this site, and copy your `wp-sample-config.php` file to `wp-config.php` and add the appropriate database credentials.
+1. (OPTIONAL) If you're going to use any common components (for example, you're building a Tank Standard Issue site), open `setup.json`. This file contains json that allows you to opt into common javascript components and content types. Set the components you wish to use to `true` and save the file. Run `gulp build` to build theme files containing your selected components.
+1. Navigate to the site (remember, you probably want to have added a subdomain in your virtual hosts in apache), and install WordPress.
+
+Once you've set all this up, log into the site and do a couple things:
+
+1. Change the theme under Appearance > Themes to the "Sherman" theme
+1. Head over to the plugins page and activate "Advanced Custom Fields PRO" and "WP Migrate DB"
+1. Once ACF Pro is enabled, head to "Custom Fields > Tools". Use the "Import Field Groups" file selector to import the `_imports/acf-page-blocks.json` file to add the page blocks functionality.
 
 
 Setting up this project
