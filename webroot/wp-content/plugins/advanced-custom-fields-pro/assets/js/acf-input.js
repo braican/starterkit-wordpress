@@ -682,6 +682,11 @@ var acf;
 			// filter out fields
 			if( !all ) {
 				
+				// remove clone fields
+				$fields = $fields.not('.acf-clone .acf-field');
+				
+				
+				// filter
 				$fields = acf.apply_filters('get_fields', $fields);
 								
 			}
@@ -933,45 +938,74 @@ var acf;
 		*  @return	$post_id (int)
 		*/
 		
-		serialize_form : function( $el ){
+		serialize_form: function( $el, prefix ){
+			
+			// defaults
+			prefix = prefix || '';
+			
 			
 			// vars
-			var data = {},
-				names = {};
-			
-			
-			// selector
-			$selector = $el.find('select, textarea, input');
+			var data = {};
+			var names = {};
+			var values = $el.find('select, textarea, input').serializeArray();
 			
 			
 			// populate data
-			$.each( $selector.serializeArray(), function( i, pair ) {
+			$.each( values, function( i, pair ) {
+				
+				// vars
+				var name = pair.name;
+				var value = pair.value;
+				
+				
+				// prefix
+				if( prefix ) {
+					
+					// bail early if does not contain
+					if( name.indexOf(prefix) !== 0 ) return;
+					
+					
+					// remove prefix
+					name = name.substr(prefix.length);
+					
+					
+					// name must not start as array piece
+					if( name.slice(0, 1) == '[' ) {
+						
+						name = name.replace('[', '');
+						name = name.replace(']', '');
+						
+					}
+					
+				}
+				
 				
 				// initiate name
-				if( pair.name.slice(-2) === '[]' ) {
+				if( name.slice(-2) === '[]' ) {
 					
 					// remove []
-					pair.name = pair.name.replace('[]', '');
+					name = name.slice(0, -2);
 					
 					
 					// initiate counter
-					if( typeof names[ pair.name ] === 'undefined'){
+					if( typeof names[ name ] === 'undefined'){
 						
-						names[ pair.name ] = -1;
+						names[ name ] = -1;
+						
 					}
 					
 					
 					// increase counter
-					names[ pair.name ]++;
+					names[ name ]++;
 					
 					
 					// add key
-					pair.name += '[' + names[ pair.name ] +']';
+					name += '[' + names[ name ] +']';
 				}
 				
 				
 				// append to data
-				data[ pair.name ] = pair.value;
+				data[ name ] = value;
 				
 			});
 			
@@ -981,9 +1015,9 @@ var acf;
 			
 		},
 		
-		serialize: function( $el ){
+		serialize: function( $el, prefix ){
 			
-			return this.serialize_form( $el );
+			return this.serialize_form.apply( this, arguments );
 			
 		},
 		
@@ -1259,8 +1293,7 @@ var acf;
 			$el.css({
 				height		: $el.height(),
 				width		: $el.width(),
-				position	: 'absolute',
-				//padding		: 0
+				position	: 'absolute'
 			});
 			
 			
@@ -1505,7 +1538,7 @@ var acf;
 			
 				$popup.find('.acf-popup-box').css({
 					'width'			: args.width,
-					'margin-left'	: 0 - (args.width / 2),
+					'margin-left'	: 0 - (args.width / 2)
 				});
 				
 			}
@@ -1517,7 +1550,7 @@ var acf;
 				
 				$popup.find('.acf-popup-box').css({
 					'height'		: args.height,
-					'margin-top'	: 0 - (args.height / 2),
+					'margin-top'	: 0 - (args.height / 2)
 				});	
 				
 			}
@@ -1832,45 +1865,229 @@ var acf;
 		
 		str_sanitize: function( string ) {
 			
-			// vars
-			var string2 = '',
-				replace = {
-				'æ': 'a',
-				'å': 'a',
-				'á': 'a',
-				'ä': 'a',
-				'č': 'c',
-				'ď': 'd',
-				'è': 'e',
-				'é': 'e',
-				'ě': 'e',
-				'ë': 'e',
-				'í': 'i',
-				'ĺ': 'l',
-				'ľ': 'l',
-				'ň': 'n',
-				'ø': 'o',
-				'ó': 'o',
-				'ô': 'o',
-				'ő': 'o',
-				'ö': 'o',
-				'ŕ': 'r',
-				'š': 's',
-				'ť': 't',
-				'ú': 'u',
-				'ů': 'u',
-				'ű': 'u',
-				'ü': 'u',
-				'ý': 'y',
-				'ř': 'r',
-				'ž': 'z',
-				' ': '_',
+			// chars (https://jsperf.com/replace-foreign-characters)
+			var map = {
+	            "À": "A",
+	            "Á": "A",
+	            "Â": "A",
+	            "Ã": "A",
+	            "Ä": "A",
+	            "Å": "A",
+	            "Æ": "AE",
+	            "Ç": "C",
+	            "È": "E",
+	            "É": "E",
+	            "Ê": "E",
+	            "Ë": "E",
+	            "Ì": "I",
+	            "Í": "I",
+	            "Î": "I",
+	            "Ï": "I",
+	            "Ð": "D",
+	            "Ñ": "N",
+	            "Ò": "O",
+	            "Ó": "O",
+	            "Ô": "O",
+	            "Õ": "O",
+	            "Ö": "O",
+	            "Ø": "O",
+	            "Ù": "U",
+	            "Ú": "U",
+	            "Û": "U",
+	            "Ü": "U",
+	            "Ý": "Y",
+	            "ß": "s",
+	            "à": "a",
+	            "á": "a",
+	            "â": "a",
+	            "ã": "a",
+	            "ä": "a",
+	            "å": "a",
+	            "æ": "ae",
+	            "ç": "c",
+	            "è": "e",
+	            "é": "e",
+	            "ê": "e",
+	            "ë": "e",
+	            "ì": "i",
+	            "í": "i",
+	            "î": "i",
+	            "ï": "i",
+	            "ñ": "n",
+	            "ò": "o",
+	            "ó": "o",
+	            "ô": "o",
+	            "õ": "o",
+	            "ö": "o",
+	            "ø": "o",
+	            "ù": "u",
+	            "ú": "u",
+	            "û": "u",
+	            "ü": "u",
+	            "ý": "y",
+	            "ÿ": "y",
+	            "Ā": "A",
+	            "ā": "a",
+	            "Ă": "A",
+	            "ă": "a",
+	            "Ą": "A",
+	            "ą": "a",
+	            "Ć": "C",
+	            "ć": "c",
+	            "Ĉ": "C",
+	            "ĉ": "c",
+	            "Ċ": "C",
+	            "ċ": "c",
+	            "Č": "C",
+	            "č": "c",
+	            "Ď": "D",
+	            "ď": "d",
+	            "Đ": "D",
+	            "đ": "d",
+	            "Ē": "E",
+	            "ē": "e",
+	            "Ĕ": "E",
+	            "ĕ": "e",
+	            "Ė": "E",
+	            "ė": "e",
+	            "Ę": "E",
+	            "ę": "e",
+	            "Ě": "E",
+	            "ě": "e",
+	            "Ĝ": "G",
+	            "ĝ": "g",
+	            "Ğ": "G",
+	            "ğ": "g",
+	            "Ġ": "G",
+	            "ġ": "g",
+	            "Ģ": "G",
+	            "ģ": "g",
+	            "Ĥ": "H",
+	            "ĥ": "h",
+	            "Ħ": "H",
+	            "ħ": "h",
+	            "Ĩ": "I",
+	            "ĩ": "i",
+	            "Ī": "I",
+	            "ī": "i",
+	            "Ĭ": "I",
+	            "ĭ": "i",
+	            "Į": "I",
+	            "į": "i",
+	            "İ": "I",
+	            "ı": "i",
+	            "Ĳ": "IJ",
+	            "ĳ": "ij",
+	            "Ĵ": "J",
+	            "ĵ": "j",
+	            "Ķ": "K",
+	            "ķ": "k",
+	            "Ĺ": "L",
+	            "ĺ": "l",
+	            "Ļ": "L",
+	            "ļ": "l",
+	            "Ľ": "L",
+	            "ľ": "l",
+	            "Ŀ": "L",
+	            "ŀ": "l",
+	            "Ł": "l",
+	            "ł": "l",
+	            "Ń": "N",
+	            "ń": "n",
+	            "Ņ": "N",
+	            "ņ": "n",
+	            "Ň": "N",
+	            "ň": "n",
+	            "ŉ": "n",
+	            "Ō": "O",
+	            "ō": "o",
+	            "Ŏ": "O",
+	            "ŏ": "o",
+	            "Ő": "O",
+	            "ő": "o",
+	            "Œ": "OE",
+	            "œ": "oe",
+	            "Ŕ": "R",
+	            "ŕ": "r",
+	            "Ŗ": "R",
+	            "ŗ": "r",
+	            "Ř": "R",
+	            "ř": "r",
+	            "Ś": "S",
+	            "ś": "s",
+	            "Ŝ": "S",
+	            "ŝ": "s",
+	            "Ş": "S",
+	            "ş": "s",
+	            "Š": "S",
+	            "š": "s",
+	            "Ţ": "T",
+	            "ţ": "t",
+	            "Ť": "T",
+	            "ť": "t",
+	            "Ŧ": "T",
+	            "ŧ": "t",
+	            "Ũ": "U",
+	            "ũ": "u",
+	            "Ū": "U",
+	            "ū": "u",
+	            "Ŭ": "U",
+	            "ŭ": "u",
+	            "Ů": "U",
+	            "ů": "u",
+	            "Ű": "U",
+	            "ű": "u",
+	            "Ų": "U",
+	            "ų": "u",
+	            "Ŵ": "W",
+	            "ŵ": "w",
+	            "Ŷ": "Y",
+	            "ŷ": "y",
+	            "Ÿ": "Y",
+	            "Ź": "Z",
+	            "ź": "z",
+	            "Ż": "Z",
+	            "ż": "z",
+	            "Ž": "Z",
+	            "ž": "z",
+	            "ſ": "s",
+	            "ƒ": "f",
+	            "Ơ": "O",
+	            "ơ": "o",
+	            "Ư": "U",
+	            "ư": "u",
+	            "Ǎ": "A",
+	            "ǎ": "a",
+	            "Ǐ": "I",
+	            "ǐ": "i",
+	            "Ǒ": "O",
+	            "ǒ": "o",
+	            "Ǔ": "U",
+	            "ǔ": "u",
+	            "Ǖ": "U",
+	            "ǖ": "u",
+	            "Ǘ": "U",
+	            "ǘ": "u",
+	            "Ǚ": "U",
+	            "ǚ": "u",
+	            "Ǜ": "U",
+	            "ǜ": "u",
+	            "Ǻ": "A",
+	            "ǻ": "a",
+	            "Ǽ": "AE",
+	            "ǽ": "ae",
+	            "Ǿ": "O",
+	            "ǿ": "o",
+	            
+	            // extra
+	            ' ': '_',
 				'\'': '',
 				'?': '',
 				'/': '',
 				'\\': '',
 				'.': '',
 				',': '',
+				'`': '',
 				'>': '',
 				'<': '',
 				'"': '',
@@ -1881,37 +2098,46 @@ var acf;
 				'}': '',
 				'(': '',
 				')': ''
-			};
+	        };
+			
+		    
+		    // vars
+		    var regexp = /\W/g,
+		        mapping = function (c) { return (typeof map[c] !== 'undefined') ? map[c] : c; };
 			
 			
-			// lowercase
+			// replace
+			string = string.replace(regexp, mapping);
+			
+			
+			// lower case
 			string = string.toLowerCase();
 			
 			
-			// loop through characters
-			for( i = 0; i < string.length; i++ ) {
-				
-				// character
-				var c = string.charAt(i);
-				
-				
-				// override c with replacement
-				if( typeof replace[c] !== 'undefined' ) {
-					
-					c = replace[c];
-						
-				}
-				
-				
-				// append
-				string2 += c;
-					
-			}
-			
-			
 			// return
-			return string2;
-				
+			return string;
+						
+		},
+		
+		
+		/*
+		*  addslashes
+		*
+		*  This function mimics the PHP addslashes function. 
+		*  Returns a string with backslashes before characters that need to be escaped.
+		*
+		*  @type	function
+		*  @date	9/1/17
+		*  @since	5.5.0
+		*
+		*  @param	text (string)
+		*  @return	(string)
+		*/
+		
+		addslashes: function(text){
+			
+			return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+			
 		},
 		
 		
@@ -2515,7 +2741,7 @@ var acf;
 			'show'				: '_show',
 			'show_field'		: '_show_field',
 			'hide'				: '_hide',
-			'hide_field'		: '_hide_field',
+			'hide_field'		: '_hide_field'
 		},
 		
 		// prepare
@@ -2735,116 +2961,286 @@ var acf;
 		active: 0,
 		
 		actions: {
-			'refresh': 	'refresh',
+			'prepare 99': 	'prepare',
+			'refresh': 		'refresh'
 		},
 		
-		refresh: function( $el ){
+		prepare: function(){
 			
-			//console.log('acf.layout.refresh', $el);
+			// vars
+			this.active = 1;
+			
+			
+			// render
+			this.refresh();
+			
+		},
+		
+		refresh: function( $el ){ 
+			
+			// bail early if not yet active
+			if( !this.active ) return;
+			
 			
 			// defaults
-			$el = $el || false;
+			$el = $el || $('body');
 			
 			
-			// if is '.acf-fields'
-			if( $el && $el.is('.acf-fields') ) {
+			// reference
+			var self = this;
+			
+			
+			// render
+			this.render_tables( $el );
+			this.render_groups( $el );
+			
+		},
+		
+		render_tables: function( $el ){ 
+			
+			// reference
+			var self = this;
+			
+			
+			// vars
+			var $tables = $el.find('.acf-table:visible');
+			
+			
+			// appent self if is tr
+			if( $el.is('tr') ) {
 				
-				$el = $el.parent();
+				$tables = $el.parent().parent();
 				
 			}
 			
 			
-			// loop over visible fields
-			$('.acf-fields:visible', $el).each(function(){
+			// loop
+			$tables.each(function(){
 				
-				// vars
-				var $els = $(),
-					top = 0,
-					height = 0,
-					cell = -1;
-				
-				
-				// get fields
-				var $fields = $(this).children('.acf-field[data-width]:visible');
-				
-				
-				// bail early if no fields
-				if( !$fields.exists() ) {
-					
-					return;
-					
-				}
-				
-				
-				// reset fields
-				$fields.removeClass('acf-r0 acf-c0').css({'min-height': 0});
-				
-				
-				$fields.each(function( i ){
-					
-					// vars
-					var $el = $(this),
-						this_top = $el.position().top;
-					
-					
-					// set top
-					if( i == 0 ) {
-						
-						top = this_top;
-						
-					}
-					
-					
-					// detect new row
-					if( this_top != top ) {
-						
-						// set previous heights
-						$els.css({'min-height': (height+1)+'px'});
-						
-						// reset
-						$els = $();
-						top = $el.position().top; // don't use variable as this value may have changed due to min-height css
-						height = 0;
-						cell = -1;
-						
-					}
-					
-											
-					// increase
-					cell++;
-				
-					// set height
-					height = ($el.outerHeight() > height) ? $el.outerHeight() : height;
-					
-					// append
-					$els = $els.add( $el );
-					
-					// add classes
-					if( this_top == 0 ) {
-						
-						$el.addClass('acf-r0');
-						
-					} else if( cell == 0 ) {
-						
-						$el.addClass('acf-c0');
-						
-					}
-					
-				});
-				
-				
-				// clean up
-				if( $els.exists() ) {
-					
-					$els.css({'min-height': (height+1)+'px'});
-					
-				}
-				
+				self.render_table( $(this) );
 				
 			});
 			
-			//console.timeEnd('acf.width.render');
-
+		},
+		
+		render_table: function( $table ){
+			
+			// vars
+			var $ths = $table.find('> thead th.acf-th'),
+				colspan = 1,
+				available_width = 100;
+			
+			
+			// bail early if no $ths
+			if( !$ths.exists() ) return;
+			
+			
+			// vars
+			var $trs = $table.find('> tbody > tr'),
+				$tds = $trs.find('> td.acf-field');
+			
+			
+			// remove clones if has visible rows
+			if( $trs.hasClass('acf-clone') && $trs.length > 1 ) {
+				
+				$tds = $trs.not('.acf-clone').find('> td.acf-field');
+				
+			}
+			
+			
+			// render th/td visibility
+			$ths.each(function(){
+				
+				// vars
+				var $th = $(this),
+					key = $th.attr('data-key'),
+					$td = $tds.filter('[data-key="'+key+'"]');
+				
+				// clear class
+				$td.removeClass('appear-empty');
+				$th.removeClass('hidden-by-conditional-logic');
+				
+				
+				// no td
+				if( !$td.exists() ) {
+					
+					// do nothing
+				
+				// if all td are hidden
+				} else if( $td.not('.hidden-by-conditional-logic').length == 0 ) {
+					
+					$th.addClass('hidden-by-conditional-logic');
+				
+				// if 1 or more td are visible
+				} else {
+					
+					$td.filter('.hidden-by-conditional-logic').addClass('appear-empty');
+					
+				}
+				
+			});
+			
+			
+			
+			// clear widths
+			$ths.css('width', 'auto');
+			
+			
+			// update $ths
+			$ths = $ths.not('.hidden-by-conditional-logic');
+			
+			
+			// set colspan
+			colspan = $ths.length;
+			
+			
+			// set custom widths first
+			$ths.filter('[data-width]').each(function(){
+				
+				// vars
+				var width = parseInt( $(this).attr('data-width') );
+				
+				
+				// remove from available
+				available_width -= width;
+				
+				
+				// set width
+				$(this).css('width', width + '%');
+				
+			});
+			
+			
+			// update $ths
+			$ths = $ths.not('[data-width]');
+			
+			
+			// set custom widths first
+			$ths.each(function(){
+				
+				// cal width
+				var width = available_width / $ths.length;
+				
+				
+				// set width
+				$(this).css('width', width + '%');
+				
+			});
+			
+			
+			// update colspan
+			$table.find('.acf-row .acf-field.-collapsed-target').removeAttr('colspan');
+			$table.find('.acf-row.-collapsed .acf-field.-collapsed-target').attr('colspan', colspan);
+			
+		},
+		
+		render_groups: function( $el ){
+			
+			// reference
+			var self = this;
+			
+			
+			// vars
+			var $groups = $el.find('.acf-fields:visible');
+			
+			
+			// appent self if is '.acf-fields'
+			if( $el && $el.is('.acf-fields') ) {
+				
+				$groups = $groups.add( $el );
+				
+			}
+			
+			
+			// loop
+			$groups.each(function(){
+				
+				self.render_group( $(this) );
+				
+			});
+			
+		},
+		
+		render_group: function( $el ){
+			
+			// vars
+			var $els = $(),
+				top = 0,
+				height = 0,
+				cell = -1;
+			
+			
+			// get fields
+			var $fields = $el.children('.acf-field[data-width]:visible');
+			
+			
+			// bail early if no fields
+			if( !$fields.exists() ) return;
+			
+			
+			// reset fields
+			$fields.removeClass('acf-r0 acf-c0').css({'min-height': 0});
+			
+			
+			// loop
+			$fields.each(function( i ){
+				
+				// vars
+				var $el = $(this),
+					this_top = $el.position().top;
+				
+				
+				// set top
+				if( i == 0 ) top = this_top;
+				
+				
+				// detect new row
+				if( this_top != top ) {
+					
+					// set previous heights
+					$els.css({'min-height': (height+1)+'px'});
+					
+					// reset
+					$els = $();
+					top = $el.position().top; // don't use variable as this value may have changed due to min-height css
+					height = 0;
+					cell = -1;
+					
+				}
+				
+								
+				// increase
+				cell++;
+				
+				
+				// set height
+				height = ($el.outerHeight() > height) ? $el.outerHeight() : height;
+				
+				
+				// append
+				$els = $els.add( $el );
+				
+				
+				// add classes
+				if( this_top == 0 ) {
+					
+					$el.addClass('acf-r0');
+					
+				} else if( cell == 0 ) {
+					
+					$el.addClass('acf-c0');
+					
+				}
+				
+			});
+			
+			
+			// clean up
+			if( $els.exists() ) {
+				
+				$els.css({'min-height': (height+1)+'px'});
+				
+			}
 			
 		}
 		
@@ -2928,7 +3324,7 @@ var acf;
 		},
 		
 		events: {
-			'submit form':	'off',
+			'submit form':	'off'
 		},
 		
 		validation_complete: function( json, $form ){
@@ -2990,7 +3386,7 @@ var acf;
 		
 		events: {
 			'mouseenter .acf-js-tooltip':	'on',
-			'mouseleave .acf-js-tooltip':	'off',
+			'mouseleave .acf-js-tooltip':	'off'
 		},
 
 		on: function( e ){
@@ -3102,7 +3498,7 @@ var acf;
 		
 		events: {
 			'mouseenter .acf-postbox .handlediv':	'on',
-			'mouseleave .acf-postbox .handlediv':	'off',
+			'mouseleave .acf-postbox .handlediv':	'off'
 		},
 
 		on: function( e ){
@@ -3304,6 +3700,28 @@ var acf;
 		
 	}, 999);
 */
+
+
+	/*
+	*  indexOf
+	*
+	*  This function will provide compatibility for ie8
+	*
+	*  @type	function
+	*  @date	5/3/17
+	*  @since	5.5.10
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+	
+	if( !Array.prototype.indexOf ) {
+		
+	    Array.prototype.indexOf = function(val) {
+	        return $.inArray(val, this);
+	    };
+	    
+	}
 	
 })(jQuery);
 
@@ -3330,7 +3748,7 @@ var acf;
 			//'page_parent':	0,
 			//'page_type':		0,
 			//'post_format':	0,
-			//'post_taxonomy':	0,
+			//'post_taxonomy':	0
 		},
 		xhr: null,
 		
@@ -4103,13 +4521,13 @@ var acf;
 			
 			
 			// calculate visibility
-			for( var i in groups ) {
+			for( var i = 0; i < groups.length; i++ ) {
 				
 				// vars
 				var group = groups[i],
 					match_group	= true;
 				
-				for( var k in group ) {
+				for( var k = 0; k < group.length; k++ ) {
 					
 					// vars
 					var rule = group[k];
@@ -4420,7 +4838,7 @@ var acf;
 	acf.datepicker = acf.model.extend({
 		
 		actions: {
-			'ready 1': 'ready',
+			'ready 1': 'ready'
 		},
 		
 		ready: function(){
@@ -4524,7 +4942,7 @@ var acf;
 		},
 		
 		events: {
-			'blur input[type="text"]': 'blur',
+			'blur input[type="text"]': 'blur'
 		},
 		
 		focus: function(){
@@ -4570,6 +4988,10 @@ var acf;
 			// add date picker
 			acf.datepicker.init( this.$input, args );
 			
+			
+			// action for 3rd party customization
+			acf.do_action('date_picker_init', this.$input, args, this.$field);
+			
 		},
 		
 		initialize2: function(){
@@ -4610,6 +5032,10 @@ var acf;
 			// now change the format back to how it should be.
 			this.$input.datepicker( 'option', 'dateFormat', dateFormat );
 			
+			
+			// action for 3rd party customization
+			acf.do_action('date_picker_init', this.$input, args, this.$field);
+			
 		},
 		
 		blur: function(){
@@ -4644,7 +5070,7 @@ var acf;
 	acf.datetimepicker = acf.model.extend({
 		
 		actions: {
-			'ready 1': 'ready',
+			'ready 1': 'ready'
 		},
 		
 		ready: function(){
@@ -4729,7 +5155,7 @@ var acf;
 			
 			// do nothing
 			
-		},
+		}
 		
 	});
 	
@@ -4749,7 +5175,7 @@ var acf;
 		},
 		
 		events: {
-			'blur input[type="text"]': 'blur',
+			'blur input[type="text"]': 'blur'
 		},
 		
 		focus: function(){
@@ -4791,6 +5217,10 @@ var acf;
 			
 			// add date time picker
 			acf.datetimepicker.init( this.$input, args );
+			
+			
+			// action for 3rd party customization
+			acf.do_action('date_time_picker_init', this.$input, args, this.$field);
 			
 		},
 		
@@ -4911,7 +5341,7 @@ var acf;
 				alt: '',
 				title: '',
 				filename: '',
-				filesize: '',
+				filesizeHumanReadable: '',
 				icon: '/wp-includes/images/media/default.png'
 			};
 			
@@ -4921,7 +5351,7 @@ var acf;
 				
 				// update data
 				data = attachment.attributes;
-			
+				
 			}
 			
 	    	
@@ -4962,7 +5392,7 @@ var acf;
 			});
 			this.$el.find('[data-name="title"]').text( data.title );
 		 	this.$el.find('[data-name="filename"]').text( data.filename ).attr( 'href', data.url );
-		 	this.$el.find('[data-name="filesize"]').text( data.filesize );
+		 	this.$el.find('[data-name="filesize"]').text( data.filesizeHumanReadable );
 		 	
 		 	
 			// vars
@@ -5172,9 +5602,92 @@ var acf;
 		
 		
 		/*
+		*  get_file_info
+		*
+		*  This function will find basic file info and store it in a hidden input
+		*
+		*  @type	function
+		*  @date	18/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$file_input (jQuery)
+		*  @param	$hidden_input (jQuery)
+		*  @return	n/a
+		*/
+		
+		get_file_info: function( $file_input, $hidden_input ){
+			
+			// vars
+			var val = $file_input.val(),
+				attachment = {};
+			
+			
+			// bail early if no value
+			if( !val ) {
+				
+				$hidden_input.val('');
+				return;
+				
+			}
+			
+			
+			// url
+			attachment.url = val;
+			
+			
+			// modern browsers
+			var files = $file_input[0].files;
+			
+			if( files.length ){
+				
+				// vars
+				var file = files[0];
+				
+				
+				// update
+				attachment.size = file.size;
+				attachment.type = file.type;
+				
+				
+				// image
+				if( file.type.indexOf('image') > -1 ) {
+					
+					// vars
+					var _url = window.URL || window.webkitURL;
+					
+					
+					// temp image
+					var img = new Image();
+					
+					img.onload = function () {
+						
+						// update
+						attachment.width = this.width;
+						attachment.height = this.height;
+						
+						
+						// set hidden input value
+						$hidden_input.val( jQuery.param(attachment) );
+						
+					};
+					
+					img.src = _url.createObjectURL(file);
+					
+				}
+				
+			}
+			
+			
+			// set hidden input value
+			$hidden_input.val( jQuery.param(attachment) );
+			
+		},
+		
+		
+		/*
 		*  change
 		*
-		*  This function will update the hidden input when selecting a basic file to clear validation errors
+		*  This function will update the hidden input when selecting a basic file to add basic validation
 		*
 		*  @type	function
 		*  @date	12/04/2016
@@ -5186,7 +5699,7 @@ var acf;
 		
 		change: function( e ){
 			
-			this.$input.val( e.$el.val() );
+			this.get_file_info( e.$el, this.$input );
 			
 		}
 		
@@ -5212,6 +5725,7 @@ var acf;
 		$pending: $(),
 		
 		actions: {
+			// have considered changing to 'load', however, could cause issues with devs expecting the API to exist earlier
 			'ready':	'initialize',
 			'append':	'initialize',
 			'show':		'show'
@@ -5226,7 +5740,7 @@ var acf;
 			'focus .search': 					'_focus',
 			'blur .search': 					'_blur',
 			//'paste .search': 					'_paste',
-			'mousedown .acf-google-map':		'_mousedown',
+			'mousedown .acf-google-map':		'_mousedown'
 		},
 		
 		focus: function(){
@@ -5500,6 +6014,10 @@ var acf;
 				self.update( lat, lng ).sync();
 			
 			});
+			
+			
+			// action for 3rd party customization
+			acf.do_action('google_map_init', this.map, this.map.marker, this.$field);
 			
 			
 	        // add to maps
@@ -6324,7 +6842,7 @@ var acf;
 		/*
 		*  change
 		*
-		*  This function will update the hidden input when selecting a basic file to clear validation errors
+		*  This function will update the hidden input when selecting a basic file to add basic validation
 		*
 		*  @type	function
 		*  @date	12/04/2016
@@ -6336,7 +6854,7 @@ var acf;
 		
 		change: function( e ){
 			
-			this.$input.val( e.$el.val() );
+			acf.fields.file.get_file_info( e.$el, this.$input );
 			
 		}
 		
@@ -6904,7 +7422,7 @@ var acf;
 				title: settings.title,
 				multiple: settings.multiple,
 				library: {},
-				states:	[],
+				states:	[]
 			};
 			
 			
@@ -6944,7 +7462,7 @@ var acf;
 
 					// If the user isn't allowed to edit fields,
 					// can they still edit it locally?
-					allowLocalEdits: true,
+					allowLocalEdits: true
 				})
 				
 			];
@@ -7337,62 +7855,63 @@ var acf;
 			// extend
 			wp.media.view.AttachmentCompat = AttachmentCompat.extend({
 				
+				add_acf_expand_button: function(){
+					
+					// vars
+					var $el = this.$el.closest('.media-modal');
+					
+					
+					// does button already exist?
+					if( $el.find('.media-frame-router .acf-expand-details').exists() ) return;
+					
+					
+					// create button
+					var $a = $([
+						'<a href="#" class="acf-expand-details">',
+							'<span class="is-closed"><span class="acf-icon -left small grey"></span>' + acf._e('expand_details') +  '</span>',
+							'<span class="is-open"><span class="acf-icon -right small grey"></span>' + acf._e('collapse_details') +  '</span>',
+						'</a>'
+					].join('')); 
+					
+					
+					// add events
+					$a.on('click', function( e ){
+						
+						e.preventDefault();
+						
+						if( $el.hasClass('acf-expanded') ) {
+						
+							$el.removeClass('acf-expanded');
+							
+						} else {
+							
+							$el.addClass('acf-expanded');
+							
+						}
+						
+					});
+					
+					
+					// append
+					$el.find('.media-frame-router').append( $a );
+					
+				},
+				
 				render: function() {
-					
-					// reference
-					var self = this;
-					
 					
 					// validate
 					if( this.ignore_render ) return this;
 					
 					
-					// add button
+					// reference
+					var self = this;
+					
+					
+					// add expand button
 					setTimeout(function(){
 						
-						// vars
-						var $media_model = self.$el.closest('.media-modal');
+						self.add_acf_expand_button();
 						
-						
-						// does button already exist?
-						if( $media_model.find('.media-frame-router .acf-expand-details').exists() ) {
-						
-							return;	
-							
-						}
-						
-						
-						// create button
-						var $a = $([
-							'<a href="#" class="acf-expand-details">',
-								'<span class="is-closed"><span class="acf-icon -left small grey"></span>' + acf._e('expand_details') +  '</span>',
-								'<span class="is-open"><span class="acf-icon -right small grey"></span>' + acf._e('collapse_details') +  '</span>',
-							'</a>'
-						].join('')); 
-						
-						
-						// add events
-						$a.on('click', function( e ){
-							
-							e.preventDefault();
-							
-							if( $media_model.hasClass('acf-expanded') ) {
-							
-								$media_model.removeClass('acf-expanded');
-								
-							} else {
-								
-								$media_model.addClass('acf-expanded');
-								
-							}
-							
-						});
-						
-						
-						// append
-						$media_model.find('.media-frame-router').append( $a );
-							
-					
 					}, 0);
 					
 					
@@ -7469,7 +7988,7 @@ var acf;
 			'click [data-name="value-title"]':		'_edit',
 			'keypress [data-name="search-input"]':	'_keypress',
 			'keyup [data-name="search-input"]':		'_keyup',
-			'blur [data-name="search-input"]':		'_blur',
+			'blur [data-name="search-input"]':		'_blur'
 		},
 		
 		
@@ -7525,7 +8044,7 @@ var acf;
 	        // bail early if no value
 	        if( !new_url ) {
 		        
-		        this.clear( $el );
+		        this.clear();
 		        return;
 		        
 	        }
@@ -7577,8 +8096,7 @@ var acf;
 			var ajax_data = acf.prepare_for_ajax({
 				'action'	: 'acf/fields/oembed/search',
 				's'			: s,
-				'width'		: this.$el.data('width'),
-				'height'	: this.$el.data('height')
+				'field_key'	: this.$field.data('key')
 			});
 			
 			
@@ -7591,7 +8109,7 @@ var acf;
 				url: acf.get('ajaxurl'),
 				data: ajax_data,
 				type: 'post',
-				dataType: 'html',
+				dataType: 'json',
 				context: this,
 				success: this.search_success
 			});
@@ -7602,7 +8120,7 @@ var acf;
 			
 		},
 		
-		search_success: function( html ){
+		search_success: function( json ){
 			
 			// vars
 			var s = this.$search.val();
@@ -7613,7 +8131,7 @@ var acf;
 			
 			
 			// error
-			if( !html ) {
+			if( !json || !json.html ) {
 				
 				this.$el.removeClass('has-value').addClass('has-error');
 				return;
@@ -7628,7 +8146,7 @@ var acf;
 			// update vars
 			this.$input.val( s );
 			this.$title.html( s );
-			this.$embed.html( html );
+			this.$embed.html( json.html );
 			
 		},
 				
@@ -7696,7 +8214,7 @@ var acf;
 			
 		},
 		
-		_keyup: function( e ){  console.log('_keypress', e.which);
+		_keyup: function( e ){  //console.log('_keypress', e.which);
 			
 			// bail early if no value
 			if( !this.$search.val() ) return;
@@ -7711,7 +8229,7 @@ var acf;
 			
 			this.blur();
 			
-		},
+		}
 		
 	});
 
@@ -7731,7 +8249,7 @@ var acf;
 		},
 		
 		events: {
-			'click input[type="radio"]': 'click',
+			'click input[type="radio"]': 'click'
 		},
 		
 		focus: function(){
@@ -8115,8 +8633,15 @@ var acf;
 			// Looks like Select2 v4 has moved away from highlighting results, so perhaps we should too
 			if( this.o.s ) {
 			
+				// vars
 				var s = this.o.s;
 				
+				
+				// allow special characters to be used within regex
+				s = acf.addslashes(s);
+				
+				
+				// loop
 				$new.find('.acf-rel-item').each(function(){
 					
 					// vars
@@ -8325,6 +8850,12 @@ var acf;
 
 (function($){
 	
+	// globals
+	var _select2,
+		_select23,
+		_select24;
+	
+	
 	/*
 	*  acf.select2
 	*
@@ -8338,22 +8869,24 @@ var acf;
 	*  @return	n/a
 	*/
 	
-	acf.select2 = acf.model.extend({
+	_select2 = acf.select2 = acf.model.extend({
 		
 		// vars
 		version: 0,
+		version3: null,
+		version4: null,
 		
 		
 		// actions
 		actions: {
-			'ready 1': 'ready',
+			'ready 1': 'ready'
 		},
 		
 		
 		/*
 		*  ready
 		*
-		*  This function will setup vars
+		*  This function will run on document ready
 		*
 		*  @type	function
 		*  @date	21/06/2016
@@ -8366,156 +8899,71 @@ var acf;
 		ready: function(){
 			
 			// determine Select2 version
-			if( acf.maybe_get(window, 'Select2') ) {
-				
-				this.version = 3;
-				
-				this.l10n_v3();
-				
-			} else if( acf.maybe_get(window, 'jQuery.fn.select2.amd') ) {
-				
-				this.version = 4;
-				
-			}
+			this.version = this.get_version();
+			
+			
+			// ready
+			this.do_function('ready');
 			
 		},
 		
 		
 		/*
-		*  l10n_v3
+		*  get_version
 		*
-		*  This function will set l10n for Select2 v3
+		*  This function will return the Select2 version
 		*
 		*  @type	function
-		*  @date	21/06/2016
-		*  @since	5.3.8
+		*  @date	29/4/17
+		*  @since	5.5.13
 		*
 		*  @param	n/a
 		*  @return	n/a
 		*/
 		
-		l10n_v3: function(){
+		get_version: function(){
 			
-			// vars
-			var locale = acf.get('locale'),
-				rtl = acf.get('rtl')
-				l10n = acf._e('select');
-			
-			
-			// bail ealry if no l10n
-			if( !l10n ) return;
-			
-			
-			// vars
-			var l10n_functions = {
-				formatMatches: function( matches ) {
-					
-					if ( 1 === matches ) {
-						return l10n.matches_1;
-					}
-	
-					return l10n.matches_n.replace('%d', matches);
-				},
-				formatNoMatches: function() {
-					return l10n.matches_0;
-				},
-				formatAjaxError: function() {
-					return l10n.load_fail;
-				},
-				formatInputTooShort: function( input, min ) {
-					var number = min - input.length;
-	
-					if ( 1 === number ) {
-						return l10n.input_too_short_1;
-					}
-	
-					return l10n.input_too_short_n.replace( '%d', number );
-				},
-				formatInputTooLong: function( input, max ) {
-					var number = input.length - max;
-	
-					if ( 1 === number ) {
-						return l10n.input_too_long_1;
-					}
-	
-					return l10n.input_too_long_n.replace( '%d', number );
-				},
-				formatSelectionTooBig: function( limit ) {
-					if ( 1 === limit ) {
-						return l10n.selection_too_long_1;
-					}
-	
-					return l10n.selection_too_long_n.replace( '%d', limit );
-				},
-				formatLoadMore: function() {
-					return l10n.load_more;
-				},
-				formatSearching: function() {
-					return l10n.searching;
-				}
-		    };
-			
-			
-			// ensure locales exists
-			// older versions of Select2 did not have a locale storage
-			$.fn.select2.locales = acf.maybe_get(window, 'jQuery.fn.select2.locales', {});
-			
-			
-			// append
-			$.fn.select2.locales[ locale ] = l10n_functions;
-			$.extend($.fn.select2.defaults, l10n_functions);
+			if( acf.maybe_get(window, 'Select2') ) return 3;
+			if( acf.maybe_get(window, 'jQuery.fn.select2.amd') ) return 4;
+			return 0;
 			
 		},
 		
 		
 		/*
-		*  init
+		*  do_function
 		*
-		*  This function will initialize a Select2 instance
+		*  This function will call the v3 or v4 equivelant function
 		*
 		*  @type	function
-		*  @date	21/06/2016
-		*  @since	5.3.8
+		*  @date	28/4/17
+		*  @since	5.5.13
 		*
-		*  @param	$select (jQuery object)
-		*  @param	args (object)
+		*  @param	name (string)
+		*  @param	args (array)
 		*  @return	(mixed)
 		*/
 		
-		init: function( $select, args ){
-			
-			// bail early if no version found
-			if( !this.version ) return;
-			
+		do_function: function( name, args ){
 			
 			// defaults
-			args = $.extend({
-				allow_null:		false,
-				placeholder:	'',
-				multiple:		false,
-				ajax:			false,
-				ajax_action:	'',
-			}, args);
+			args = args || [];
 			
 			
-			// v3
-			if( this.version == 3 ) {
-				
-				return this.init_v3( $select, args );
-			
-			// v4
-			} else if( this.version == 4 ) {
-				
-				return this.init_v4( $select, args );
-				
-			}
+			// vars
+			var model = 'version'+this.version;
 			
 			
-			// return
-			return false;
-					
+			// bail early if not set
+			if( typeof this[model] === 'undefined' ||
+				typeof this[model][name] === 'undefined' ) return false;
+			
+			
+			// run
+			return this[model][name].apply( this, args );
+			
 		},
-		
+				
 		
 		/*
 		*  get_data
@@ -8573,7 +9021,7 @@ var acf;
 			
 		},
 		
-		
+				
 		/*
 		*  decode_data
 		*
@@ -8604,7 +9052,7 @@ var acf;
 				// children
 				if( typeof v.children !== 'undefined' ) {
 					
-					data[ k ].children = acf.select2.decode_data(v.children);
+					data[ k ].children = _select2.decode_data(v.children);
 					
 				}
 				
@@ -8676,19 +9124,19 @@ var acf;
 		*  @return	$post_id (int)
 		*/
 		
-		get_ajax_data: function( args, params ){
+		get_ajax_data: function( args, params, $el, $field ){
 			
 			// vars
 			var data = acf.prepare_for_ajax({
 				action: 	args.ajax_action,
 				field_key: 	args.key,
-				s: 			params.term,
-				paged: 		params.page
+				s: 			params.term || '',
+				paged: 		params.page || 1
 			});
 			
 			
 			// filter
-			data = acf.apply_filters( 'select2_ajax_data', data, args, params );
+			data = acf.apply_filters( 'select2_ajax_data', data, args, $el, $field );
 			
 			
 			// return
@@ -8792,7 +9240,8 @@ var acf;
 				// append
 				val.push({
 					'id':	$el.attr('value'),
-					'text':	$el.text()
+					'text':	$el.text(),
+					'$el':	$el
 				});
 				
 			});
@@ -8802,8 +9251,293 @@ var acf;
 			return val;
 			
 		},
-		    
-    
+		
+		
+		/*
+		*  get_input_value
+		*
+		*  This function will return an array of values as per the hidden input
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.13
+		*
+		*  @param	$input (jQuery)
+		*  @return	(array)
+		*/
+		
+		get_input_value: function( $input ) {
+			
+			return $input.val().split('||');
+			
+		},
+		
+		
+		/*
+		*  sync_input_value
+		*
+		*  This function will save the current selected values into the hidden input
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.13
+		*
+		*  @param	$input (jQuery)
+		*  @param	$select (jQuery)
+		*  @return	n/a
+		*/
+		
+		sync_input_value: function( $input, $select ) {
+			
+			$input.val( $select.val().join('||') );
+			
+		},
+		
+		
+		/*
+		*  add_option
+		*
+		*  This function will add an <option> element to a select (if it doesn't already exist)
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.13
+		*
+		*  @param	$select (jQuery)
+		*  @param	value (string)
+		*  @param	label (string)
+		*  @return	n/a
+		*/
+		
+		add_option: function( $select, value, label ){
+			
+			if( !$select.find('option[value="'+value+'"]').length ) {
+				
+				$select.append('<option value="'+value+'">'+label+'</option>');
+				
+			}
+			
+		},
+		
+		
+		/*
+		*  select_option
+		*
+		*  This function will select an option
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.13
+		*
+		*  @param	$select (jQuery)
+		*  @param	value (string)
+		*  @return	n/a
+		*/
+		
+		select_option: function( $select, value ){
+			
+			$select.find('option[value="'+value+'"]').prop('selected', true);
+			$select.trigger('change');
+			
+		},
+		
+		
+		/*
+		*  unselect_option
+		*
+		*  This function will unselect an option
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.13
+		*
+		*  @param	$select (jQuery)
+		*  @param	value (string)
+		*  @return	n/a
+		*/
+		
+		unselect_option: function( $select, value ){
+			
+			$select.find('option[value="'+value+'"]').prop('selected', false);
+			$select.trigger('change');
+			
+		},
+		
+		
+		/*
+		*  Select2 v3 or v4 functions
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	29/4/17
+		*  @since	5.5.10
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		init: function( $select, args, $field ){
+			
+			this.do_function( 'init', arguments );
+					
+		},
+		
+		destroy: function( $select ){
+			
+			this.do_function( 'destroy', arguments );
+			
+		},
+		
+		add_value: function( $select, value, label ){
+			
+			this.do_function( 'add_value', arguments );
+			
+		},
+		
+		remove_value: function( $select, value ){
+			
+			this.do_function( 'remove_value', arguments );
+			
+		},
+		
+		remove_value: function( $select, value ){
+			
+			this.do_function( 'remove_value', arguments );
+			
+		}
+		
+	});
+	
+	
+	/*
+	*  Select2 v3
+	*
+	*  This model contains the Select2 v3 functions
+	*
+	*  @type	function
+	*  @date	28/4/17
+	*  @since	5.5.10
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+	
+	_select23 = _select2.version3 = {
+		
+		ready: function(){
+			
+			// vars
+			var locale = acf.get('locale'),
+				rtl = acf.get('rtl')
+				l10n = acf._e('select');
+			
+			
+			// bail ealry if no l10n
+			if( !l10n ) return;
+			
+			
+			// vars
+			var l10n_functions = {
+				formatMatches: function( matches ) {
+					
+					if ( 1 === matches ) {
+						return l10n.matches_1;
+					}
+	
+					return l10n.matches_n.replace('%d', matches);
+				},
+				formatNoMatches: function() {
+					return l10n.matches_0;
+				},
+				formatAjaxError: function() {
+					return l10n.load_fail;
+				},
+				formatInputTooShort: function( input, min ) {
+					var number = min - input.length;
+	
+					if ( 1 === number ) {
+						return l10n.input_too_short_1;
+					}
+	
+					return l10n.input_too_short_n.replace( '%d', number );
+				},
+				formatInputTooLong: function( input, max ) {
+					var number = input.length - max;
+	
+					if ( 1 === number ) {
+						return l10n.input_too_long_1;
+					}
+	
+					return l10n.input_too_long_n.replace( '%d', number );
+				},
+				formatSelectionTooBig: function( limit ) {
+					if ( 1 === limit ) {
+						return l10n.selection_too_long_1;
+					}
+	
+					return l10n.selection_too_long_n.replace( '%d', limit );
+				},
+				formatLoadMore: function() {
+					return l10n.load_more;
+				},
+				formatSearching: function() {
+					return l10n.searching;
+				}
+		    };
+			
+			
+			// ensure locales exists
+			// older versions of Select2 did not have a locale storage
+			$.fn.select2.locales = acf.maybe_get(window, 'jQuery.fn.select2.locales', {});
+			
+			
+			// append
+			$.fn.select2.locales[ locale ] = l10n_functions;
+			$.extend($.fn.select2.defaults, l10n_functions);
+			
+		},
+		
+		set_data: function( $select, data ){
+			
+			// v3
+			if( this.version == 3 ) {
+				
+				$select = $select.siblings('input');
+				
+			}
+			
+			
+			// set data
+			$select.select2('data', data);
+			
+		},
+		
+		append_data: function( $select, data ){
+			
+			// v3
+			if( this.version == 3 ) {
+				
+				$select = $select.siblings('input');
+				
+			}
+			
+			
+			
+			// vars
+			var current = $select.select2('data') || [];
+			
+			
+			// append
+			current.push( data );
+			
+			
+			// set data
+			$select.select2('data', current);
+			
+		},
+		
+		
 		/*
 		*  init_v3
 		*
@@ -8817,8 +9551,23 @@ var acf;
 		*  @return	args (object)
 		*/
 		
-		init_v3: function( $select, args ){
-					
+		init: function( $select, args, $field ){
+			
+			// defaults
+			args = args || {};
+			$field = $field || null;
+			
+			
+			// merge
+			args = $.extend({
+				allow_null:		false,
+				placeholder:	'',
+				multiple:		false,
+				ajax:			false,
+				ajax_action:	''
+			}, args);
+			
+				
 			// vars
 			var $input = $select.siblings('input');
 			
@@ -8936,7 +9685,7 @@ var acf;
 						
 						
 						// return
-						return acf.select2.get_ajax_data(args, params);
+						return _select2.get_ajax_data(args, params, $input, $field);
 						
 					},
 					results: function( data, page ){
@@ -8948,13 +9697,13 @@ var acf;
 						// merge together groups
 						setTimeout(function(){
 							
-							acf.select2.merge_results_v3();
+							_select23.merge_results();
 							
 						}, 1);
 						
 						
 						// return
-						return acf.select2.get_ajax_results(data, params);
+						return _select2.get_ajax_results(data, params);
 						
 					}
 				};
@@ -8973,7 +9722,7 @@ var acf;
 			
 			
 			// filter for 3rd party customization
-			select2_args = acf.apply_filters( 'select2_args', select2_args, $select, args );
+			select2_args = acf.apply_filters( 'select2_args', select2_args, $select, args, $field );
 			
 			
 			// add select2
@@ -9021,15 +9770,20 @@ var acf;
 				// add new data
 				if( e.added ) {
 					
-					$select.append('<option value="' + e.added.id + '">' + e.added.text + '</option>');
+					// add item
+					_select2.add_option($select, e.added.id, e.added.text);
 					
 				}
 				
 				
-				// update val
-				$select.val( e.val );
+				// select
+				_select2.select_option($select, e.val);
 				
 			});
+			
+			
+			// action for 3rd party customization
+			acf.do_action('select2_init', $input, select2_args, args, $field);
 			
 		},
 		
@@ -9047,7 +9801,7 @@ var acf;
 		*  @return	$post_id (int)
 		*/
 		
-		merge_results_v3: function(){
+		merge_results: function(){
 			
 			// vars
 			var label = '',
@@ -9083,8 +9837,149 @@ var acf;
 		},
 		
 		
-		init_v4: function( $select, args ){
+		/*
+		*  destroy
+		*
+		*  This function will destroy a Select2
+		*
+		*  @type	function
+		*  @date	24/12/2015
+		*  @since	5.3.2
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		destroy: function( $select ){
+			
+			// vars
+			var $input = $select.siblings('input');
+			
+			
+			// bail early if no select2
+			if( !$input.data('select2') ) return;
+			
+			
+			// destroy
+			$input.select2('destroy');
+			
+			
+			// enable select
+			$select.prop('disabled', false).removeClass('acf-disabled acf-hidden');
 					
+		},
+		
+		add_value: function( $select, value, label ){
+			
+			// add and select item
+			_select2.add_option($select, value, label);
+			_select2.select_option($select, value);
+			
+			
+			// vars
+			var $input = $select.siblings('input');
+			
+			
+			// new item
+			var item = {
+				'id':	value,
+				'text':	label
+			};
+			
+			
+			// single
+			if( !$select.data('multiple') ) {
+				
+				return $input.select2('data', item);
+				
+			}
+			
+			
+			// get existing value
+			var values = $input.select2('data') || [];
+			
+			
+			// append
+			values.push(item);
+			
+			
+			// set data
+			return $input.select2('data', values);
+			
+		},
+		
+		remove_value: function( $select, value ){
+			
+			// unselect option
+			_select2.unselect_option($select, value);
+			
+			
+			// vars
+			var $input = $select.siblings('input'),
+				current = $input.select2('data');
+			
+			
+			// single
+			if( !$select.data('multiple') ) {
+				
+				if( current && current.id == value ) {
+					
+					$input.select2('data', null);
+					
+				}
+			
+			// multiple	
+			} else {
+				
+				// filter
+				current = $.grep(current, function( item ) {
+				    return item.id != value;
+				});
+				
+				
+				// set data
+				$input.select2('data', current);
+				
+			}
+			
+		}
+		
+		
+	};
+	
+	
+	/*
+	*  Select2 v4
+	*
+	*  This model contains the Select2 v4 functions
+	*
+	*  @type	function
+	*  @date	28/4/17
+	*  @since	5.5.10
+	*
+	*  @param	n/a
+	*  @return	n/a
+	*/
+	
+	_select24 = _select2.version4 = {
+		
+		init: function( $select, args, $field ){
+			
+			// defaults
+			args = args || {};
+			$field = $field || null;
+			
+			
+			// merge
+			args = $.extend({
+				allow_null:		false,
+				placeholder:	'',
+				multiple:		false,
+				ajax:			false,
+				ajax_action:	''
+			}, args);
+			
+			
 			// vars
 			var $input = $select.siblings('input');
 			
@@ -9101,12 +9996,7 @@ var acf;
 				multiple:			args.multiple,
 				separator:			'||',
 				data:				[],
-				escapeMarkup:		function( m ){ return m; },
-/*
-				sorter: function (data) { console.log('sorter %o', data);
-			        return data;
-			      },
-*/
+				escapeMarkup:		function( m ){ return m; }
 			};
 			
 			
@@ -9117,18 +10007,13 @@ var acf;
 			// multiple
 			if( args.multiple ) {
 				
-/*
-				// vars
-				var name = $select.attr('name');
-				
-				
-				// add hidden input to each multiple selection
-				select2_args.templateSelection = function( selection ){
+				// reorder opts
+				$.each(value, function( k, item ){
 					
-					return selection.text + '<input type="hidden" class="select2-search-choice-hidden" name="' + name + '" value="' + selection.id + '" />';
-										
-				}
-*/
+					// detach and re-append to end
+					item.$el.detach().appendTo( $select );
+						
+				});
 				
 			} else {
 				
@@ -9145,20 +10030,6 @@ var acf;
 				
 			}
 			
-			
-			// get data
-			select2_args.data = this.get_data( $select );
-			
-		    
-		    // initial selection
-/*
-		    select2_args.initSelection = function( element, callback ) {
-				
-				callback( value );
-		        
-		    };
-*/
-		    
 		    
 		    // remove conflicting atts
 			if( !args.ajax ) {
@@ -9177,13 +10048,13 @@ var acf;
 					data: function( params ) {
 						
 						// return
-						return acf.select2.get_ajax_data(args, params);
+						return _select2.get_ajax_data(args, params, $select, $field);
 						
 					},
 					processResults: function( data, params ){
 						
 						// vars
-						var results = acf.select2.get_ajax_results(data, params);
+						var results = _select2.get_ajax_results(data, params);
 						
 						
 						// change to more
@@ -9197,7 +10068,7 @@ var acf;
 						// merge together groups
 						setTimeout(function(){
 							
-							acf.select2.merge_results_v4();
+							_select24.merge_results();
 							
 						}, 1);
 						
@@ -9209,52 +10080,106 @@ var acf;
 					
 				};
 				
-				
-				
 			}
 		    
-		
+			
+			// filter for 3rd party customization
+			select2_args = acf.apply_filters( 'select2_args', select2_args, $select, args, $field );
+			
+			
+			// add select2
+			$select.select2( select2_args );
+			
+			
+			// get container (Select2 v4 deos not return this from constructor)
+			var $container = $select.next('.select2-container');
+			
+			
+			// reorder DOM
+			// - no need to reorder, the select field is needed to $_POST values
+			
 			
 			// multiple
-/*
 			if( args.multiple ) {
 				
-
+				// vars
+				var $ul = $container.find('ul');
 				
-				$select.on('select2:select', function( e ){
+				
+				// sortable
+				$ul.sortable({
 					
-					console.log( 'select2:select %o &o', $(this), e );
+		            stop: function( e ) {
+			            
+			            $ul.find('.select2-selection__choice').each(function() {
+				            
+				            // vars
+							var $option = $( $(this).data('data').element );
+							
+							
+							// detach and re-append to end
+							$option.detach().appendTo( $select );
+		                    
+		                    
+		                    // trigger change on input (JS error if trigger on select)
+		                    $input.trigger('change');
+		                    // update input
+		                    //_select2.sync_input_value( $input, $select );
+		                    
+		                });
+		                
+		            }
+
+				});
+				
+				
+				// on select, move to end
+				$select.on('select2:select', function( e ){
 					
 					// vars
 					var $option = $(e.params.data.element);
 					
 					
-					// move option to begining of select
-					//$(this).prepend( $option );
+					// detach and re-append to end
+					$option.detach().appendTo( $select );
+					
+					 
+					// trigger change
+					//$select.trigger('change');
 					
 				});
 				
 			}
 			
+			
+/*
+			// update input
+			$select.on('select2:select', function( e ){
+				
+				// update input
+	            _select2.sync_input_value( $input, $select );
+				
+			});
+			
+			$select.on('select2:unselect', function( e ){
+				
+				// update input
+	            _select2.sync_input_value( $input, $select );
+				
+			});
 */
 			
-
 			
-			// reorder DOM
-			// - no need to reorder, the select field is needed to $_POST values
-
-			
-			// filter for 3rd party customization
-			select2_args = acf.apply_filters( 'select2_args', select2_args, $select, args );
-			
-			
-			// add select2
-			//console.log( '%o %o ', $select, select2_args );
-			var $container = $select.select2( select2_args );
+			// clear value (allows null to be saved)
+			$input.val('');
 			
 			
 			// add class
 			$container.addClass('-acf');
+			
+			
+			// action for 3rd party customization
+			acf.do_action('select2_init', $select, select2_args, args, $field);
 			
 		},
 		
@@ -9272,7 +10197,7 @@ var acf;
 		*  @return	$post_id (int)
 		*/
 		
-		merge_results_v4: function(){
+		merge_results: function(){
 			
 			// vars
 			var $prev_options = null,
@@ -9307,36 +10232,33 @@ var acf;
 			
 		},
 		
+		add_value: function( $select, value, label ){
+			
+			// add and select item
+			_select2.add_option($select, value, label);
+			_select2.select_option($select, value);
+			
+		},
 		
-		/*
-		*  destroy
-		*
-		*  This function will destroy a Select2
-		*
-		*  @type	function
-		*  @date	24/12/2015
-		*  @since	5.3.2
-		*
-		*  @param	$post_id (int)
-		*  @return	$post_id (int)
-		*/
+		remove_value: function( $select, value ){
+			
+			// unselect
+			_select2.unselect_option($select, value);
+			
+		},
 		
 		destroy: function( $select ){
 			
-			// remove select2 container
-			$select.siblings('.select2-container').remove();
+			// bail early if no select2
+			if( !$select.data('select2') ) return;
 			
 			
-			// show input so that select2 can correctly render visible select2 container
-			$select.siblings('input').show();
-			
-			
-			// enable select
-			$select.prop('disabled', false).removeClass('acf-disabled acf-hidden');
-			
+			// destroy
+			$select.select2('destroy');
+					
 		}
 		
-	});
+	};
 	
 	
 	/*
@@ -9354,16 +10276,19 @@ var acf;
 	
 	acf.add_select2 = function( $select, args ) {
 		
-		acf.select2.init( $select, args );
+		_select2.init( $select, args );
 
 	}
 	
 	acf.remove_select2 = function( $select ) {
 		
-		acf.select2.destroy( $select );
+		_select2.destroy( $select );
 		
 	}
-	
+
+})(jQuery);
+
+(function($){
 	
 	// select
 	acf.fields.select = acf.field.extend({
@@ -9410,7 +10335,7 @@ var acf;
 			}
 			
 			
-			acf.select2.init( this.$select, this.o );
+			acf.select2.init( this.$select, this.o, this.$field );
 			
 		},
 		
@@ -9435,7 +10360,7 @@ var acf;
 	// user
 	acf.fields.user = acf.fields.select.extend({
 		
-		type: 'user',
+		type: 'user'
 		
 	});	
 	
@@ -9443,7 +10368,7 @@ var acf;
 	// post_object
 	acf.fields.post_object = acf.fields.select.extend({
 		
-		type: 'post_object',
+		type: 'post_object'
 		
 	});
 	
@@ -9451,7 +10376,7 @@ var acf;
 	// page_link
 	acf.fields.page_link = acf.fields.select.extend({
 		
-		type: 'page_link',
+		type: 'page_link'
 		
 	});
 	
@@ -9482,7 +10407,7 @@ var acf;
 			// get options
 			this.o = this.$el.data();
 			this.o.key = this.$field.data('key');
-			this.o.text = this.$el.text();
+			this.o.text = this.$el.html();
 			
 		},
 		
@@ -9919,7 +10844,7 @@ var acf;
 		},
 		
 		events: {
-			'blur input[type="text"]': 'blur',
+			'blur input[type="text"]': 'blur'
 		},
 		
 		focus: function(){
@@ -9986,7 +10911,7 @@ var acf;
 			
 			
 			// add date picker
-			this.$input.addClass('active').timepicker( args );
+			this.$input.timepicker( args );
 			
 			
 			// wrap the datepicker (only if it hasn't already been wrapped)
@@ -9995,6 +10920,10 @@ var acf;
 				$('body > #ui-datepicker-div').wrap('<div class="acf-ui-datepicker" />');
 				
 			}
+			
+			
+			// action for 3rd party customization
+			acf.do_action('time_picker_init', this.$input, args, this.$field);
 			
 		},
 		
@@ -10027,7 +10956,10 @@ var acf;
 		},
 		
 		events: {
-			'change .acf-switch-input': 'change'
+			'change .acf-switch-input': '_change',
+			'focus .acf-switch-input': 	'_focus',
+			'blur .acf-switch-input': 	'_blur',
+			'keypress .acf-switch-input':	'_keypress'
 		},
 		
 		
@@ -10090,6 +11022,48 @@ var acf;
 		
 		
 		/*
+		*  on
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	10/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		on: function() { //console.log('on');
+			
+			this.$input.prop('checked', true);
+			this.$switch.addClass('-on');
+			
+		},
+		
+		
+		/*
+		*  off
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	10/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		off: function() { //console.log('off');
+			
+			this.$input.prop('checked', false);
+			this.$switch.removeClass('-on');
+			
+		},
+		
+		
+		/*
 		*  change
 		*
 		*  description
@@ -10102,7 +11076,7 @@ var acf;
 		*  @return	$post_id (int)
 		*/
 		
-		change: function( e ){
+		_change: function( e ){
 			
 			// vars
 			var checked = e.$el.prop('checked');
@@ -10111,15 +11085,88 @@ var acf;
 			// enable
 			if( checked ) {
 				
-				this.$switch.addClass('-on');
+				this.on();
 			
 			// disable	
 			} else {
 				
-				this.$switch.removeClass('-on');
+				this.off();
 			
 			}
 					
+		},
+		
+		
+		/*
+		*  _focus
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	10/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		_focus: function( e ){
+			
+			this.$switch.addClass('-focus');
+			
+		},
+		
+		
+		/*
+		*  _blur
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	10/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		_blur: function( e ){
+			
+			this.$switch.removeClass('-focus');
+			
+		},
+		
+		
+		/*
+		*  _keypress
+		*
+		*  description
+		*
+		*  @type	function
+		*  @date	10/1/17
+		*  @since	5.5.0
+		*
+		*  @param	$post_id (int)
+		*  @return	$post_id (int)
+		*/
+		
+		_keypress: function( e ){
+			
+			// left
+			if( e.keyCode === 37 ) {
+				
+				return this.off();
+				
+			}
+			
+			
+			// right
+			if( e.keyCode === 39 ) {
+				
+				return this.on();
+				
+			}
+			
 		}
 	
 	});
@@ -10140,7 +11187,7 @@ var acf;
 			'remove':	'remove'
 		},
 		events: {
-			'click a[data-name="add"]': 	'add_term',
+			'click a[data-name="add"]': 	'add_term'
 		},
 		
 		focus: function(){
@@ -10471,11 +11518,19 @@ var acf;
 				// select
 				case 'select':
 					
-					this.$el.children('input').select2('data', item);
+					//this.$el.children('input').select2('data', item);
+					
+					
+					// vars
+					var $select = this.$el.children('select');
+					acf.select2.add_value($select, term.term_id, term.term_label);
+					
+					
 					break;
 				
 				case 'multi_select':
 					
+/*
 					// vars
 					var $input = this.$el.children('input'),
 						value = $input.select2('data') || [];
@@ -10487,6 +11542,14 @@ var acf;
 					
 					// update
 					$input.select2('data', value);
+					
+					
+*/
+					// vars
+					var $select = this.$el.children('select');
+					acf.select2.add_value($select, term.term_id, term.term_label);
+					
+					
 					break;
 				
 				case 'checkbox':
@@ -11612,6 +12675,10 @@ var acf;
 			if( typeof tinymce === 'undefined' ) return;
 			
 			
+			// bail early if no tinyMCEPreInit.mceInit
+			if( typeof tinyMCEPreInit.mceInit === 'undefined' ) return;
+			
+			
 			// vars
 			var mceInit = this.get_mceInit();
 			
@@ -11627,7 +12694,16 @@ var acf;
 			// initialize
 			try {
 				
+				// init
 				tinymce.init( mceInit );
+				
+				
+				// vars
+				var ed = tinyMCE.get( mceInit.id );
+				
+				
+				// action for 3rd party customization
+				acf.do_action('wysiwyg_tinymce_init', ed, ed.id, mceInit, this.$field);
 				
 			} catch(e){}
 			
@@ -11637,6 +12713,10 @@ var acf;
 			
 			// bail early if no quicktags
 			if( typeof quicktags === 'undefined' ) return;
+			
+			
+			// bail early if no tinyMCEPreInit.qtInit
+			if( typeof tinyMCEPreInit.qtInit === 'undefined' ) return;
 			
 			
 			// vars
@@ -11649,10 +12729,17 @@ var acf;
 			
 			// initialize
 			try {
-			
+				
+				// init
 				var qtag = quicktags( qtInit );
 				
+				
+				// buttons
 				this._buttonsInit( qtag );
+				
+				
+				// action for 3rd party customization
+				acf.do_action('wysiwyg_quicktags_init', qtag, qtag.id, qtInit, this.$field);
 				
 			} catch(e){}
 			
@@ -11776,7 +12863,7 @@ ed.on('ResizeEditor', function(e) {
 			
 			
 			// hook for 3rd party customization
-			mceInit = acf.apply_filters('wysiwyg_tinymce_settings', mceInit, mceInit.id);
+			mceInit = acf.apply_filters('wysiwyg_tinymce_settings', mceInit, mceInit.id, this.$field);
 			
 			
 			// return
@@ -11795,7 +12882,7 @@ ed.on('ResizeEditor', function(e) {
 			
 			
 			// hook for 3rd party customization
-			qtInit = acf.apply_filters('wysiwyg_quicktags_settings', qtInit, qtInit.id);
+			qtInit = acf.apply_filters('wysiwyg_quicktags_settings', qtInit, qtInit.id, this.$field);
 			
 			
 			// return
@@ -11839,12 +12926,16 @@ ed.on('ResizeEditor', function(e) {
 		
 		enable: function(){
 			
-			// bail early if html mode
-			if( this.$el.hasClass('tmce-active') && acf.isset(window,'switchEditors') ) {
+			try {
 				
-				switchEditors.go( this.o.id, 'tmce');
-				
-			}
+				// bail early if html mode
+				if( this.$el.hasClass('tmce-active') ) {
+					
+					switchEditors.go( this.o.id, 'tmce');
+					
+				}
+								
+			} catch(e) {}
 			
 		},
 		
@@ -11926,7 +13017,7 @@ ed.on('ResizeEditor', function(e) {
 			ed.toolbar.innerHTML = html;
 			ed.theButtons = theButtons;
 			
-		},
+		}
 		
 	});
 	
@@ -11967,7 +13058,7 @@ ed.on('ResizeEditor', function(e) {
 			
 			
 			// bail early if no tinymce
-			if( typeof tinymce === 'undefined' ) return;
+			if( !acf.isset(window,'tinymce','on') ) return;
 			
 			
 			// restore default activeEditor
@@ -12012,6 +13103,7 @@ ed.on('ResizeEditor', function(e) {
 // @codekit-prepend "../js/acf-oembed.js";
 // @codekit-prepend "../js/acf-radio.js";
 // @codekit-prepend "../js/acf-relationship.js";
+// @codekit-prepend "../js/acf-select2.js";
 // @codekit-prepend "../js/acf-select.js";
 // @codekit-prepend "../js/acf-tab.js";
 // @codekit-prepend "../js/acf-time-picker.js";

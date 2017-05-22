@@ -210,9 +210,15 @@ require get_template_directory() . '/inc/extras.php';
  */
 require get_template_directory() . '/inc/customizer.php';
 
+/**
+ * Custom post types and taxonomies
+ */
+require get_template_directory() . '/inc/post-types.php';
 
-
-require get_template_directory() . '/inc/custom-taxonomies.php';
+/**
+ * Custom post types and taxonomies
+ */
+require get_template_directory() . '/inc/taxonomies.php';
 
 /**
  * theme api - generally front end functions
@@ -221,6 +227,11 @@ require get_template_directory() . '/inc/api.php';
 
 /**
  * custom filters
+ */
+require get_template_directory() . '/inc/filters.php';
+
+/**
+ * admin
  */
 require get_template_directory() . '/inc/filters.php';
 

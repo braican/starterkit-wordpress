@@ -37,6 +37,15 @@
 *  Postbox: Fields
 *
 *---------------------------------------------------------------------------------------------*/
+.acf-field p.description {
+  margin: 0;
+  padding: 0;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.4em;
+  color: #777777;
+  display: block;
+}
 #acf-field-group-fields > .inside,
 #acf-field-group-locations > .inside,
 #acf-field-group-options > .inside {
@@ -338,9 +347,27 @@ table.conditional-logic-rules tbody td {
 *	Field: Date Picker
 *	
 *---------------------------------------------------------------------------------------------*/
-.acf-field-object-date_picker .acf-radio-list span {
+.acf-field-object-date-picker .acf-radio-list li,
+.acf-field-object-time-picker .acf-radio-list li,
+.acf-field-object-date-time-picker .acf-radio-list li {
+  line-height: 25px;
+}
+.acf-field-object-date-picker .acf-radio-list span,
+.acf-field-object-time-picker .acf-radio-list span,
+.acf-field-object-date-time-picker .acf-radio-list span {
   display: inline-block;
+  min-width: 10em;
+}
+.acf-field-object-date-picker .acf-radio-list input[type="text"],
+.acf-field-object-time-picker .acf-radio-list input[type="text"],
+.acf-field-object-date-time-picker .acf-radio-list input[type="text"] {
   width: 100px;
+}
+.acf-field-object-date-time-picker .acf-radio-list span {
+  min-width: 15em;
+}
+.acf-field-object-date-time-picker .acf-radio-list input[type="text"] {
+  width: 200px;
 }
 /*--------------------------------------------------------------------------------------------
 *

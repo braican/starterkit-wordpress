@@ -1,0 +1,49 @@
+/* ==============================================================
+ *
+ * Media queries
+ *
+ * ============================================================== */
+
+
+$desktop: 1068px;
+
+$tablet: 860px;
+
+$mobile: 580px;
+
+
+// desktop
+@mixin gt-desktop {
+    @media ( min-width: {$desktop + 1} ){
+        @content;
+    }
+}
+@mixin lt-desktop{
+    @media ( max-width: {$desktop} ){
+        @content;
+    }
+}
+
+// tablet
+@mixin gt-tablet {
+    @media ( min-width: {$tablet + 1} ){
+        @content;
+    }
+}
+@mixin lt-tablet{
+    @media ( max-width: {$tablet} ){
+        @content;
+    }
+}
+
+// mobile
+@mixin gt-mobile {
+    @media ( min-width: {$mobile + 1} ){
+        @content;
+    }
+}
+@mixin lt-mobile{
+    @media ( max-width: {$mobile} ){
+        @content;
+    }
+}

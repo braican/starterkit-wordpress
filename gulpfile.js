@@ -2,81 +2,108 @@
 //
 // npm packages
 //
-var gulp       = require('gulp-help')(require('gulp')),
-    fs         = require('fs'),
-    rename     = require('gulp-rename'),
-    watch      = require('gulp-watch'),
+var gulp         = require('gulp-help')(require('gulp')),
+    fs           = require('fs'),
+    rename       = require('gulp-rename'),
+    watch        = require('gulp-watch'),
 
     // inject
-    inject     = require('gulp-inject-string'),
+    inject       = require('gulp-inject-string'),
 
     // svg
-    svgmin     = require('gulp-svgmin'),
-    svgstore   = require('gulp-svgstore'),
+    svgmin       = require('gulp-svgmin'),
+    svgstore     = require('gulp-svgstore'),
 
     // concat/uglify
-    concat     = require('gulp-concat'),
-    uglify     = require('gulp-uglify'),
+    concat       = require('gulp-concat'),
+    uglify       = require('gulp-uglify'),
     
     // sass
-    sass       = require('gulp-sass'),
-    sourcemaps = require('gulp-sourcemaps');
+    sass         = require('gulp-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    sourcemaps   = require('gulp-sourcemaps');
+
+
+
+
 
 //
-// local vars
+// Config
 //
+
+
+var config = {};
+
+config.sass = {
+    errLogToConsole : true
+};
+
+
+config.sourcemaps = {
+    includeContent : false,
+    sourceRoot     : 'src'
+};
+
+config.autoprefixer = {};
+
+
+config.svgmin = {
+    plugins:[
+        {
+            mergePaths: false
+        },{
+            convertShapeToPath: false
+        },{
+            convertPathData: false
+        }
+    ]
+};
+
+
+
+
+
+//
+// File system
+//
+
 var themeDir = 'webroot/wp-content/themes/sherman/';
+
+var files = {};
+
+files.sass = {
+    src   : themeDir + 'styles/sass/**/*.scss',
+    build : themeDir + 'styles/build/'
+};
+
+
+files.js = {
+    src   : [ themeDir + 'js/arsenal/*.js', themeDir + 'js/src/*.js' ],
+    build : themeDir + 'js/build/'
+};
+
+
+
+files.svg = {
+    src   : themeDir + 'svg/*.svg',
+    build : themeDir + 'svg/build/'
+};
+
+
+
+
+
+
 
 //
 // SETUP
 //
-var setup     = require( './setup.json' ),
-    jsModules = setup.jsModules;
 
 
-/* --------------------------------------------
- * --getters
- * -------------------------------------------- */
-
-/**
- * returns an array of javascript modules that should be included
- *  in this project, per setup.json
- *
- * @return array
- */
-var getActiveJSModules = function(){
-    var activeModules = [],
-        modules       = setup.jsModules;
-
-    for( module in modules){
-        if( modules[module] === true ){
-            activeModules.push( module );
-        }
-    }
-
-    return activeModules;
-}
+var setup     = require( './setup.json' );
 
 
 
-/**
- * returns an array of content types that should be registered for
- *  this project, per the setup.json file
- *
- * @return array
- */
-var getContentTypes = function(){
-    var ct      = [],
-        modules = setup.contentTypes;
-
-    for( module in modules ){
-        if( modules[module] === true ){
-            ct.push(module);
-        }
-    }
-
-    return ct;
-}
 
 
 /* --------------------------------------------
@@ -161,7 +188,7 @@ gulp.task(
  * compile sass
  */
 gulp.task(
-    'sass',
+    'styles',
     'Compile that sass.',
     function(){
         gulp.src( themeDir + 'css/*.scss')
@@ -233,8 +260,70 @@ gulp.task(
 
 
 /* ------------------------------------------
+ *
  * --util
+ *
  * ------------------------------------------ */
+
+
+
+
+// -------------------
+// GETTERS
+//
+
+
+
+/**
+ * returns an array of javascript modules that should be included
+ *  in this project, per setup.json
+ *
+ * @return array
+ */
+var getActiveJSModules = function(){
+    var activeModules = [],
+        modules       = setup.jsModules;
+
+    for( module in modules){
+        if( modules[module] === true ){
+            activeModules.push( module );
+        }
+    }
+
+    return activeModules;
+}
+
+
+
+/**
+ * returns an array of content types that should be registered for
+ *  this project, per the setup.json file
+ *
+ * @return array
+ */
+var getContentTypes = function(){
+    var ct      = [],
+        modules = setup.contentTypes;
+
+    for( module in modules ){
+        if( modules[module] === true ){
+            ct.push(module);
+        }
+    }
+
+    return ct;
+}
+
+
+
+
+
+
+// -------------------
+// UTIL
+//
+
+
 
 /**
  * Concatenates the code from each of the active post types templates.
