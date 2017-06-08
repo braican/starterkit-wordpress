@@ -1,12 +1,20 @@
 /* ==============================================================
-   --variables
-   ============================================================== */
+ *
+ * STYLES
+ *
+ * ============================================================== */
 /* ==============================================================
-   --mixins
-   ============================================================== */
+ *
+ * Media queries
+ *
+ * ============================================================== */
 /* ==============================================================
-   --reset
-   ============================================================== */
+ *
+ * Base
+ *  - reset
+ *  - default styles
+ *
+ * ============================================================== */
 *,
 *:before,
 *:after {
@@ -126,6 +134,11 @@ li > ol {
   margin-bottom: 0;
   margin-left: 1.5em; }
 
+.menu {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
+
 b, strong {
   font-weight: bold; }
 
@@ -177,6 +190,21 @@ sub {
 small {
   font-size: 75%; }
 
+/* --------------------------------------------
+ * --media
+ * -------------------------------------------- */
+img, svg {
+  height: auto;
+  /* Make sure images are scaled correctly. */
+  max-width: 100%;
+  /* Adhere to container width. */ }
+
+/* Make sure embeds and iframes fit their containers */
+embed,
+iframe,
+object {
+  max-width: 100%; }
+
 /* ==============================================================
    --utility
    ============================================================== */
@@ -210,91 +238,19 @@ small {
   /* Above WP toolbar */ }
 
 /* --clear */
-._s-cf:before,
-._s-cf:after,
-.column-container:before,
-.column-container:after {
+.l-cf:before, .l-cf:after,
+.l-column-container:before,
+.l-column-container:after {
   content: " ";
   display: table; }
 
-._s-cf:after,
-.column-container:after {
+.l-cf:after,
+.l-column-container:after {
   clear: both; }
 
-/* ==============================================================
-   --mixins
-   ============================================================== */
-/* ==============================================================
-   --typography
-   ============================================================== */
-body,
-button,
-input,
-select,
-textarea {
-  color: #404040;
-  font-family: sans-serif;
-  font-size: 16px;
-  line-height: 1.5; }
-
-p {
-  margin-bottom: 1.5em; }
-
-a {
-  color: royalblue; }
-
-/**
- * --forms
- */
-button,
-input,
-select,
-textarea {
-  font-size: 100%;
-  /* Corrects font size not being inherited in all browsers */
-  margin: 0;
-  /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
-  vertical-align: baseline;
-  /* Improves appearance and consistency in all browsers */ }
-
-/**
- * --icons
- */
-/* ==============================================================
-   --layout
-   ============================================================== */
-._s-container {
-  margin: 0 auto;
-  width: 100%;
-  max-width: 1000px;
-  padding-left: 20px;
-  padding-right: 20px; }
-
-/**
- * --columns
- */
-.column-container {
-  margin-left: -20px;
-  margin-right: -20px; }
-
-.col {
-  width: 100%;
-  float: left;
-  padding-left: 20px;
-  padding-right: 20px; }
-
-/* ==============================================================
-   --components
-   ============================================================== */
-/**
- * --media
- */
-img, svg {
-  height: auto;
-  /* Make sure images are scaled correctly. */
-  max-width: 100%;
-  /* Adhere to container width. */ }
-
+/* --------------------------------------------
+ * --wordpress default media
+ * -------------------------------------------- */
 .alignleft {
   display: inline;
   float: left;
@@ -309,20 +265,6 @@ img, svg {
   clear: both;
   display: block;
   margin: 0 auto; }
-
-.page-content img.wp-smiley,
-.entry-content img.wp-smiley,
-.comment-content img.wp-smiley {
-  border: none;
-  margin-bottom: 0;
-  margin-top: 0;
-  padding: 0; }
-
-/* Make sure embeds and iframes fit their containers */
-embed,
-iframe,
-object {
-  max-width: 100%; }
 
 .iframe-container {
   position: relative;
@@ -352,44 +294,191 @@ object {
 .wp-caption .wp-caption-text {
   margin: 0.8075em 0; }
 
-/**
- * --header
- */
-/**
- * --menu
- */
-.main-navigation {
-  clear: both;
-  display: block;
-  float: left;
-  width: 100%; }
+/* ==============================================================
+ *
+ * Layout
+ *  - util layout styles (prefixed with "l-")
+ *
+ * ============================================================== */
+.l-container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1000px;
+  padding-left: 20px;
+  padding-right: 20px; }
 
-.main-navigation ul {
-  list-style: none;
+/**
+ * --columns
+ */
+.l-column-container {
+  margin-left: -20px;
+  margin-right: -20px; }
+
+.col {
+  width: 100%;
+  float: left;
+  padding-left: 20px;
+  padding-right: 20px; }
+
+.col-left {
+  float: left; }
+
+.col-right {
+  float: right; }
+
+/* ==============================================================
+ *
+ * Typography
+ *
+ * ============================================================== */
+/* ------------------------------------------
+ * --vars
+ * ------------------------------------------ */
+/* ------------------------------------------
+ * --base
+ * ------------------------------------------ */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  color: #404040;
+  font-size: 16px;
+  line-height: 1.4; }
+
+/* --------------------------------------------
+ * --headers
+ * -------------------------------------------- */
+/* --------------------------------------------
+ * --basic
+ * -------------------------------------------- */
+p + p {
+  margin-top: 1em; }
+
+a {
+  color: #666; }
+
+/* --------------------------------------------
+ * --forms
+ * -------------------------------------------- */
+button,
+input,
+select,
+textarea {
+  font-size: 100%;
+  /* Corrects font size not being inherited in all browsers */
   margin: 0;
-  padding-left: 0; }
+  /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
+  vertical-align: baseline;
+  /* Improves appearance and consistency in all browsers */ }
 
-.main-navigation li {
-  float: left;
+/* ------------------------------------------
+ * --icons
+ * ------------------------------------------ */
+/* ==============================================================
+ *
+ * Navigation
+ *
+ * ============================================================== */
+/* --------------------------------------------
+ * --main nav
+ * -------------------------------------------- */
+.main-navigation ul li {
+  display: inline-block;
   position: relative; }
-
-.main-navigation a {
-  display: block;
-  text-decoration: none; }
+  .main-navigation ul li a {
+    display: block;
+    text-decoration: none; }
 
 /* Small menu */
 .menu-toggle {
   display: none; }
 
-/**
- * --footer
- */
-.site-footer {
-  clear: both;
-  width: 100%; }
-
 /* ==============================================================
-   --media queries
-   ============================================================== */
+ *
+ * Arsenal - slider
+ *  - styles for the slider
+ *
+ * ============================================================== */
+/* --------------------------------------------
+ * --slider
+ * -------------------------------------------- */
+.sk-slider {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent; }
+
+.slick-list {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  margin: 0;
+  padding: 0; }
+  .slick-list:focus {
+    outline: none; }
+  .slick-list.dragging {
+    cursor: pointer;
+    cursor: hand; }
+
+.sk-slider .slick-track,
+.sk-slider .slick-list {
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  -o-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0); }
+
+.slick-track {
+  position: relative;
+  left: 0;
+  top: 0;
+  display: block; }
+  .slick-track:before, .slick-track:after {
+    content: "";
+    display: table; }
+  .slick-track:after {
+    clear: both; }
+  .slick-loading .slick-track {
+    visibility: hidden; }
+
+.sk-slide {
+  float: left;
+  height: 100%;
+  min-height: 1px;
+  display: none; }
+  [dir="rtl"] .sk-slide {
+    float: right; }
+  .sk-slide img {
+    display: block; }
+  .sk-slide.slick-loading img {
+    display: none; }
+  .sk-slide.dragging img {
+    pointer-events: none; }
+  .slick-initialized .sk-slide {
+    display: block; }
+  .slick-loading .sk-slide {
+    visibility: hidden; }
+  .slick-vertical .sk-slide {
+    display: block;
+    height: auto;
+    border: 1px solid transparent; }
+
+.slick-arrow.slick-hidden {
+  display: none; }
+
+.slick-dots {
+  margin: 0;
+  padding: 0;
+  list-style: none; }
 
 /*# sourceMappingURL=style.css.map */

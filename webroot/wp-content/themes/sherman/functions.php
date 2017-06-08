@@ -134,23 +134,23 @@ function sk_scripts() {
     if( $env === 'production'){
 
         // load up the one production, minified file
-        wp_enqueue_script( 'sk_script-main', get_template_directory_uri() . '/js/build/production.min.js', array('jquery'), false, true );
+        wp_enqueue_script( 'sk_script_main', get_template_directory_uri() . '/js/build/production.min.js', array('jquery'), false, true );
     } else {
         // the arsenal
         sk_loadArsenal();
 
         // plugins
-        wp_enqueue_script( 'sk_script-plugins', get_template_directory_uri() . '/js/plugins.js', array('jquery'), false, true );
+        wp_enqueue_script( 'sk_script_plugins', get_template_directory_uri() . '/js/src/plugins.js', array('jquery'), false, true );
 
         // main
-        wp_enqueue_script( 'sk_script-main', get_template_directory_uri() . '/js/main.js', array('sk_script-plugins', 'jquery'), false, true );
+        wp_enqueue_script( 'sk_script_main', get_template_directory_uri() . '/js/src/main.js', array('sk_script_plugins', 'jquery'), false, true );
     }
 
     //
     // since we're compiling sass anyway, the style.css file is
     //  already minified and optimized
     //
-    wp_enqueue_style( 'sk_script-style', get_template_directory_uri() . '/css/build/style.css' );
+    wp_enqueue_style( 'sk_script_style', get_template_directory_uri() . '/styles/build/style.css' );
     
     //
     // comments

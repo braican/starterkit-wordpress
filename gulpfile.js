@@ -60,6 +60,10 @@ config.svgmin = {
 };
 
 
+config.svgstore = {
+    inlineSvg: true
+};
+
 
 
 
@@ -124,13 +128,9 @@ gulp.task(
     'combine',
     'Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file',
     function(){
-        return gulp.src( [
-                    themeDir + 'js/arsenal/enabled/*.js',
-                    themeDir + 'js/plugins.js',
-                    themeDir + 'js/main.js'
-                ] )
-                .pipe( concat('production.js') )
-                .pipe( gulp.dest( themeDir + 'js/build' ) );
+        return gulp.src( files.js.src )
+            .pipe( concat('production.js') )
+            .pipe( gulp.dest( files.js.build ) );
     }
 );
 
@@ -143,12 +143,10 @@ gulp.task(
     'Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.',
     ['combine'],
     function(){
-        return gulp.src( themeDir + 'js/build/production.js')
-            .pipe(uglify())
-            .pipe(rename({
-                extname: '.min.js'
-            }))
-            .pipe(gulp.dest( themeDir + '/js/build' ));
+        return gulp.src( files.js.build + 'production.js' )
+            .pipe( uglify() )
+            .pipe( rename({ extname: '.min.js' }) )
+            .pipe( gulp.dest( files.js.build ) );
     }
 );
 
@@ -164,21 +162,11 @@ gulp.task(
     'svgstore',
     'Creates the svg sprite that can be loaded into the page via javascript.',
     function () {
-        return gulp.src( themeDir + 'svg/icons/**/*.svg')
-                .pipe(rename({prefix: 'icon--'}))
-                .pipe( svgmin({
-                    plugins:[{
-                        mergePaths: false
-                    },{
-                        convertShapeToPath: false
-                    },{
-                        convertPathData: false
-                    }]
-                }) )
-                .pipe(svgstore({
-                    inlineSvg: true
-                }))
-                .pipe(gulp.dest( themeDir + 'svg/icons/build'));
+        return gulp.src( files.svg.src )
+            .pipe( rename({prefix: 'icon--'}) )
+            .pipe( svgmin( config.svgmin ) )
+            .pipe( svgstore( config.svgstore ))
+            .pipe(gulp.dest( files.svg.build ));
     }
 );
 
@@ -191,15 +179,11 @@ gulp.task(
     'styles',
     'Compile that sass.',
     function(){
-        gulp.src( themeDir + 'css/*.scss')
-            .pipe(sourcemaps.init())
-            .pipe(sass({
-                errLogToConsole: true
-            }).on('error', sass.logError))
-            .pipe( sourcemaps.write('.', {
-                includeContent: false, sourceRoot: 'src'
-            }) )
-            .pipe(gulp.dest( themeDir + 'css/build/' ));
+        gulp.src( files.sass.src )
+            .pipe( sourcemaps.init() )
+            .pipe( sass( config.sass ).on('error', sass.logError) )
+            .pipe( sourcemaps.write('.', config.sourcemaps) )
+            .pipe( gulp.dest( files.sass.build ));
     }
 );
 
@@ -210,7 +194,7 @@ gulp.task(
     'watch',
     'Watch those sass files so we can compile it for you on the fly.',
     function(){
-        gulp.watch( themeDir + 'css/*.scss' , ['sass']);
+        gulp.watch( files.sass.src, ['styles']);
     }
 );
 
