@@ -20,12 +20,19 @@ if( !function_exists('sk_create_img_markup') ) :
 /**
  * filter to render an image from a custom field
  *
- * @param $img_obj (array)
- *   - the image object from wordpress
+ * @param object  $img_obj  All the image data
+ * @param array   $args     Arguments for the filter. Accepted arguments are:
+ *         
  */
-function sk_create_img_markup( $img_obj ){
+function sk_create_img_markup( $img_obj, $args = array() ){
 
-    return '<img src="' . $img_obj['url'] . '">';
+    $img_src = $img_obj['url'];
+
+    if( $args && isset($args['img_size']) && isset( $img_obj['sizes'][ $args['img_size'] ] ) ){
+        $img_src = $img_obj['sizes'][ $args['img_size'] ];
+    }
+
+    return '<img src="' . $img_src . '">';
 
 }
 add_filter('sk_image_markup', 'sk_create_img_markup');
