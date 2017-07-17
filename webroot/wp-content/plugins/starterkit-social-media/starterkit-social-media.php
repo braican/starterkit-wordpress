@@ -3,7 +3,7 @@
  * Plugin Name: Starterkit Social Media
  * Plugin URI: http://tankdesign.com
  * Description: Creates an admin page to edit the social links for this site, and provides a function to render the social links in a menu
- * Version: 0.1
+ * Version: 0.2
  * Author: Tank Design
  * Author URI: http://tankdesign.com
  * License: GPL2
@@ -17,15 +17,34 @@ if( ! class_exists('StarterkitSocialMedia') ) :
  * StarterkitSocialMedia
  */
 class StarterkitSocialMedia {
-    
-    // Holds the values to be used in the fields callbacks
-    private $options;
+
+
+    public $socialOutlets = array(
+        'facebook'   => array(
+            'title' => 'Facebook'
+        ),
+        'twitter'    => array(
+            'title' => 'Twitter'
+        ),
+        'instagram'  => array(
+            'title' => 'Instagram'
+        ),
+        'linkedin'   => array(
+            'title' => 'LinkedIn'
+        ),
+        'googleplus' => array(
+            'title' => 'Google Plus'
+        ),
+        'pinterest'  => array(
+            'title' => 'Pinterest'
+        ),
+    );
+
 
     /**
      * Start up
      */
     public function __construct() {
-        $this->socialOutlets = $this->setSocialOutlets();
 
         $this->include_before_theme();
 
@@ -35,38 +54,6 @@ class StarterkitSocialMedia {
 
 
 
-
-    /* -------------------------------------------------
-     *
-     * --setters
-     *
-     * ------------------------------------------------- */
-
-
-    /**
-     * Sets the socialOutlets var
-     */
-    public function setSocialOutlets(){
-
-        $this->socialOutlets = array(
-            'facebook'  => array(
-                'id'    => 'facebook',
-                'title' => 'Facebook'
-            ),
-            'twitter'   => array(
-                'id'    => 'twitter',
-                'title' => 'Twitter'
-            ),
-            'instagram' => array(
-                'id'    => 'instagram',
-                'title' => 'Instagram'
-            ),
-            'linkedin'  => array(
-                'id'    => 'linkedin',
-                'title' => 'LinkedIn'
-            )
-        );
-    }
 
 
     /* -------------------------------------------------
@@ -115,7 +102,7 @@ class StarterkitSocialMedia {
             'Social Links', 
             'Social Links', 
             'manage_options', 
-            'tank-social-links-admin', 
+            'sk-social', 
             array( $this, 'create_admin_page' )
         );
     }
@@ -126,16 +113,14 @@ class StarterkitSocialMedia {
      * Options page callback
      */
     public function create_admin_page() {
-        // Set class property
-        $this->options = get_option( 'sk_social' );
         ?>
         <div class="wrap">    
             <h2>Social links</h2>
             <form method="post" action="options.php">
             <?php
                 // This prints out all hidden setting fields
-                settings_fields( 'sk_social_group' );   
-                do_settings_sections( 'tank-social-links-admin' );
+                settings_fields( 'sk_social' );   
+                do_settings_sections( 'sk-social' );
                 submit_button(); 
             ?>
             </form>
@@ -153,30 +138,31 @@ class StarterkitSocialMedia {
      */
     public function init() {
         register_setting(
-            'sk_social_group',         // Option group
+            'sk_social',         // Option group
             'sk_social',               // Option name
             array( $this, 'sanitize' ) // Sanitize
         );
 
         add_settings_section(
-            'tank_social_block_setting_section', // ID
+            'sk_social',                         // ID
             '',                                  // Title
             array( $this, 'printSectionInfo' ),  // Callback
-            'tank-social-links-admin'            // Page
+            'sk-social'                          // Page
         );
 
         $socialOutlets = $this->getSocialOutlets();
 
-        foreach($socialOutlets as $social){
+        foreach($socialOutlets as $id => $social){
+
             add_settings_field(
-                $social['id'],
+                $id,
                 $social['title'],
                 array($this, 'settingCallback'),
-                'tank-social-links-admin',
-                'tank_social_block_setting_section',
-                array( 'id' => $social['id'] )
+                'sk-social',
+                'sk_social',
+                array( 'id' => $id )
             );
-        }     
+        }
     }
 
 
@@ -203,9 +189,11 @@ class StarterkitSocialMedia {
     public function settingCallback($args){
         $id = $args['id'];
 
+        $options = get_option( 'sk_social' );
+
         printf(
             '<input type="text" id="' . $id . '" name="sk_social[' . $id . ']" value="%s" />',
-            isset( $this->options[$id] ) ? esc_attr( $this->options[$id]) : ''
+            isset( $options[$id] ) ? esc_attr( $options[$id]) : ''
         );
     }
 
@@ -230,9 +218,7 @@ class StarterkitSocialMedia {
 
         $socialOutlets = $this->getSocialOutlets();
 
-        foreach($socialOutlets as $social){
-            $id = $social['id'];
-
+        foreach($socialOutlets as $id =>$social){
             if(isset($input[$id])){
                 $newInput[$id] = sanitize_text_field($input[$id]);
             }
