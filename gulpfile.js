@@ -82,7 +82,11 @@ files.sass = {
 
 
 files.js = {
-    src   : [ themeDir + 'js/arsenal/*.js', themeDir + 'js/src/*.js' ],
+    src   : [
+        themeDir + 'js/arsenal/*.js',
+        themeDir + 'js/modules/*.js',
+        themeDir + 'js/src/*.js'
+    ],
     build : themeDir + 'js/build/'
 };
 
@@ -104,7 +108,7 @@ files.svg = {
 //
 
 
-var setup     = require( './setup.json' );
+var setup = require( './setup.json' );
 
 
 
@@ -182,6 +186,7 @@ gulp.task(
         gulp.src( files.sass.src )
             .pipe( sourcemaps.init() )
             .pipe( sass( config.sass ).on('error', sass.logError) )
+            .pipe( autoprefixer(config.autoprefixer).on('error', function(err){ console.log( err); } ) )
             .pipe( sourcemaps.write('.', config.sourcemaps) )
             .pipe( gulp.dest( files.sass.build ));
     }
@@ -195,6 +200,7 @@ gulp.task(
     'Watch those sass files so we can compile it for you on the fly.',
     function(){
         gulp.watch( files.sass.src, ['styles']);
+        gulp.watch( files.js.src, ['opt-js']);
     }
 );
 
