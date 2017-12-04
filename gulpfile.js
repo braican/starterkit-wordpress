@@ -133,7 +133,8 @@ function getPostTypeCode() {
  * -------------------------------------------- */
 
 function compile(watchIt) {
-    const bundler = watchify(browserify(files.js.src, config.browserify).transform(babelify, config.babelify));
+    const bundler = watchify(browserify(files.js.src, config.browserify)
+        .transform(babelify, config.babelify));
 
     function rebundle() {
         return bundler
@@ -173,16 +174,14 @@ gulp.task('minify', 'Minify the compiled Javascript', ['build'], () => gulp.src(
  * --sass
  * -------------------------------------------- */
 
-gulp.task(
-    'styles',
-    'Compile that sass.',
-    () => gulp.src(files.sass.src)
+gulp.task('styles', 'Compile that sass.', () => {
+    gulp.src(files.sass.src)
         .pipe(sourcemaps.init())
         .pipe(sass(config.sass).on('error', sass.logError))
         .pipe(autoprefixer(config.autoprefixer).on('error', (err) => { console.log(err); }))
         .pipe(sourcemaps.write('.', config.sourcemaps))
         .pipe(gulp.dest(files.sass.build))
-);
+});
 
 
 /* --------------------------------------------
@@ -192,20 +191,17 @@ gulp.task(
 /**
  * build from arsenal
  */
-gulp.task(
-    'build-arsenal',
-    'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.',
-    () => {
-        //
-        // register the content types
-        //
-        const typeCode = getPostTypeCode();
+const buildArsenalHelp = 'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.';
+gulp.task('build-arsenal', buildArsenalHelp, () => {
+    //
+    // register the content types
+    //
+    const typeCode = getPostTypeCode();
 
-        gulp.src('./_arsenal/_templates/post-types.php')
-            .pipe(inject.replace('//sk_insert_types//', typeCode))
-            .pipe(gulp.dest(`${themeDir}/arsenal`));
-    }
-);
+    gulp.src('./_arsenal/_templates/post-types.php')
+        .pipe(inject.replace('//sk_insert_types//', typeCode))
+        .pipe(gulp.dest(`${themeDir}/arsenal`));
+});
 
 
 /* --------------------------------------------
