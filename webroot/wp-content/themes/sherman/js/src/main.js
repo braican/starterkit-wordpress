@@ -1,7 +1,10 @@
 //
-// imports
+// Imports
+//  - to enable a module from the arsenal, uncomment it below.
 //
-import Modal from '../arsenal/modal';
+
+// import Modal from '../arsenal/modal';
+// import Slider from '../arsenal/slider';
 
 //
 // namespace - SK
