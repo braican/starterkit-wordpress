@@ -26,7 +26,5 @@
     //
     $(document).ready(() => {
         SK.init();
-
-        const t = new Modal();
     });
 }(window.SK = window.SK || {}, jQuery));

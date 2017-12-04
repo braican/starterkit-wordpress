@@ -174,14 +174,13 @@ gulp.task('minify', 'Minify the compiled Javascript', ['build'], () => gulp.src(
  * --sass
  * -------------------------------------------- */
 
-gulp.task('styles', 'Compile that sass.', () => {
+gulp.task('styles', 'Compile that sass.', () =>
     gulp.src(files.sass.src)
         .pipe(sourcemaps.init())
         .pipe(sass(config.sass).on('error', sass.logError))
         .pipe(autoprefixer(config.autoprefixer).on('error', (err) => { console.log(err); }))
         .pipe(sourcemaps.write('.', config.sourcemaps))
-        .pipe(gulp.dest(files.sass.build))
-});
+        .pipe(gulp.dest(files.sass.build)));
 
 
 /* --------------------------------------------
