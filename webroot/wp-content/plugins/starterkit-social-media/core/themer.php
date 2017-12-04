@@ -16,6 +16,8 @@ if(!function_exists('sk_social_themer')) :
  *  - {string} $list_class // the class to assign to the ul element
  * 
  * @usage
+ *  do_action('sk_social/render', $args);
+ * 
  */
 function sk_social_themer($args){
 
