@@ -88,7 +88,7 @@ class StarterkitSocialMedia {
     private function include_before_theme(){
 
         // incudes
-        include_once('core/api.php');
+        include_once('core/themer.php');
     }
 
 
@@ -243,9 +243,7 @@ function initSocialMediaClass(){
     return $StarterkitSocialMedia;
 }
 
-if( is_admin() ){
-    initSocialMediaClass();
-}
+initSocialMediaClass();
 
 
 endif; // end classcheck for StarterkitSocialMedia
