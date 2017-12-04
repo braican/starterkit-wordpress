@@ -94,7 +94,7 @@ function getContentTypes() {
     const ct = [];
     const modules = setup.contentTypes;
 
-    Object.keys.forEach((module) => {
+    Object.keys(modules).forEach((module) => {
         if (modules[module] === true) {
             ct.push(module);
         }
@@ -191,8 +191,8 @@ gulp.task('styles', 'Compile that sass.', () => {
 /**
  * build from arsenal
  */
-const buildArsenalHelp = 'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.';
-gulp.task('build-arsenal', buildArsenalHelp, () => {
+const contentTypesHelp = 'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.';
+gulp.task('content-types', contentTypesHelp, () => {
     //
     // register the content types
     //
