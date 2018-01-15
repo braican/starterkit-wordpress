@@ -1,8 +1,4 @@
 {
-    "jsModules": {
-        "slider" : false,
-        "modal"  : false
-    },
     "contentTypes": {
         "careers"      : false,
         "case-studies" : false,

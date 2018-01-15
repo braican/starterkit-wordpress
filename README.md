@@ -38,12 +38,7 @@ Functions are namespaced with the prefix `sk`.
 The Javascript Structure
 ------------------------
 
-The Javascript is organized in the following way (all file paths are relative to the theme path, unless otherwise noted):
-
-* Available javascript modules are located in the project root in the `_arsenal/js` directory. Use the `setup.json` file in the webroot to choose which of these modules (if any) you'll need for this project, and run the `gulp build-arsenal` command. This will place the activated modules inside the theme at `js/arsenal`.
-* All third-party plugins that stand alone from a standardized module pattern should go in the `js/src/plugins.js` file.
-* All project-specific scripts and front-end code should go into the `js/src/main.js` file.
-* Upon running the `gulp opt-js` task, `production.js` will be built, and a minified version will be placed into the `js/build` directory.
+The Javascript for this projects utilizes Babel to utilize ES6 syntax, as well as some Browserify goodness to enable Javascript modules. There are some starting modules in the `webroot/wp-content/themes/sherman/js/arsenal` directory; to enable any of these modules, import them into the javascript file that you're going to use the module in.
 
 
 Gulp Tasks
@@ -52,28 +47,25 @@ Gulp Tasks
 Gulp is used to maintain and complete a number of tasks for the site, including compiling sass, optimizing svgs, and more. You can use `gulp help` to get an overview of the tasks present in this project, or use the reference below.
 
 #### `gulp`
-Runs the default task, which is nothing at the moment.
+Runs the watcher.
 
 #### `gulp help`
 List all the tasks defined in the gulpfile, and see a description of what they do.
 
-#### `gulp combine`
-Concatenates all the javascripts from the arsenal, any plugin scripts, and the main js file
+#### `gulp build`
+Builds the Javascript using the ES6 modules and running all the files through Babel to get us down to ES5.
 
-#### `gulp opt-js`
-Optimizes javascript by concatenating all the enabled arsenal scripts, the plugins, and the main js file, then minifying that file.
-
-#### `gulp svgstore`
-Creates the svg sprite for insertion into the page.
+#### `gulp minify`
+Minify the compiled Javascript.
 
 #### `gulp styles`
 Compiles sass.
 
 #### `gulp watch`
-Watch the `css` directory within the theme to changes to any `.scss` files.
+Watch the sass and Javascripts within the theme for changes, and then run the appropriate compiler.
 
-#### `gulp build-arsenal`
-Using the `setup.json` file, populates the theme with the chosen build components, including javascript modules and WordPress content types.
+#### `gulp content-types`
+Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.
 
 
 
