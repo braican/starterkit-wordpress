@@ -4,21 +4,10 @@
  *
  * ============================================================== */
 
-
-//
-// Global vars
-//
-
-
-
-
-
-
-//
-// Imports
-//
-
-
+// vars
+@import 'vars/mixins';
+@import 'vars/colors';
+@import 'vars/icons';
 
 // base
 @import 'base/media-queries';
@@ -26,14 +15,6 @@
 @import 'base/layout';
 @import 'base/type';
 
-
-
 // components
-//  - site parts
 @import 'components/nav';
 
-
-
-// arsenal
-//  - you can comment out any arsenal modules that you're not using
-@import 'arsenal/slider';

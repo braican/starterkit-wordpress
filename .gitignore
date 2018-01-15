@@ -1,12 +1,16 @@
+## system
+
 .htaccess
 *.log
-sitemap.xml
-wp-config.php
 .DS_Store
-
 node_modules
 node_modules/*
 
+
+## wordpress
+
+sitemap.xml
+wp-config.php
 */wp-content/uploads/
 */wp-content/blogs.dir/
 */wp-content/upgrade/
@@ -18,6 +22,15 @@ node_modules/*
 */wp-content/cache/sitemap.xml.gz
 
 
+## Compiled
+style.css.map
+production.js.map
+
+
+## Vagrant
+
 Vagrantfile
 .vagrant/
+.vscode/
+.vscode/*
 

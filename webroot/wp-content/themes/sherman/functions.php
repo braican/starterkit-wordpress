@@ -126,25 +126,7 @@ function sk_scripts() {
 
     $env = defined('WP_ENV') ? WP_ENV : 'staging';
 
-    //
-    // if we're in the production environment, enqueue the minified,
-    //  concatenated scripts. Otherwise, load them all individually
-    //  for easier debugging.
-    //
-    if( $env === 'production'){
-
-        // load up the one production, minified file
-        wp_enqueue_script( 'sk_script_main', get_template_directory_uri() . '/js/build/production.min.js', array('jquery'), false, true );
-    } else {
-        // the arsenal
-        sk_loadArsenal();
-
-        // plugins
-        wp_enqueue_script( 'sk_script_plugins', get_template_directory_uri() . '/js/src/plugins.js', array('jquery'), false, true );
-
-        // main
-        wp_enqueue_script( 'sk_script_main', get_template_directory_uri() . '/js/src/main.js', array('sk_script_plugins', 'jquery'), false, true );
-    }
+    wp_enqueue_script( 'sk_script_main', get_template_directory_uri() . '/js/build/production.js', array('jquery'), false, true );
 
     //
     // since we're compiling sass anyway, the style.css file is
@@ -160,28 +142,6 @@ function sk_scripts() {
     }
 }
 add_action( 'wp_enqueue_scripts', 'sk_scripts' );
-
-
-/**
- * Helper function that loads the individual arsenal javascripts, if
- *  they are present
- */
-function sk_loadArsenal(){
-
-    // the list of available scripts
-    $arsenal = glob( get_template_directory() . '/js/arsenal/*.js');
-
-    foreach( $arsenal as $script ){
-
-        $filename = str_replace( get_template_directory() . '/js/arsenal/', '', $script);
-        $uri = get_template_directory_uri() . '/js/arsenal/' . $filename;
-
-        if( file_exists( $script ) ){
-            wp_enqueue_script( "sk_script--$filename", $uri, array('jquery'), false, true);
-        }
-    }
-}
-
 
 
 
