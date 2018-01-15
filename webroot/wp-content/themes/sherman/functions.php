@@ -223,17 +223,12 @@ require get_template_directory() . '/inc/taxonomies.php';
 /**
  * theme api - generally front end functions
  */
-require get_template_directory() . '/inc/api.php';
-
-/**
- * custom filters
- */
-require get_template_directory() . '/inc/filters.php';
+require get_template_directory() . '/api/api.php';
 
 /**
  * admin
  */
-require get_template_directory() . '/inc/filters.php';
+require get_template_directory() . '/admin/admin.php';
 
 
 /**
@@ -242,33 +237,5 @@ require get_template_directory() . '/inc/filters.php';
 $arsenal_postTypes = get_template_directory() . '/arsenal/post-types.php';
 if( file_exists( $arsenal_postTypes ) ){
     require $arsenal_postTypes;
-}
-
-
-
-/* --------------------------------------------
- * --util
- * -------------------------------------------- */
-
-/**
- * include svgs inline
- *
- * @param $svg (string)
- *   - the svg to include
- * @param $return (boolean)
- *   - whether to return the svg as a string or simply include the svg
- */
-function include_svg( $svg, $return = false ){
-    $svg_path = get_template_directory() . '/svg/build/' . $svg . '.svg';
-
-    if(!file_exists($svg_path)){
-        return false;
-    }
-
-    if($return){
-        return file_get_contents($svg_path);
-    }
-
-    include( $svg_path );
 }
 
