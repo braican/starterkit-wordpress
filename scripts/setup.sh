@@ -20,9 +20,6 @@ define( 'WP_DEBUG', true );
 PHP
 fi
 
-if $(wp core is-installed); then
-	wp theme activate "$WORDPRESS_THEME_NAME"
-fi
 
 # Run WP install if it's not already installed.
 if ! $(wp core is-installed); then
@@ -35,6 +32,9 @@ if ! $(wp core is-installed); then
 
 	# Activate this theme.
 	wp theme activate "$WORDPRESS_THEME_NAME"
+
+	# activate teh plugins
+	wp plugin activate advanced-custom-fields-pro wp-migrate-db
 
 	# Ensure correct permissions for files / directories creating during install.
 	if [ -z "$SKIP_CHOWN" ]; then

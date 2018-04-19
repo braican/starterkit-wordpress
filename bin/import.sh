@@ -2,7 +2,10 @@
 
 set -e
 
-echo "Importing database..."
-docker-compose exec wordpress wp db import dbdump.sql
-echo "Replacing live URLs with localURLs"
-docker-compose exec wordpress wp search-replace www.OLDHOST.com NEWHOST.ups.dock
+fullpath=$1
+filename="${fullpath##*/}"
+
+echo "Importing database $1"
+mv $1 db/
+docker-compose exec wordpress wp db import /var/www/db/${filename}
+echo "done"
