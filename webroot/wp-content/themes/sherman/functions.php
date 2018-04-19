@@ -23,8 +23,8 @@ define('SHERMAN_THEME_PATH', dirname(__FILE__) . '/');
  *
  * ------------------------------------------------- */
 
-require_once('lib/admin/Sherman_Admin.php');
-require_once('lib/admin/Sherman_Site.php');
+require_once('lib/Sherman_Admin.php');
+require_once('lib/Sherman_Site.php');
 
 
 // Initialize site

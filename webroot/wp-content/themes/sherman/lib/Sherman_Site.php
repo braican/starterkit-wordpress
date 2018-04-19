@@ -51,6 +51,10 @@ class Sherman_Site {
         remove_action('wp_print_styles', 'print_emoji_styles');
         remove_action('admin_print_styles', 'print_emoji_styles');
 
+
+        // include the api
+        require_once SHERMAN_THEME_PATH . 'lib/api/api.php';
+
     }
 
     public function register_post_types() {
