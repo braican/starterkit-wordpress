@@ -7,11 +7,9 @@ Theme based on [_s](https://github.com/Automattic/_s/).
 
 Getting Started
 ---------------
-1. Download this repo from the Downloads link on the left. Extract the contents and add all the files to your project. Don't forget to set up your local apache to point to the `webroot` directory.
-1. Run `git init` to init the git repo, `git add -A` to add all the files, and `git commit -m "initial commit"` to add all the files. Once you've set up your remote repo, `git push` to that remote.
+1. Download this repo from the Downloads link on the left. Extract the contents and add all the files to your project. Don't forget to set up your web server to point to the `webroot` directory.
 1. Run `npm install` to install gulp and get all that good stuff set up.
 1. Create your database for this site, and copy your `wp-sample-config.php` file to `wp-config.php` and add the appropriate database credentials.
-1. (OPTIONAL) If you're going to use any common components (for example, you're building a Tank Standard Issue site), open `setup.json`. This file contains json that allows you to opt into common javascript components and content types. Set the components you wish to use to `true` and save the file. Run `gulp build` to build theme files containing your selected components.
 1. Navigate to the site (remember, you probably want to have added a subdomain in your virtual hosts in apache), and install WordPress.
 
 Once you've set all this up, log into the site and do a couple things:
@@ -28,10 +26,6 @@ Setting up this project
 1. Install the database, from wherever you can get it. Worse case, there is a `db` directory in here, use the most recent dump in there.
 1. Create `wp-config.php` by copying the `wp-sample-config.php` and add the appropriate database credentials.
 
-
-Namespacing
------------
-Functions are namespaced with the prefix `sk`.
 
 
 
@@ -63,9 +57,6 @@ Compiles sass.
 
 #### `gulp watch`
 Watch the sass and Javascripts within the theme for changes, and then run the appropriate compiler.
-
-#### `gulp content-types`
-Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.
 
 
 
