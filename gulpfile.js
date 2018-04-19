@@ -4,7 +4,6 @@
 const gulp = require('gulp-help')(require('gulp'));
 const exit = require('gulp-exit');
 const rename = require('gulp-rename');
-const fs = require('fs');
 
 // babel
 const babelify = require('babelify');
@@ -20,9 +19,6 @@ const uglify = require('gulp-uglify');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
-
-// inject (for the arsenal)
-const inject = require('gulp-inject-string');
 
 
 //
@@ -61,71 +57,16 @@ const themeDir = 'webroot/wp-content/themes/sherman';
 
 const files = {};
 
-files.sass = {
-    dir   : `${themeDir}/styles`,
-    src   : `${themeDir}/styles/sass/**/*.scss`,
-    build : `${themeDir}/styles/build`,
+files.dist = `${themeDir}/static/dist`;
+
+files.scss = {
+    dir : `${themeDir}/static/scss`,
+    src : `${themeDir}/static/scss/**/*.scss`,
 };
 
 files.js = {
-    src   : `${themeDir}/js/src/main.js`,
-    build : `${themeDir}/js/build`,
+    src : `${themeDir}/static/js/main.js`,
 };
-
-//
-// SETUP
-//
-
-const setup = require('./setup.json');
-
-
-/* ------------------------------------------
- * --util
- * ------------------------------------------ */
-
-
-/**
- * returns an array of content types that should be registered for
- *  this project, per the setup.json file
- *
- * @return array
- */
-function getContentTypes() {
-    const ct = [];
-    const modules = setup.contentTypes;
-
-    Object.keys(modules).forEach((module) => {
-        if (modules[module] === true) {
-            ct.push(module);
-        }
-    });
-
-    return ct;
-}
-
-
-/**
- * Concatenates the code from each of the active post types templates.
- *
- * @return string
- */
-function getPostTypeCode() {
-    const contentTypes = getContentTypes();
-    let typeCode = '';
-
-    for (let i = 0; i < contentTypes.length; i += 1) {
-        const file = `./_arsenal/post-types/${contentTypes[i]}.php`;
-
-        try {
-            const fileContent = fs.readFileSync(file);
-            typeCode += `${fileContent}\n\n`;
-        } catch (e) {
-            console.error(`Warning: couldn't write ${e.path}; please make sure that file exists.`);
-        }
-    }
-
-    return typeCode;
-}
 
 
 /* --------------------------------------------
@@ -143,17 +84,17 @@ function compile(watchIt) {
                 console.error(err);
                 this.emit('end');
             })
-            .pipe(source(files.js.build))
+            .pipe(source(files.dist))
             .pipe(buffer())
             .pipe(sourcemaps.init({ loadMaps : true }))
             .pipe(rename('production.js'))
             .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest(files.js.build));
+            .pipe(gulp.dest(files.dist));
     }
 
     if (watchIt) {
         bundler.on('update', () => {
-            console.log('--> rebundle...done');
+            console.log('--> rebundle...done'); // eslint-disable-line
             rebundle();
         });
         rebundle();
@@ -164,10 +105,10 @@ function compile(watchIt) {
 
 gulp.task('build', 'Build the Javascript and compile down to ES5', () => compile());
 
-gulp.task('minify', 'Minify the compiled Javascript', ['build'], () => gulp.src(files.js.build)
+gulp.task('minify', 'Minify the compiled Javascript', ['build'], () => gulp.src(files.dist)
     .pipe(uglify())
     .pipe(rename({ extname : '.min.js' }))
-    .pipe(gulp.dest(files.js.build)));
+    .pipe(gulp.dest(files.dist)));
 
 
 /* --------------------------------------------
@@ -175,32 +116,12 @@ gulp.task('minify', 'Minify the compiled Javascript', ['build'], () => gulp.src(
  * -------------------------------------------- */
 
 gulp.task('styles', 'Compile that sass.', () =>
-    gulp.src(files.sass.src)
+    gulp.src(files.scss.src)
         .pipe(sourcemaps.init())
         .pipe(sass(config.sass).on('error', sass.logError))
-        .pipe(autoprefixer(config.autoprefixer).on('error', (err) => { console.log(err); }))
+        .pipe(autoprefixer(config.autoprefixer).on('error', (err) => { console.log(err); })) // eslint-disable-line
         .pipe(sourcemaps.write('.', config.sourcemaps))
-        .pipe(gulp.dest(files.sass.build)));
-
-
-/* --------------------------------------------
- * --arsenal
- * --------------------------------------------*/
-
-/**
- * build from arsenal
- */
-const contentTypesHelp = 'Using the "setup.json" config file in the document root, write copy enabled arsenal files into the appropriate place within the theme.';
-gulp.task('content-types', contentTypesHelp, () => {
-    //
-    // register the content types
-    //
-    const typeCode = getPostTypeCode();
-
-    gulp.src('./_arsenal/_templates/post-types.php')
-        .pipe(inject.replace('//sk_insert_types//', typeCode))
-        .pipe(gulp.dest(`${themeDir}/arsenal`));
-});
+        .pipe(gulp.dest(files.dist)));
 
 
 /* --------------------------------------------
@@ -212,5 +133,5 @@ gulp.task('default', 'Run the watch task', ['watch']);
 
 gulp.task('watch', 'Watch the `javascript` and `styles` directories for changes', () => {
     compile(true);
-    gulp.watch(files.sass.src, ['styles']);
+    gulp.watch(files.scss.src, ['styles']);
 });

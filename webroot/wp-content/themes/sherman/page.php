@@ -18,7 +18,7 @@ get_header(); ?>
             
             <?php if ( '' !== $post->post_content ) : ?>
                 <main id="main" class="site-main" role="main">
-                    <?php get_template_part( 'content', 'page' ); ?>
+                    <?php get_template_part( 'templates/content/content', 'page' ); ?>
                 </main><!-- #main -->
             <?php endif; ?>
 

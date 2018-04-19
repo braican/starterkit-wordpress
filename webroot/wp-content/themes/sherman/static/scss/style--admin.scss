@@ -1,0 +1,9 @@
+.acf-repeater.-row table tr + tr td,
+.acf-repeater.-block table tr + tr td{
+    border-top-color: #ccc;
+    border-top-width: 2px;
+}
+.acf-repeater.-row table tr:nth-child(even) .acf-fields,
+.acf-repeater.-block table tr:nth-child(even) .acf-fields{
+    background-color: #f9f9f9;
+}

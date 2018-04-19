@@ -1,0 +1,44 @@
+/* ==============================================================
+ *
+ * ICONS
+ *
+ * ============================================================== */
+
+$icon_expand: url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2015%22%3E%3Ctitle%3Eicon-expand%3C%2Ftitle%3E%3Cpath%20d%3D%22M21%200l3%203.06L12%2015%200%203.06%203%200l9%209z%22%20fill%3D%22%23d80b6d%22%20data-name%3D%22Layer%201%22%2F%3E%3C%2Fsvg%3E');
+
+ /* ------------------------------------
+  * --mixins
+  * ------------------------------------*/
+
+@mixin icon-right( $svg, $width: 1em, $height: 1em, $margin: 10px, $fromRight: 0 ){
+    position: relative;
+    padding-right: calc(#{$width} + #{$margin});
+
+    &:after{
+        content: "";
+        display: block;
+        position: absolute;
+        top: 50%;
+        right: $fromRight;
+        width: $width;
+        height: $height;
+        margin-top: #{$height / -2};
+        background-image: $svg;
+        background-repeat:no-repeat;
+        background-position:center center;
+        background-size: contain;
+    }
+}
+
+
+@mixin icon( $svg, $width, $height, $bgsz: contain ){
+    display: inline-block;
+    vertical-align: middle;
+    width: $width;
+    height: $height;
+    background-image: $svg;
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size: $bgsz;
+    text-indent: -9999px;
+}

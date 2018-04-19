@@ -1,3 +1,0 @@
-# The Arsenal
-
-This directory houses the arsenal; all reusable components present in the starterkit. This includes common javascripts and content types that will be used to build the site. Using the `setup.json` file, choose which components within this arsenal you'll need for your project, and then run `gulp build` to place the appropriate arsenal files into the appropriate places within the WordPress theme.
