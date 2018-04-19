@@ -22,9 +22,8 @@ wp-config.php
 */wp-content/cache/sitemap.xml.gz
 
 
-## Compiled
-style.css.map
-production.js.map
+## Compiled sourcemaps
+*.map
 
 
 ## Vagrant

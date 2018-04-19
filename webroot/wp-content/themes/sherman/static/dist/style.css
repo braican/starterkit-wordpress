@@ -1,0 +1,294 @@
+/* ==============================================================
+ *
+ * STYLES
+ *
+ * ============================================================== */
+/* ==============================================================
+ *
+ * MIXINS
+ *
+ * ============================================================== */
+/* ==============================================================
+ *
+ * COLORS
+ *
+ * ============================================================== */
+/* ==============================================================
+ *
+ * ICONS
+ *
+ * ============================================================== */
+/* ------------------------------------
+  * --mixins
+  * ------------------------------------*/
+/* ==============================================================
+ *
+ * Media queries
+ *
+ * ============================================================== */
+/* ==============================================================
+ *
+ * Base
+ *  - reset
+ *  - default styles
+ *
+ * ============================================================== */
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit; }
+
+html {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box; }
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+/* ------------------------------------
+ * --media
+ * ------------------------------------*/
+img, svg {
+  height: auto;
+  /* Make sure images are scaled correctly. */
+  max-width: 100%;
+  /* Adhere to container width. */ }
+
+/* Make sure embeds and iframes fit their containers */
+embed,
+iframe,
+object {
+  max-width: 100%; }
+
+/* ------------------------------------
+ * --utility
+ * ------------------------------------*/
+/* Text meant only for screen readers */
+.screen-reader-text {
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden; }
+
+.screen-reader-text:hover,
+.screen-reader-text:active,
+.screen-reader-text:focus {
+  background-color: #f1f1f1;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+          box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+  clip: auto !important;
+  color: #21759b;
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
+  /* Above WP toolbar */ }
+
+/* --clear */
+.l-cf:before, .l-cf:after,
+.l-column-container:before,
+.l-column-container:after {
+  content: " ";
+  display: table; }
+
+.l-cf:after,
+.l-column-container:after {
+  clear: both; }
+
+/* ------------------------------------
+ * --media
+ * ------------------------------------*/
+.alignleft {
+  display: inline;
+  float: left;
+  margin-right: 1.5em; }
+
+.alignright {
+  display: inline;
+  float: right;
+  margin-left: 1.5em; }
+
+.aligncenter {
+  clear: both;
+  display: block;
+  margin: 0 auto; }
+
+.iframe-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  /* 16:9 */
+  padding-top: 25px;
+  height: 0; }
+
+.iframe-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+
+.wp-caption {
+  margin-bottom: 1.5em;
+  max-width: 100%; }
+
+.wp-caption img[class*="wp-image-"] {
+  display: block;
+  margin: 0 auto; }
+
+.wp-caption-text {
+  text-align: center; }
+
+.wp-caption .wp-caption-text {
+  margin: 0.8075em 0; }
+
+/* ==============================================================
+ *
+ * Layout
+ *  - util layout styles (prefixed with "l-")
+ *
+ * ============================================================== */
+.l-container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1000px;
+  padding-left: 20px;
+  padding-right: 20px; }
+
+/**
+ * --columns
+ */
+.l-column-container {
+  margin-left: -20px;
+  margin-right: -20px; }
+
+.col {
+  width: 100%;
+  float: left;
+  padding-left: 20px;
+  padding-right: 20px; }
+
+.col-left {
+  float: left; }
+
+.col-right {
+  float: right; }
+
+/* ==============================================================
+ *
+ * Typography
+ *
+ * ============================================================== */
+/* ------------------------------------------
+ * --vars
+ * ------------------------------------------ */
+/* ------------------------------------------
+ * --base
+ * ------------------------------------------ */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: 'Helvetica', 'Arial', sans-serif;
+  color: #404040;
+  font-size: 16px;
+  line-height: 1.4; }
+
+/* --------------------------------------------
+ * --headers
+ * -------------------------------------------- */
+/* --------------------------------------------
+ * --basic
+ * -------------------------------------------- */
+p + p {
+  margin-top: 1em; }
+
+a {
+  color: #666; }
+
+/* --------------------------------------------
+ * --forms
+ * -------------------------------------------- */
+button,
+input,
+select,
+textarea {
+  font-size: 100%;
+  /* Corrects font size not being inherited in all browsers */
+  margin: 0;
+  /* Addresses margins set differently in IE6/7, F3/4, S5, Chrome */
+  vertical-align: baseline;
+  /* Improves appearance and consistency in all browsers */ }
+
+/* ==============================================================
+ *
+ * Navigation
+ *
+ * ============================================================== */
+/* --------------------------------------------
+ * --main nav
+ * -------------------------------------------- */
+.main-navigation ul li {
+  display: inline-block;
+  position: relative; }
+  .main-navigation ul li a {
+    display: block;
+    text-decoration: none; }
+
+/* Small menu */
+.menu-toggle {
+  display: none; }
+
+/*# sourceMappingURL=style.css.map */
