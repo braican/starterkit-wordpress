@@ -16,6 +16,7 @@ Quick links:
 1. Download and extract this repo.
 1. Run `npm install` to install gulp and get all that good stuff set up for theming.
 1. Copy `.env.sample` to `.env` and update to reflect your theme values.
+1. In `docker-compose.yml`, update the `container_name` settings for the two services to reflect the container names that you'd like.
 1. In the theme directory, update `style.css` to reflect your theme values.
 1. From the root directory, run `./bin/install.sh`.
 
