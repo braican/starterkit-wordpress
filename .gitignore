@@ -1,5 +1,6 @@
 ## system
 
+.env
 .htaccess
 *.log
 .DS_Store

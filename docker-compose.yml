@@ -1,16 +1,18 @@
 version: '3.5'
 services:
     wordpress:
-        image: website_wordpress
+        # image: website_wordpress
         container_name:
-            pentacle_wordpress
+            starterkit_wordpress
         build:
             context: .
             args:
-                - WORDPRESS_THEME_NAME
+                - sherman
         volumes:
             - ./webroot:/var/www/html
             - ./db:/var/www/db
+            - ./scripts:/var/www/html/scripts
+            - ./conf:/var/www/html/conf
         depends_on:
             - db
         env_file: .env
@@ -22,7 +24,7 @@ services:
     db:
         image: mysql
         container_name:
-            pentacle_db
+            starterkit_db
         volumes:
             - db_data:/var/lib/mysql
             - ./db:/home
