@@ -65,8 +65,8 @@ class Sherman_Site {
     }
 
     public function enqueue() {
-        wp_enqueue_script('sk_script_main', SHERMAN_THEME_PATH . 'static/dist/production.js', array('jquery'), false, true );
-        wp_enqueue_style('sk_script_style', SHERMAN_THEME_PATH . 'static/dist/style.css');
+        wp_enqueue_script('sk_script_main', SHERMAN_THEME_URI . '/static/dist/production.js', array('jquery'), false, true );
+        wp_enqueue_style('sk_script_style', SHERMAN_THEME_URI . '/static/dist/style.css');
 
         //
         // comments

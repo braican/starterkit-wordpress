@@ -26,7 +26,6 @@ class Sherman_Admin {
     }
 
     public function load_admin_styles() {
-        wp_register_style('custom_wp_admin_css', get_template_directory_uri() . '/static/dist/style--admin.css', false, '1.0.0');
-        wp_enqueue_style('custom_wp_admin_css');
+        wp_enqueue_style('custom_wp_admin_css', SHERMAN_THEME_URI . '/static/dist/style--admin.css', false, '1.0.0');
     }
 }
