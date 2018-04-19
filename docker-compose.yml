@@ -1,0 +1,40 @@
+version: '3.5'
+services:
+    wordpress:
+        image: website_wordpress
+        container_name:
+            pentacle_wordpress
+        build:
+            context: .
+            args:
+                - WORDPRESS_THEME_NAME
+        volumes:
+            - ./webroot:/var/www/html
+            - ./db:/var/www/db
+        depends_on:
+            - db
+        env_file: .env
+        environment:
+            PAGER: 'more'
+        networks:
+            - proxy
+            - default
+    db:
+        image: mysql
+        container_name:
+            pentacle_db
+        volumes:
+            - db_data:/var/lib/mysql
+            - ./db:/home
+        environment:
+            # See https://hub.docker.com/_/mysql/
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+volumes:
+    db_data:
+networks:
+    proxy:
+        name: ups-dock
+        external: true
